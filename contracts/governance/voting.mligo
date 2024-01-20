@@ -110,6 +110,13 @@ let assert_current_phase_proposal
         then unit
         else failwith Errors.not_proposal_phase
 
+let assert_current_phase_promotion 
+        (voting_context : Storage.voting_context_t)
+        : unit =
+    if voting_context.phase_type = Phases.promotion
+        then unit
+        else failwith Errors.not_promotion_phase
+
 let assert_new_proposal_allowed
         (proposals : Storage.proposals_t)
         (config : Storage.config_t)
@@ -161,3 +168,21 @@ let upvote_proposal
         up_votes_power = proposal.up_votes_power + voting_power;  
     } in
     Map.update hash (Some updated_proposal) proposals
+
+let vote_promotion
+        (vote : Storage.promotion_vote_t)
+        (voter : address)
+        (voting_power : nat)
+        (promotion : Storage.promotion_t)
+        : Storage.promotion_t =
+    let _ = if Set.mem voter promotion.voters
+        then failwith Errors.promotion_already_voted
+        else unit in
+    let updated_promotion = match vote with
+        | Yay  -> { promotion with yay_vote_power = promotion.yay_vote_power + voting_power }
+        | Nay  -> { promotion with nay_vote_power = promotion.nay_vote_power + voting_power }
+        | Pass -> { promotion with pass_vote_power = promotion.pass_vote_power + voting_power } in
+    { 
+        updated_promotion with 
+        voters = Set.add voter promotion.voters;
+    }

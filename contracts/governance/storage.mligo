@@ -40,3 +40,5 @@ type t = {
     voting_context : voting_context_t;
     metadata : (string, bytes) big_map;
 }
+
+type promotion_vote_t = Yay | Nay | Pass
