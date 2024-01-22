@@ -15,35 +15,40 @@ from typing import (
 
 class Governance(ContractHelper):
     @staticmethod
-    def make_storage() -> dict[str, Any]:
+    def make_storage(custom_config=None) -> dict[str, Any]:
         metadata = Metadata.make_default(
             name='Governance',
             description='The Governance contract allows bakers to make proposals and vote on kernel upgrade',
         )
+        config = {
+            'started_at_block': 0,
+            'phase_length': 10,
+            'rollup_address': DEFAULT_ADDRESS,
+            'proposals_limit_per_account': 20,
+            'min_proposal_quorum': 80,
+            'quorum': 80,
+            'super_majority': 80,
+        }
+        if custom_config is not None:
+            config.update(custom_config)
+
         return {
-            'config' : {
-                'rollup_address' : DEFAULT_ADDRESS,
-                'phase_length' : 10,
-                'proposals_limit_per_account' : 20,
-                'min_proposal_quorum' : 80,
-                'quorum' : 80,
-                'super_majority' : 80,
-            },
+            'config' : config,
             'voting_context' : {
                 'phase_index' : 0,
                 'phase_type' : 0,
                 'proposals' : {},
                 'promotion' : None,  
-                'last_promotion_winner_hash' : None,
+                'last_winner_hash' : None,
             },
             'metadata': metadata
         }
 
     @classmethod
-    def originate(cls, client: PyTezosClient) -> OperationGroup:
+    def originate(cls, client: PyTezosClient, custom_config=None) -> OperationGroup:
         """Deploys Governance"""
 
-        storage = cls.make_storage()
+        storage = cls.make_storage(custom_config=custom_config)
         filename = join(get_build_dir(), 'governance.tz')
 
         return originate_from_file(filename, client, storage)
@@ -53,5 +58,13 @@ class Governance(ContractHelper):
 
         return self.contract.new_proposal(
             {'key_hash': key_hash, 'hash': hash, 'url': url}
+        )
+    
+    
+    def upvote_proposal(self, key_hash : str, hash : bytes) -> ContractCall:
+        """Upvotes an exist proposal"""
+
+        return self.contract.upvote_proposal(
+            {'key_hash': key_hash, 'hash': hash}
         )
     

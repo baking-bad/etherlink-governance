@@ -1,5 +1,5 @@
 from tests.base import BaseTestCase
-from tests.helpers.utility import pkh, pack
+from tests.helpers.utility import pkh
 
 class GovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:

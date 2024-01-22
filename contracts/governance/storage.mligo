@@ -1,8 +1,9 @@
 let ratio_denominator = 100n
 
 type config_t = {
-    rollup_address : address;
+    started_at_block : nat;
     phase_length : nat;
+    rollup_address : address;
     proposals_limit_per_account : nat;
     min_proposal_quorum : nat; // MIN_WINNING_STAKE_RATIO
     quorum : nat;
@@ -32,7 +33,7 @@ type voting_context_t = {
     phase_type : nat;
     proposals : proposals_t;
     promotion : promotion_t option;  
-    last_promotion_winner_hash : bytes option; // think about naming
+    last_winner_hash : bytes option; // think about naming
 }
 
 type t = {

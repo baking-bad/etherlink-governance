@@ -10,6 +10,13 @@ from tests.helpers.utility import pkh
 
 class BaseTestCase(SandboxedNodeTestCase):
     accounts: list = []
+    
+    def setUp(self) -> None:
+        self.accounts = []
+        self.manager = self.bootstrap_baker()
+
+    def get_current_level(self) -> int:
+        return self.client.shell.head.header()['level']
 
     def bootstrap_baker(self, n: Optional[int] = None) -> PyTezosClient:
         """Creates baker with given number"""
@@ -29,16 +36,12 @@ class BaseTestCase(SandboxedNodeTestCase):
         no_baker.reveal().autofill().sign().inject()
         return no_baker
 
-    def deploy_governance(self) -> Governance:
+    def deploy_governance(self, custom_config=None) -> Governance:
         """Deploys Governance contract"""
 
-        opg = Governance.originate(self.manager).send()
+        opg = Governance.originate(self.manager, custom_config=custom_config).send()
         self.bake_block()
         return Governance.from_opg(self.manager, opg)
-
-    def setUp(self) -> None:
-        self.accounts = []
-        self.manager = self.bootstrap_baker()
 
     @contextmanager
     def raisesMichelsonError(self, error_message):

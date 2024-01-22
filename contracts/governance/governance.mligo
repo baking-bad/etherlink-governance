@@ -84,9 +84,23 @@ module Governance = struct
         let _ = Utils.assert_no_xtz_deposit () in
         let rollup_entry = Rollup.get_entry storage.config.rollup_address in
         let voting_context = Voting.get_voting_context storage in
-        let kernel_hash = Option.unopt_with_error voting_context.last_promotion_winner_hash Errors.last_promotion_winner_hash_not_found in
+        let kernel_hash = Option.unopt_with_error voting_context.last_winner_hash Errors.last_winner_hash_not_found in
         let upgrade_params = Rollup.get_upgrade_params kernel_hash in
         let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
         [upgrade_operation], storage
+
+    type extended_voting_context_t = {
+        voting_context : Storage.voting_context_t;
+        total_voting_power : nat;
+    }
+
+    [@view] 
+    let get_voting_context
+            (_ : unit) 
+            (storage : Storage.t) : extended_voting_context_t = 
+        { 
+            voting_context = Voting.get_voting_context storage;
+            total_voting_power = Tezos.get_total_voting_power ();
+        }
 
 end

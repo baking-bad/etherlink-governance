@@ -2,12 +2,15 @@
 #import "errors.mligo" "Errors"
 #import "phases.mligo" "Phases"
 
-// TODO: check divition operations
+// TODO: check division operations
 
 let get_phase_index
         (config : Storage.config_t)
         : nat =
-    Tezos.get_level () / config.phase_length // TODO: think about a shift
+    let blocks_after_start_int = Tezos.get_level () - config.started_at_block in
+    match is_nat blocks_after_start_int with // TODO: move to helper func
+        | Some blocks_after_start ->  blocks_after_start / config.phase_length
+        | None -> failwith Errors.current_level_is_less_than_start_block
 
 let get_min_winning_propsal_voting_power
         (config : Storage.config_t)
@@ -25,7 +28,7 @@ let get_proposal_winner
                 then (None, max_power)
                 else (winner, max_power) in
     let (winner_hash, winner_up_votes_power) = Map.fold get_winners proposals (None, 0n) in
-    if winner_up_votes_power > (get_min_winning_propsal_voting_power config)
+    if winner_up_votes_power >= (get_min_winning_propsal_voting_power config)
         then winner_hash
         else None
 
@@ -89,7 +92,7 @@ let init_new_voting_context
                 | Some promotion_winner -> 
                     { 
                         new_proposal_voting_context with 
-                        last_promotion_winner_hash = Some promotion_winner
+                        last_winner_hash = Some promotion_winner
                     } 
                 | None -> new_proposal_voting_context
             else failwith Errors.incorrect_phase_type
