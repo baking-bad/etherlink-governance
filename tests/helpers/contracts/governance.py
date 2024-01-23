@@ -13,8 +13,13 @@ from typing import (
     Any,
 )
 
+
 PROPOSAL_PHASE = 'proposal'
 PROMOTION_PHASE = 'promotion'
+
+YAY_VOTE = 'yay'
+NAY_VOTE = 'nay'
+PASS_VOTE = 'pass'
 
 class Governance(ContractHelper):
     @staticmethod
@@ -56,18 +61,27 @@ class Governance(ContractHelper):
 
         return originate_from_file(filename, client, storage)
     
-    def new_proposal(self, key_hash : str, hash : bytes, url : str) -> ContractCall:
+    def new_proposal(self, sender_key_hash : str, hash : bytes, url : str) -> ContractCall:
         """Creates a new proposal"""
 
         return self.contract.new_proposal(
-            {'key_hash': key_hash, 'hash': hash, 'url': url}
+            {'sender_key_hash': sender_key_hash, 'hash': hash, 'url': url}
         )
     
     
-    def upvote_proposal(self, key_hash : str, hash : bytes) -> ContractCall:
+    def upvote_proposal(self, sender_key_hash : str, hash : bytes) -> ContractCall:
         """Upvotes an exist proposal"""
 
         return self.contract.upvote_proposal(
-            {'key_hash': key_hash, 'hash': hash}
+            {'sender_key_hash': sender_key_hash, 'hash': hash}
         )
     
+    def vote(self, sender_key_hash : str, vote : str) -> ContractCall:
+        """Votes for a hash in promotion phase"""
+
+        return self.contract.vote(
+            {'sender_key_hash': sender_key_hash, 'vote': vote}
+        )
+    
+    def get_voting_context(self):
+        return self.contract.get_voting_context().run_view()

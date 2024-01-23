@@ -10,7 +10,7 @@ module Governance = struct
 
     // TODO: think about adding phase_index as a parameter
     type new_proposal_params_t = {
-        key_hash : key_hash;
+        sender_key_hash : key_hash;
         hash : bytes;
         url : string;
     }
@@ -20,10 +20,10 @@ module Governance = struct
             (params : new_proposal_params_t)
             (storage : Storage.t) 
             : return_t = 
-        let voting_power = Tezos.voting_power params.key_hash in
+        let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
         let _ = Utils.assert_no_xtz_deposit () in
-        let _ = Utils.asssert_sender_is_key_hash_owner params.key_hash in
+        let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
         let _ = Voting.assert_current_phase_proposal voting_context in
         let proposer = Tezos.get_sender () in
@@ -34,7 +34,7 @@ module Governance = struct
     // TODO: think about additional entrypoint - update_proposal_url
 
     type upvote_proposal_params_t = {
-        key_hash : key_hash;
+        sender_key_hash : key_hash;
         hash : bytes;
     }
 
@@ -43,10 +43,10 @@ module Governance = struct
             (params : upvote_proposal_params_t) 
             (storage : Storage.t) 
             : return_t = 
-        let voting_power = Tezos.voting_power params.key_hash in
+        let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
         let _ = Utils.assert_no_xtz_deposit () in
-        let _ = Utils.asssert_sender_is_key_hash_owner params.key_hash in
+        let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
         let _ = Voting.assert_current_phase_proposal voting_context in
         let voter = Tezos.get_sender () in
@@ -55,7 +55,7 @@ module Governance = struct
   
 
     type vote_params_t = {
-        key_hash : key_hash;
+        sender_key_hash : key_hash;
         vote : Storage.promotion_vote_t;
     }
    
@@ -64,10 +64,10 @@ module Governance = struct
             (params : vote_params_t) 
             (storage : Storage.t) 
             : return_t =
-        let voting_power = Tezos.voting_power params.key_hash in
+        let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
         let _ = Utils.assert_no_xtz_deposit () in
-        let _ = Utils.asssert_sender_is_key_hash_owner params.key_hash in
+        let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
         let _ = Voting.assert_current_phase_promotion voting_context in
         let voter = Tezos.get_sender () in

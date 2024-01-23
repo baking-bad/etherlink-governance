@@ -11,11 +11,6 @@ let get_phase_index
         | Some blocks_after_start ->  blocks_after_start / config.phase_length
         | None -> failwith Errors.current_level_is_less_than_start_block
 
-let get_min_winning_propsal_voting_power
-        (config : Storage.config_t)
-        : nat =
-    (Tezos.get_total_voting_power () * config.min_proposal_quorum / Storage.ratio_denominator)
-
 let get_proposal_winner
         (proposals : Storage.proposals_t)
         (config : Storage.config_t)
@@ -27,7 +22,8 @@ let get_proposal_winner
                 then (None, max_power)
                 else (winner, max_power) in
     let (winner_hash, winner_up_votes_power) = Map.fold get_winners proposals (None, 0n) in
-    if winner_up_votes_power >= (get_min_winning_propsal_voting_power config)
+    let proposal_quorum_reached = winner_up_votes_power * Storage.scale >= Tezos.get_total_voting_power () * config.min_proposal_quorum in
+    if proposal_quorum_reached
         then winner_hash
         else None
 
@@ -36,11 +32,9 @@ let get_promotion_winner
         (config : Storage.config_t)
         : bytes option =
     let { yay_vote_power; nay_vote_power; pass_vote_power; proposal_hash; voters = _; } = promotion in 
-    let yay_votes_ratio = yay_vote_power / (yay_vote_power + nay_vote_power) in
-    let partisipation_ratio = (yay_vote_power + nay_vote_power + pass_vote_power) / Tezos.get_total_voting_power () in
-    let quorum = config.quorum / Storage.ratio_denominator in
-    let super_majority = config.super_majority / Storage.ratio_denominator in
-    if yay_votes_ratio > quorum && partisipation_ratio > super_majority
+    let quorum_reached = yay_vote_power * Storage.scale / (yay_vote_power + nay_vote_power) >= config.quorum in
+    let super_majority_voted = (yay_vote_power + nay_vote_power + pass_vote_power) * Storage.scale / Tezos.get_total_voting_power () >= config.super_majority in
+    if quorum_reached && super_majority_voted 
         then Some proposal_hash
         else None
 
@@ -176,7 +170,7 @@ let vote_promotion
         (voting_power : nat)
         (promotion : Storage.promotion_t)
         : Storage.promotion_t =
-    let _ = if Set.mem voter promotion.voters
+    let _ = if Set.mem voter promotion.voters // TODO: should we allow proposer to vote? 
         then failwith Errors.promotion_already_voted
         else unit in
     let updated_promotion = match vote with

@@ -1,8 +1,11 @@
-let ratio_denominator = 100n
-
+(*
+    min_proposal_quorum, quorum and super_majority
+    are represented with scale = 100, ex. 80 = .80 = 80%
+*)
+let scale = 100n
 type config_t = {
     started_at_block : nat;
-    phase_length : nat;
+    phase_length : nat; // represented in blocks
     rollup_address : address;
     proposals_limit_per_account : nat;
     min_proposal_quorum : nat; // MIN_WINNING_STAKE_RATIO
