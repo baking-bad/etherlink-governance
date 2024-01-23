@@ -31,6 +31,7 @@ module Governance = struct
         let updated_proposals = Voting.add_new_proposal params.hash params.url proposer voting_power voting_context.proposals in
         [], { storage with voting_context = { voting_context with proposals = updated_proposals } }
   
+    // TODO: think about additional entrypoint - update_proposal_url
 
     type upvote_proposal_params_t = {
         key_hash : key_hash;

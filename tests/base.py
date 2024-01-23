@@ -61,3 +61,7 @@ class BaseTestCase(SandboxedNodeTestCase):
         self.bake_block()
         opg = self.client.shell.blocks['head':].find_operation(opg.hash())
         return ContractCallResult.from_operation_group(opg)[0]
+    
+    def bake_blocks(self, count: int):
+        for _ in range(count):
+            self.bake_block()

@@ -81,9 +81,11 @@ let init_new_voting_context
     let { voting_context; config; metadata = _} = storage in
     match storage.voting_context.phase_type with
         | Proposal -> 
-            (match get_proposal_winner voting_context.proposals config with
-                | Some proposal_winner -> init_new_promotion_voting_contex voting_context phase_index proposal_winner
-                | None -> init_new_poposal_voting_contex voting_context phase_index)
+            if phase_index = voting_context.phase_index + 1n
+                then (match get_proposal_winner voting_context.proposals config with
+                    | Some proposal_winner -> init_new_promotion_voting_contex voting_context phase_index proposal_winner
+                    | None -> init_new_poposal_voting_contex voting_context phase_index)
+                else init_new_poposal_voting_contex voting_context phase_index
         | Promotion ->
             let new_proposal_voting_context = init_new_poposal_voting_contex voting_context phase_index in
             (match get_promotion_winner (Option.unopt voting_context.promotion) config with
@@ -138,7 +140,6 @@ let add_new_proposal
         (voting_power : nat)
         (proposals : Storage.proposals_t)
         : Storage.proposals_t =
-    // TODO: ether allow to edit already existent proposal (e.g update url) or disable adding the same proposal twise
     let _ = match Map.find_opt hash proposals with
         | Some _ -> failwith Errors.proposal_already_created
         | None -> unit in

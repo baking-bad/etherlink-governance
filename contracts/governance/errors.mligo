@@ -1,5 +1,4 @@
 let no_voting_power = "NO_VOTING_POWER"
-let incorrect_phase_type = "INCORRECT_PHASE_TYPE"
 let not_proposal_phase = "NOT_PROPOSAL_PHASE"
 let not_promotion_phase = "NOT_PROMOTION_PHASE"
 let xtz_deposit_disallowed = "XTZ_DEPOSIT_DISALLOWED"
