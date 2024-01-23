@@ -32,9 +32,9 @@ let get_promotion_winner
         (config : Storage.config_t)
         : bytes option =
     let { yay_vote_power; nay_vote_power; pass_vote_power; proposal_hash; voters = _; } = promotion in 
-    let quorum_reached = yay_vote_power * Storage.scale / (yay_vote_power + nay_vote_power) >= config.quorum in
-    let super_majority_voted = (yay_vote_power + nay_vote_power + pass_vote_power) * Storage.scale / Tezos.get_total_voting_power () >= config.super_majority in
-    if quorum_reached && super_majority_voted 
+    let quorum_reached = (yay_vote_power + nay_vote_power + pass_vote_power) * Storage.scale / Tezos.get_total_voting_power () >= config.quorum in
+    let super_majority_reached = yay_vote_power * Storage.scale / (yay_vote_power + nay_vote_power) >= config.super_majority in
+    if quorum_reached && super_majority_reached 
         then Some proposal_hash
         else None
 
