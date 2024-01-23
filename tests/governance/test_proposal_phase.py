@@ -1,19 +1,20 @@
 from tests.base import BaseTestCase
+from tests.helpers.contracts.governance import PROPOSAL_PHASE, PROMOTION_PHASE
 from tests.helpers.utility import pkh
 
 class GovernancePhasesTestCase(BaseTestCase):
     def test_should_reset_proposals_when_no_proposals(self) -> None:
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1
+        # Phase index: 0. Block: 1 of 3
         governance = self.deploy_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'phase_length': 3
         })
         assert self.get_current_level() == governance_started_at_block
 
-        # Phase index: 0. Block: 1 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
@@ -21,7 +22,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         self.bake_block()
         # Phase index: 0. Block: 2 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
@@ -29,7 +30,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         self.bake_block()
         # Phase index: 0. Block: 3 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
@@ -37,7 +38,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         self.bake_block()
         # Phase index: 1. Block: 1 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 1
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
@@ -45,7 +46,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         self.bake_block()
         # Phase index: 1. Block: 2 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 1
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
@@ -54,6 +55,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         baker = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
+        # Phase index: 0. Block: 1 of 2
         governance = self.deploy_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'phase_length': 2,
@@ -61,14 +63,13 @@ class GovernancePhasesTestCase(BaseTestCase):
         })
         assert self.get_current_level() == governance_started_at_block
 
-        # Phase index: 0. Block: 1 of 2
+        # Phase index: 0. Block: 2 of 2
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
         self.bake_block()
         
-        # Phase index: 0. Block: 2 of 2
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
@@ -77,7 +78,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         self.bake_block()
         # Phase index: 1. Block: 1 of 2
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 1
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
@@ -88,6 +89,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
+        # Phase index: 0. Block: 1 of 3
         governance = self.deploy_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'phase_length': 3,
@@ -95,25 +97,24 @@ class GovernancePhasesTestCase(BaseTestCase):
         })
         assert self.get_current_level() == governance_started_at_block
 
-        # Phase index: 0. Block: 1 of 3
+        # Phase index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
         self.bake_block()
         
-        # Phase index: 0. Block: 2 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
 
+        # Phase index: 0. Block: 3 of 3
         governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
         self.bake_block()
         
-        # Phase index: 0. Block: 3 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
@@ -123,7 +124,7 @@ class GovernancePhasesTestCase(BaseTestCase):
 
         # Phase index: 1. Block: 1 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 1
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
@@ -134,6 +135,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
+        # Phase index: 0. Block: 1 of 3
         governance = self.deploy_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'phase_length': 3,
@@ -141,26 +143,25 @@ class GovernancePhasesTestCase(BaseTestCase):
         })
         assert self.get_current_level() == governance_started_at_block
 
-        # Phase index: 0. Block: 1 of 3
+        # Phase index: 0. Block: 2 of 3
         kernel_hash1 = bytes.fromhex('0101010101010101010101010101010101010101')
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1, 'abc.com').send()
         self.bake_block()
         
-        # Phase index: 0. Block: 2 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
 
+        # Phase index: 0. Block: 3 of 3
         kernel_hash2 = bytes.fromhex('0202020202020202020202020202020202020202')
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash2, 'abc.com').send()
         self.bake_block()
         
-        # Phase index: 0. Block: 3 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 2
         assert context['voting_context']['promotion'] == None
@@ -170,7 +171,7 @@ class GovernancePhasesTestCase(BaseTestCase):
 
         # Phase index: 1. Block: 1 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 1
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
@@ -181,6 +182,7 @@ class GovernancePhasesTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
+        # Phase index: 0. Block: 1 of 3
         governance = self.deploy_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'phase_length': 3,
@@ -188,25 +190,24 @@ class GovernancePhasesTestCase(BaseTestCase):
         })
         assert self.get_current_level() == governance_started_at_block
 
-        # Phase index: 0. Block: 1 of 3
+        # Phase index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
         self.bake_block()
         
-        # Phase index: 0. Block: 2 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
         assert context['voting_context']['last_winner_hash'] == None
 
+        # Phase index: 0. Block: 3 of 3
         governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
         self.bake_block()
         
-        # Phase index: 0. Block: 3 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 0
+        assert context['voting_context']['phase_type'] == PROPOSAL_PHASE
         assert context['voting_context']['phase_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
@@ -216,7 +217,7 @@ class GovernancePhasesTestCase(BaseTestCase):
 
         # Phase index: 1. Block: 1 of 3
         context = governance.contract.get_voting_context().run_view()
-        assert context['voting_context']['phase_type'] == 1
+        assert context['voting_context']['phase_type'] == PROMOTION_PHASE
         assert context['voting_context']['phase_index'] == 1
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {

@@ -1,6 +1,5 @@
 #import "storage.mligo" "Storage"
 #import "errors.mligo" "Errors"
-#import "phases.mligo" "Phases"
 
 // TODO: check division operations
 
@@ -52,7 +51,7 @@ let init_new_poposal_voting_contex
     { 
         voting_context with 
         phase_index = phase_index;
-        phase_type = Phases.proposal;
+        phase_type = Proposal;
         proposals = Map.empty;
         promotion = None
     }   
@@ -65,7 +64,7 @@ let init_new_promotion_voting_contex
     { 
         voting_context with 
         phase_index = phase_index;
-        phase_type = Phases.promotion;
+        phase_type = Promotion;
         promotion = Some {
             proposal_hash = proposal_winner;
             voters = Set.empty;
@@ -80,22 +79,20 @@ let init_new_voting_context
         (phase_index : nat)
         : Storage.voting_context_t =
     let { voting_context; config; metadata = _} = storage in
-    if storage.voting_context.phase_type = Phases.proposal 
-        then 
-            match get_proposal_winner voting_context.proposals config with
-            | Some proposal_winner -> init_new_promotion_voting_contex voting_context phase_index proposal_winner
-            | None -> init_new_poposal_voting_contex voting_context phase_index
-        else if voting_context.phase_type = Phases.promotion
-            then
-                let new_proposal_voting_context = init_new_poposal_voting_contex voting_context phase_index in
-                match get_promotion_winner (Option.unopt voting_context.promotion) config with
+    match storage.voting_context.phase_type with
+        | Proposal -> 
+            (match get_proposal_winner voting_context.proposals config with
+                | Some proposal_winner -> init_new_promotion_voting_contex voting_context phase_index proposal_winner
+                | None -> init_new_poposal_voting_contex voting_context phase_index)
+        | Promotion ->
+            let new_proposal_voting_context = init_new_poposal_voting_contex voting_context phase_index in
+            (match get_promotion_winner (Option.unopt voting_context.promotion) config with
                 | Some promotion_winner -> 
                     { 
                         new_proposal_voting_context with 
                         last_winner_hash = Some promotion_winner
                     } 
-                | None -> new_proposal_voting_context
-            else failwith Errors.incorrect_phase_type
+                | None -> new_proposal_voting_context)
 
 let get_voting_context 
         (storage : Storage.t)
@@ -109,16 +106,16 @@ let get_voting_context
 let assert_current_phase_proposal 
         (voting_context : Storage.voting_context_t)
         : unit =
-    if voting_context.phase_type = Phases.proposal
-        then unit
-        else failwith Errors.not_proposal_phase
+    match voting_context.phase_type with 
+        | Proposal -> unit
+        | Promotion -> failwith Errors.not_proposal_phase
 
 let assert_current_phase_promotion 
         (voting_context : Storage.voting_context_t)
         : unit =
-    if voting_context.phase_type = Phases.promotion
-        then unit
-        else failwith Errors.not_promotion_phase
+    match voting_context.phase_type with
+        | Promotion -> unit
+        | Proposal -> failwith Errors.not_promotion_phase
 
 let assert_new_proposal_allowed
         (proposals : Storage.proposals_t)

@@ -28,9 +28,11 @@ type promotion_t = {
     pass_vote_power : nat;
 }
 
+type phase_type_t = Proposal | Promotion
+
 type voting_context_t = {
     phase_index : nat;
-    phase_type : nat;
+    phase_type : phase_type_t;
     proposals : proposals_t;
     promotion : promotion_t option;  
     last_winner_hash : bytes option; // think about naming

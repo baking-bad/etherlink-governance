@@ -13,6 +13,9 @@ from typing import (
     Any,
 )
 
+PROPOSAL_PHASE = 'proposal'
+PROMOTION_PHASE = 'promotion'
+
 class Governance(ContractHelper):
     @staticmethod
     def make_storage(custom_config=None) -> dict[str, Any]:
@@ -36,7 +39,7 @@ class Governance(ContractHelper):
             'config' : config,
             'voting_context' : {
                 'phase_index' : 0,
-                'phase_type' : 0,
+                'phase_type' : PROPOSAL_PHASE,
                 'proposals' : {},
                 'promotion' : None,  
                 'last_winner_hash' : None,

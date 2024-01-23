@@ -7,6 +7,8 @@ from typing import Optional
 from pytezos.rpc import RpcError
 from contextlib import contextmanager
 from tests.helpers.utility import pkh
+from pytezos.contract.result import ContractCallResult
+from pytezos.operation.group import OperationGroup
 
 class BaseTestCase(SandboxedNodeTestCase):
     accounts: list = []
@@ -54,3 +56,8 @@ class BaseTestCase(SandboxedNodeTestCase):
 
     def extract_runtime_failwith(self, e: RpcError):
         return e.args[-1]['with']['string']
+
+    def bake_block_and_get_operation_result(self, opg: OperationGroup) -> ContractCallResult:
+        self.bake_block()
+        opg = self.client.shell.blocks['head':].find_operation(opg.hash())
+        return ContractCallResult.from_operation_group(opg)[0]
