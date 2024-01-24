@@ -73,8 +73,8 @@ class GovernancePromotionPhaseTestCase(BaseTestCase):
     
     def test_should_reset_to_proposal_phase_if_quorum_is_not_reached(self) -> None:
         test = self.prepare_promotion_phase({
-            'quorum': 51,   # 1 baker will vote yay, 1 baker will vote nay (50%)
-            'super_majority': 10, # 2 bakers out of 5 will vote (40%)
+            'quorum': 50, # 2 bakers out of 5 will vote (40%)
+            'super_majority': 10, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: Governance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -99,8 +99,8 @@ class GovernancePromotionPhaseTestCase(BaseTestCase):
 
     def test_should_reset_to_proposal_phase_if_super_majority_is_not_reached(self) -> None:
         test = self.prepare_promotion_phase({
-            'quorum': 10,   # 1 baker will vote yay, 1 baker will vote nay (50%)
-            'super_majority': 61, # 3 bakers out of 5 will vote (60%)
+            'quorum': 50, # 3 bakers out of 5 will vote (60%)
+            'super_majority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: Governance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -127,8 +127,8 @@ class GovernancePromotionPhaseTestCase(BaseTestCase):
 
     def test_should_reset_to_proposal_phase_with_a_new_winner_if_promotion_phase_passed_successfully(self) -> None:
         test = self.prepare_promotion_phase({
-            'quorum': 50,   # 1 baker will vote yay, 1 baker will vote nay (50%)
-            'super_majority': 60, # 3 bakers out of 5 will vote (60%)
+            'quorum': 50, # 3 bakers out of 5 will vote (60%)  
+            'super_majority': 40, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: Governance = test['governance']
         proposer: PyTezosClient = test['proposer']
