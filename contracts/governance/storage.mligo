@@ -5,7 +5,7 @@
 let scale = 100n
 type config_t = {
     started_at_block : nat;             // used to align with protocol governance cycles
-    phase_length : nat;                 // represented in blocks
+    period_length : nat;                // represented in blocks
     rollup_address : address;
     proposals_limit_per_account : nat;
     min_proposal_quorum : nat;          // min_winning_stake_ratio
@@ -31,11 +31,11 @@ type promotion_t = {
     pass_vote_power : nat;
 }
 
-type phase_type_t = Proposal | Promotion
+type period_type_t = Proposal | Promotion
 
 type voting_context_t = {
-    phase_index : nat;
-    phase_type : phase_type_t;
+    period_index : nat;
+    period_type : period_type_t;
     proposals : proposals_t;
     promotion : promotion_t option;  
     last_winner_hash : bytes option; // think about naming

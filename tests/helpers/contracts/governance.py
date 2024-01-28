@@ -14,8 +14,8 @@ from typing import (
 )
 
 
-PROPOSAL_PHASE = 'proposal'
-PROMOTION_PHASE = 'promotion'
+PROPOSAL_PERIOD = 'proposal'
+PROMOTION_PERIOD = 'promotion'
 
 YAY_VOTE = 'yay'
 NAY_VOTE = 'nay'
@@ -30,7 +30,7 @@ class Governance(ContractHelper):
         )
         config = {
             'started_at_block': 0,
-            'phase_length': 10,
+            'period_length': 10,
             'rollup_address': DEFAULT_ADDRESS,
             'proposals_limit_per_account': 20,
             'min_proposal_quorum': 80,
@@ -43,8 +43,8 @@ class Governance(ContractHelper):
         return {
             'config' : config,
             'voting_context' : {
-                'phase_index' : 0,
-                'phase_type' : PROPOSAL_PHASE,
+                'period_index' : 0,
+                'period_type' : PROPOSAL_PERIOD,
                 'proposals' : {},
                 'promotion' : None,  
                 'last_winner_hash' : None,
@@ -77,7 +77,7 @@ class Governance(ContractHelper):
         )
     
     def vote(self, sender_key_hash : str, vote : str) -> ContractCall:
-        """Votes for a hash in promotion phase"""
+        """Votes for a hash in promotion period"""
 
         return self.contract.vote(
             {'sender_key_hash': sender_key_hash, 'vote': vote}

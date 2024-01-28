@@ -3,12 +3,12 @@
 
 // TODO: check division operations
 
-let get_phase_index
+let get_period_index
         (config : Storage.config_t)
         : nat =
     let blocks_after_start_int = Tezos.get_level () - config.started_at_block in
     match is_nat blocks_after_start_int with // TODO: move to helper func
-        | Some blocks_after_start ->  blocks_after_start / config.phase_length
+        | Some blocks_after_start ->  blocks_after_start / config.period_length
         | None -> failwith Errors.current_level_is_less_than_start_block
 
 let get_proposal_winner
@@ -40,25 +40,25 @@ let get_promotion_winner
 
 let init_new_poposal_voting_contex
         (voting_context : Storage.voting_context_t)
-        (phase_index : nat)
+        (period_index : nat)
         : Storage.voting_context_t =
     { 
         voting_context with 
-        phase_index = phase_index;
-        phase_type = Proposal;
+        period_index = period_index;
+        period_type = Proposal;
         proposals = Map.empty;
         promotion = None
     }   
 
 let init_new_promotion_voting_contex
         (voting_context : Storage.voting_context_t)
-        (phase_index : nat)
+        (period_index : nat)
         (proposal_winner : bytes)
         : Storage.voting_context_t =
     { 
         voting_context with 
-        phase_index = phase_index;
-        phase_type = Promotion;
+        period_index = period_index;
+        period_type = Promotion;
         promotion = Some {
             proposal_hash = proposal_winner;
             voters = Set.empty;
@@ -70,18 +70,18 @@ let init_new_promotion_voting_contex
 
 let init_new_voting_context
         (storage : Storage.t)
-        (phase_index : nat)
+        (period_index : nat)
         : Storage.voting_context_t =
     let { voting_context; config; metadata = _} = storage in
-    match storage.voting_context.phase_type with
+    match storage.voting_context.period_type with
         | Proposal -> 
-            if phase_index = voting_context.phase_index + 1n
+            if period_index = voting_context.period_index + 1n
                 then (match get_proposal_winner voting_context.proposals config with
-                    | Some proposal_winner -> init_new_promotion_voting_contex voting_context phase_index proposal_winner
-                    | None -> init_new_poposal_voting_contex voting_context phase_index)
-                else init_new_poposal_voting_contex voting_context phase_index
+                    | Some proposal_winner -> init_new_promotion_voting_contex voting_context period_index proposal_winner
+                    | None -> init_new_poposal_voting_contex voting_context period_index)
+                else init_new_poposal_voting_contex voting_context period_index
         | Promotion ->
-            let new_proposal_voting_context = init_new_poposal_voting_contex voting_context phase_index in
+            let new_proposal_voting_context = init_new_poposal_voting_contex voting_context period_index in
             (match get_promotion_winner (Option.unopt voting_context.promotion) config with
                 | Some promotion_winner -> 
                     { 
@@ -93,25 +93,25 @@ let init_new_voting_context
 let get_voting_context 
         (storage : Storage.t)
         : Storage.voting_context_t = 
-    let phase_index = get_phase_index storage.config in
-    let context = if phase_index = storage.voting_context.phase_index 
+    let period_index = get_period_index storage.config in
+    let context = if period_index = storage.voting_context.period_index 
         then storage.voting_context 
-        else init_new_voting_context storage phase_index in
+        else init_new_voting_context storage period_index in
     context
 
-let assert_current_phase_proposal 
+let assert_current_period_proposal 
         (voting_context : Storage.voting_context_t)
         : unit =
-    match voting_context.phase_type with 
+    match voting_context.period_type with 
         | Proposal -> unit
-        | Promotion -> failwith Errors.not_proposal_phase
+        | Promotion -> failwith Errors.not_proposal_period
 
-let assert_current_phase_promotion 
+let assert_current_period_promotion 
         (voting_context : Storage.voting_context_t)
         : unit =
-    match voting_context.phase_type with
+    match voting_context.period_type with
         | Promotion -> unit
-        | Proposal -> failwith Errors.not_promotion_phase
+        | Proposal -> failwith Errors.not_promotion_period
 
 let assert_new_proposal_allowed
         (proposals : Storage.proposals_t)

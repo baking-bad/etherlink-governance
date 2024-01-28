@@ -8,7 +8,7 @@ module Governance = struct
 
     type return_t = operation list * Storage.t
 
-    // TODO: think about adding phase_index as a parameter
+    // TODO: think about adding period_index as a parameter
     type new_proposal_params_t = {
         sender_key_hash : key_hash;
         hash : bytes;
@@ -25,7 +25,7 @@ module Governance = struct
         let _ = Utils.assert_no_xtz_deposit () in
         let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
-        let _ = Voting.assert_current_phase_proposal voting_context in
+        let _ = Voting.assert_current_period_proposal voting_context in
         let proposer = Tezos.get_sender () in
         let _ = Voting.assert_new_proposal_allowed voting_context.proposals storage.config proposer in
         let updated_proposals = Voting.add_new_proposal params.hash params.url proposer voting_power voting_context.proposals in
@@ -48,7 +48,7 @@ module Governance = struct
         let _ = Utils.assert_no_xtz_deposit () in
         let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
-        let _ = Voting.assert_current_phase_proposal voting_context in
+        let _ = Voting.assert_current_period_proposal voting_context in
         let voter = Tezos.get_sender () in
         let updated_proposals = Voting.upvote_proposal params.hash voter voting_power voting_context.proposals in
         [], { storage with voting_context = { voting_context with proposals = updated_proposals } }
@@ -69,7 +69,7 @@ module Governance = struct
         let _ = Utils.assert_no_xtz_deposit () in
         let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
-        let _ = Voting.assert_current_phase_promotion voting_context in
+        let _ = Voting.assert_current_period_promotion voting_context in
         let voter = Tezos.get_sender () in
         let promotion = Option.unopt_with_error voting_context.promotion Errors.promotion_context_not_exist in
         let updated_promotion = Voting.vote_promotion params.vote voter voting_power promotion in
