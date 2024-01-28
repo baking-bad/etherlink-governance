@@ -78,11 +78,11 @@ module Governance = struct
 
     [@entry]
     let trigger_kernel_upgrade // TODO: Think about better name
-            (_ : unit) // TODO: Think about passing desired kernel_hash
+            (rollup_address : address) // TODO: Think about passing desired kernel_hash
             (storage : Storage.t) 
             : return_t =
         let _ = Utils.assert_no_xtz_deposit () in
-        let rollup_entry = Rollup.get_entry storage.config.rollup_address in
+        let rollup_entry = Rollup.get_entry rollup_address in
         let voting_context = Voting.get_voting_context storage in
         let kernel_hash = Option.unopt_with_error voting_context.last_winner_hash Errors.last_winner_hash_not_found in
         let upgrade_params = Rollup.get_upgrade_params kernel_hash in

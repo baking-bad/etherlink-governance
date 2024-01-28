@@ -6,7 +6,6 @@ let scale = 100n
 type config_t = {
     started_at_block : nat;             // used to align with protocol governance cycles
     period_length : nat;                // represented in blocks
-    rollup_address : address;
     proposals_limit_per_account : nat;
     min_proposal_quorum : nat;          // min_winning_stake_ratio
     quorum : nat;

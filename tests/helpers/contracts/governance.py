@@ -31,7 +31,6 @@ class Governance(ContractHelper):
         config = {
             'started_at_block': 0,
             'period_length': 10,
-            'rollup_address': DEFAULT_ADDRESS,
             'proposals_limit_per_account': 20,
             'min_proposal_quorum': 80,
             'quorum': 80,
