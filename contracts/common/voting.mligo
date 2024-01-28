@@ -12,36 +12,39 @@ let get_period_index
         | None -> failwith Errors.current_level_is_less_than_start_block
 
 let get_proposal_winner
-        (proposals : Storage.proposals_t)
+        (type pt)
+        (proposals : pt Storage.proposals_t)
         (config : Storage.config_t)
-        : bytes option =
-    let get_winners = fun ((winner, max_power), (_, proposal) : (bytes option * nat) * (bytes * Storage.proposal_t)) -> 
+        : pt option =
+    let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
         if proposal.up_votes_power > max_power
-            then (Some(proposal.hash), proposal.up_votes_power)
+            then (Some(proposal.payload), proposal.up_votes_power)
             else if proposal.up_votes_power = max_power
                 then (None, max_power)
                 else (winner, max_power) in
-    let (winner_hash, winner_up_votes_power) = Map.fold get_winners proposals (None, 0n) in
+    let (winner_payload, winner_up_votes_power) = Map.fold get_winners proposals (None, 0n) in
     let proposal_quorum_reached = winner_up_votes_power * Storage.scale >= Tezos.get_total_voting_power () * config.min_proposal_quorum in
     if proposal_quorum_reached
-        then winner_hash
+        then winner_payload
         else None
 
 let get_promotion_winner
-        (promotion : Storage.promotion_t)
+        (type pt)
+        (promotion : pt Storage.promotion_t)
         (config : Storage.config_t)
-        : bytes option =
-    let { yay_vote_power; nay_vote_power; pass_vote_power; proposal_hash; voters = _; } = promotion in 
+        : pt option =
+    let { yay_vote_power; nay_vote_power; pass_vote_power; proposal_payload; voters = _; } = promotion in 
     let quorum_reached = (yay_vote_power + nay_vote_power + pass_vote_power) * Storage.scale / Tezos.get_total_voting_power () >= config.quorum in
     let super_majority_reached = yay_vote_power * Storage.scale / (yay_vote_power + nay_vote_power) >= config.super_majority in
     if quorum_reached && super_majority_reached 
-        then Some proposal_hash
+        then Some proposal_payload
         else None
 
 let init_new_poposal_voting_contex
-        (voting_context : Storage.voting_context_t)
+        (type pt)
+        (voting_context : pt Storage.voting_context_t)
         (period_index : nat)
-        : Storage.voting_context_t =
+        : pt Storage.voting_context_t =
     { 
         voting_context with 
         period_index = period_index;
@@ -51,16 +54,17 @@ let init_new_poposal_voting_contex
     }   
 
 let init_new_promotion_voting_contex
-        (voting_context : Storage.voting_context_t)
+        (type pt)
+        (voting_context : pt Storage.voting_context_t)
         (period_index : nat)
-        (proposal_winner : bytes)
-        : Storage.voting_context_t =
+        (proposal_winner : pt)
+        : pt Storage.voting_context_t =
     { 
         voting_context with 
         period_index = period_index;
         period_type = Promotion;
         promotion = Some {
-            proposal_hash = proposal_winner;
+            proposal_payload = proposal_winner;
             voters = Set.empty;
             yay_vote_power = 0n;
             nay_vote_power = 0n;
@@ -69,9 +73,10 @@ let init_new_promotion_voting_contex
     }   
 
 let init_new_voting_context
-        (storage : Storage.t)
+        (type pt)
+        (storage : pt Storage.t)
         (period_index : nat)
-        : Storage.voting_context_t =
+        : pt Storage.voting_context_t =
     let { voting_context; config; metadata = _} = storage in
     match storage.voting_context.period_type with
         | Proposal -> 
@@ -86,13 +91,14 @@ let init_new_voting_context
                 | Some promotion_winner -> 
                     { 
                         new_proposal_voting_context with 
-                        last_winner_hash = Some promotion_winner
-                    } 
+                        last_winner_payload = Some promotion_winner
+                    }
                 | None -> new_proposal_voting_context)
 
-let get_voting_context 
-        (storage : Storage.t)
-        : Storage.voting_context_t = 
+let get_voting_context
+        (type pt)
+        (storage : pt Storage.t)
+        : pt Storage.voting_context_t = 
     let period_index = get_period_index storage.config in
     let context = if period_index = storage.voting_context.period_index 
         then storage.voting_context 
@@ -100,25 +106,28 @@ let get_voting_context
     context
 
 let assert_current_period_proposal 
-        (voting_context : Storage.voting_context_t)
+        (type pt)
+        (voting_context : pt Storage.voting_context_t)
         : unit =
     match voting_context.period_type with 
         | Proposal -> unit
         | Promotion -> failwith Errors.not_proposal_period
 
 let assert_current_period_promotion 
-        (voting_context : Storage.voting_context_t)
+        (type pt)
+        (voting_context : pt Storage.voting_context_t)
         : unit =
     match voting_context.period_type with
         | Promotion -> unit
         | Proposal -> failwith Errors.not_promotion_period
 
 let assert_new_proposal_allowed
-        (proposals : Storage.proposals_t)
+        (type pt)
+        (proposals : pt Storage.proposals_t)
         (config : Storage.config_t)
         (proposer : address)
         : unit =
-    let get_proposals_count = fun (acc, (_, proposal) : nat * (bytes * Storage.proposal_t)) ->
+    let get_proposals_count = fun (acc, (_, proposal) : nat * (bytes * pt Storage.proposal_t)) ->
         if proposal.proposer = proposer
             then acc + 1n
             else acc in
@@ -127,32 +136,42 @@ let assert_new_proposal_allowed
         then unit
         else failwith Errors.proposal_limit_exceeded
 
+let get_payload_key
+        (type pt)
+        (payload : pt)
+        : bytes =
+    Crypto.blake2b (Bytes.pack payload) //TODO: choose hash algoritm
+
 let add_new_proposal
-        (hash : bytes)
+        (type pt)
+        (payload : pt)
         (url : string)
         (proposer : address)
         (voting_power : nat)
-        (proposals : Storage.proposals_t)
-        : Storage.proposals_t =
-    let _ = match Map.find_opt hash proposals with
+        (proposals : pt Storage.proposals_t)
+        : pt Storage.proposals_t =
+    let key = get_payload_key payload in
+    let _ = match Map.find_opt key proposals with
         | Some _ -> failwith Errors.proposal_already_created
         | None -> unit in
     let value = {
-        hash = hash;
+        payload = payload;
         url = url;
         proposer = proposer;
         voters = Set.literal [proposer];
         up_votes_power = voting_power;
     } in
-    Map.add hash value proposals
+    Map.add key value proposals
 
 let upvote_proposal
-        (hash : bytes)
+        (type pt)
+        (payload : pt)
         (voter : address)
         (voting_power : nat)
-        (proposals : Storage.proposals_t)
-        : Storage.proposals_t =
-    let proposal_opt = Map.find_opt hash proposals in
+        (proposals : pt Storage.proposals_t)
+        : pt Storage.proposals_t =
+    let key = get_payload_key payload in
+    let proposal_opt = Map.find_opt key proposals in
     let proposal = Option.unopt_with_error proposal_opt Errors.proposal_not_found in
     let _ = if Set.mem voter proposal.voters
         then failwith Errors.proposal_already_upvoted
@@ -162,14 +181,15 @@ let upvote_proposal
         voters = Set.add voter proposal.voters;
         up_votes_power = proposal.up_votes_power + voting_power;  
     } in
-    Map.update hash (Some updated_proposal) proposals
+    Map.update key (Some updated_proposal) proposals
 
 let vote_promotion
+        (type pt)
         (vote : Storage.promotion_vote_t)
         (voter : address)
         (voting_power : nat)
-        (promotion : Storage.promotion_t)
-        : Storage.promotion_t =
+        (promotion : pt Storage.promotion_t)
+        : pt Storage.promotion_t =
     let _ = if Set.mem voter promotion.voters // TODO: should we allow proposer to vote? 
         then failwith Errors.promotion_already_voted
         else unit in

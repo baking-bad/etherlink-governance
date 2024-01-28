@@ -1,24 +1,26 @@
-#import "storage.mligo" "Storage"
-#import "errors.mligo" "Errors"
-#import "utils.mligo" "Utils"
-#import "voting.mligo" "Voting"
-#import "rollup.mligo" "Rollup"
+#import "common/storage.mligo" "Storage"
+#import "common/errors.mligo" "Errors"
+#import "common/utils.mligo" "Utils"
+#import "common/voting.mligo" "Voting"
+#import "common/rollup.mligo" "Rollup"
 
-module Governance = struct
+module KernelGovernance = struct
 
-    type return_t = operation list * Storage.t
+    type payload_t = bytes 
+    type storage_t = payload_t Storage.t
+    type return_t = operation list * storage_t
 
     // TODO: think about adding period_index as a parameter
     type new_proposal_params_t = {
         sender_key_hash : key_hash;
-        hash : bytes;
+        hash : payload_t;
         url : string;
     }
 
     [@entry] 
     let new_proposal 
             (params : new_proposal_params_t)
-            (storage : Storage.t) 
+            (storage : storage_t) 
             : return_t = 
         let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
@@ -35,13 +37,13 @@ module Governance = struct
 
     type upvote_proposal_params_t = {
         sender_key_hash : key_hash;
-        hash : bytes;
+        hash : payload_t;
     }
 
     [@entry]
     let upvote_proposal 
             (params : upvote_proposal_params_t) 
-            (storage : Storage.t) 
+            (storage : storage_t) 
             : return_t = 
         let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
@@ -62,7 +64,7 @@ module Governance = struct
     [@entry]
     let vote 
             (params : vote_params_t) 
-            (storage : Storage.t) 
+            (storage : storage_t) 
             : return_t =
         let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
@@ -79,25 +81,25 @@ module Governance = struct
     [@entry]
     let trigger_kernel_upgrade // TODO: Think about better name
             (rollup_address : address) // TODO: Think about passing desired kernel_hash
-            (storage : Storage.t) 
+            (storage : storage_t) 
             : return_t =
         let _ = Utils.assert_no_xtz_deposit () in
         let rollup_entry = Rollup.get_entry rollup_address in
         let voting_context = Voting.get_voting_context storage in
-        let kernel_hash = Option.unopt_with_error voting_context.last_winner_hash Errors.last_winner_hash_not_found in
+        let kernel_hash = Option.unopt_with_error voting_context.last_winner_payload Errors.last_winner_hash_not_found in
         let upgrade_params = Rollup.get_upgrade_params kernel_hash in
         let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
         [upgrade_operation], storage
 
     type extended_voting_context_t = {
-        voting_context : Storage.voting_context_t;
+        voting_context : payload_t Storage.voting_context_t;
         total_voting_power : nat;
     }
 
     [@view] 
     let get_voting_context
             (_ : unit) 
-            (storage : Storage.t) : extended_voting_context_t = 
+            (storage : storage_t) : extended_voting_context_t = 
         { 
             voting_context = Voting.get_voting_context storage;
             total_voting_power = Tezos.get_total_voting_power ();

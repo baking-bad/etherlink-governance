@@ -11,19 +11,21 @@ type config_t = {
     quorum : nat;
     super_majority : nat;
 }
-
-type proposal_t = {
-    hash : bytes;
+(*
+    'pt - payload type. for kernel governance it is bytes, for committee governance it is address set
+*)
+type 'pt proposal_t = {
+    payload : 'pt;
     url : string;
     proposer : address;
     voters: address set;
     up_votes_power: nat;
 }
 
-type proposals_t = (bytes, proposal_t) map
+type 'pt proposals_t = (bytes, ('pt proposal_t)) map
 
-type promotion_t = {
-    proposal_hash : bytes;
+type 'pt promotion_t = {
+    proposal_payload : 'pt;
     voters : address set;
     yay_vote_power : nat;
     nay_vote_power : nat;
@@ -32,17 +34,17 @@ type promotion_t = {
 
 type period_type_t = Proposal | Promotion
 
-type voting_context_t = {
+type 'pt voting_context_t = {
     period_index : nat;
     period_type : period_type_t;
-    proposals : proposals_t;
-    promotion : promotion_t option;  
-    last_winner_hash : bytes option; // think about naming
+    proposals : 'pt proposals_t;
+    promotion : 'pt promotion_t option;  
+    last_winner_payload : 'pt option; // think about naming
 }
 
-type t = {
+type 'pt t = {
     config : config_t;
-    voting_context : voting_context_t;
+    voting_context : 'pt voting_context_t;
     metadata : (string, bytes) big_map;
 }
 

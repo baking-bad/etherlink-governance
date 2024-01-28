@@ -1,7 +1,7 @@
 from pytezos.client import PyTezosClient
 from pytezos.sandbox.node import SandboxedNodeTestCase
 from tests.helpers.contracts import (
-    Governance,
+    KernelGovernance,
 )
 from typing import Optional
 from pytezos.rpc import RpcError
@@ -38,12 +38,12 @@ class BaseTestCase(SandboxedNodeTestCase):
         no_baker.reveal().autofill().sign().inject()
         return no_baker
 
-    def deploy_governance(self, custom_config=None) -> Governance:
-        """Deploys Governance contract"""
+    def deploy_kernel_governance(self, custom_config=None) -> KernelGovernance:
+        """Deploys KErnel Governance contract"""
 
-        opg = Governance.originate(self.manager, custom_config=custom_config).send()
+        opg = KernelGovernance.originate(self.manager, custom_config=custom_config).send()
         self.bake_block()
-        return Governance.from_opg(self.manager, opg)
+        return KernelGovernance.from_opg(self.manager, opg)
 
     @contextmanager
     def raisesMichelsonError(self, error_message):

@@ -1,10 +1,10 @@
 from tests.base import BaseTestCase
 from tests.helpers.utility import pkh
 
-class GovernanceNewProposalTestCase(BaseTestCase):
+class KernelGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:
         no_baker = self.bootstrap_no_baker()
-        governance = self.deploy_governance()
+        governance = self.deploy_kernel_governance()
 
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         with self.raisesMichelsonError("NO_VOTING_POWER"):

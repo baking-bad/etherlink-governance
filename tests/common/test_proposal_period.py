@@ -1,13 +1,13 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance import PROPOSAL_PERIOD, PROMOTION_PERIOD
+from tests.helpers.contracts.kernel_governance import PROPOSAL_PERIOD, PROMOTION_PERIOD
 from tests.helpers.utility import pkh
 
-class GovernanceProposalPeriodTestCase(BaseTestCase):
+class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
     def test_should_reset_proposals_when_no_proposals(self) -> None:
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_governance(custom_config={
+        governance = self.deploy_kernel_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 3
         })
@@ -17,7 +17,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert context['voting_context']['period_index'] == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
         # Period index: 0. Block: 2 of 3
@@ -25,7 +25,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert context['voting_context']['period_index'] == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
         
         self.bake_block()
         # Period index: 0. Block: 3 of 3
@@ -33,7 +33,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert context['voting_context']['period_index'] == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
         # Period index: 1. Block: 1 of 3
@@ -41,7 +41,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert context['voting_context']['period_index'] == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
         # Period index: 1. Block: 2 of 3
@@ -49,7 +49,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert context['voting_context']['period_index'] == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_blocks(10)
         # Period index: 1. Block: 2 of 3
@@ -57,14 +57,14 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert context['voting_context']['period_index'] == 4
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
     def test_should_reset_proposals_when_period_is_finished_with_no_votes_except_proposer(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 2
-        governance = self.deploy_governance(custom_config={
+        governance = self.deploy_kernel_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 2,
             'min_proposal_quorum': 40 # 1 baker out of 5 will vote
@@ -81,7 +81,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
         # Period index: 1. Block: 1 of 2
@@ -90,7 +90,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 1
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
     def test_should_reset_proposals_when_period_is_finished_with_not_enough_votes(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -98,7 +98,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_governance(custom_config={
+        governance = self.deploy_kernel_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 3,
             'min_proposal_quorum': 60 # 2 bakers out of 5 will vote
@@ -115,7 +115,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         # Period index: 0. Block: 3 of 3
         governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
@@ -126,7 +126,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
 
@@ -136,7 +136,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 1
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
     def test_should_reset_proposals_when_period_is_finished_with_2_winners(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -144,7 +144,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_governance(custom_config={
+        governance = self.deploy_kernel_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 3,
             'min_proposal_quorum': 20 # 1 bakers out of 5 will vote for each proposal
@@ -161,7 +161,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         # Period index: 0. Block: 3 of 3
         kernel_hash2 = bytes.fromhex('0202020202020202020202020202020202020202')
@@ -173,7 +173,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 2
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
 
@@ -183,7 +183,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 1
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
     def test_should_reset_proposals_when_promotion_period_is_skipped(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -191,7 +191,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_governance(custom_config={
+        governance = self.deploy_kernel_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 3,
             'min_proposal_quorum': 40 # 2 bakers out of 5 voted
@@ -208,7 +208,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         # Period index: 0. Block: 3 of 3
         governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
@@ -219,7 +219,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_blocks(4)
 
@@ -229,7 +229,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 2
         assert len(context['voting_context']['proposals']) == 0
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
     def test_should_prolong_to_promotion_when_proposal_period_is_finished_with_a_winner(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -237,7 +237,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_governance(custom_config={
+        governance = self.deploy_kernel_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 3,
             'min_proposal_quorum': 40 # 2 bakers out of 5 voted
@@ -254,7 +254,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         # Period index: 0. Block: 3 of 3
         governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
@@ -265,7 +265,7 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 0
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == None
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None
 
         self.bake_block()
 
@@ -275,10 +275,10 @@ class GovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['period_index'] == 1
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {
-            'proposal_hash': kernel_hash,
+            'proposal_payload': kernel_hash,
             'voters': [],
             'yay_vote_power': 0,
             'nay_vote_power': 0,
             'pass_vote_power': 0,
         }
-        assert context['voting_context']['last_winner_hash'] == None
+        assert context['voting_context']['last_winner_payload'] == None

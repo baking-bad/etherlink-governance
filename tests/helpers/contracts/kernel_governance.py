@@ -21,12 +21,12 @@ YAY_VOTE = 'yay'
 NAY_VOTE = 'nay'
 PASS_VOTE = 'pass'
 
-class Governance(ContractHelper):
+class KernelGovernance(ContractHelper):
     @staticmethod
     def make_storage(custom_config=None) -> dict[str, Any]:
         metadata = Metadata.make_default(
-            name='Governance',
-            description='The Governance contract allows bakers to make proposals and vote on kernel upgrade',
+            name='Kernel Governance',
+            description='The Kernel Governance contract allows bakers to make proposals and vote on kernel upgrade',
         )
         config = {
             'started_at_block': 0,
@@ -46,7 +46,7 @@ class Governance(ContractHelper):
                 'period_type' : PROPOSAL_PERIOD,
                 'proposals' : {},
                 'promotion' : None,  
-                'last_winner_hash' : None,
+                'last_winner_payload' : None,
             },
             'metadata': metadata
         }
@@ -56,7 +56,7 @@ class Governance(ContractHelper):
         """Deploys Governance"""
 
         storage = cls.make_storage(custom_config=custom_config)
-        filename = join(get_build_dir(), 'governance.tz')
+        filename = join(get_build_dir(), 'kernel_governance.tz')
 
         return originate_from_file(filename, client, storage)
     
