@@ -31,15 +31,17 @@ class BaseTestCase(SandboxedNodeTestCase):
     
     def bootstrap_no_baker(self) -> PyTezosClient:
         """Creates no baker account"""
+
         no_baker = self.client.using(key='alice')
-        donor = self.bootstrap_baker()
-        donor.transaction(destination=pkh(no_baker), amount=100000000000).autofill().sign().inject()
-        self.bake_block()
-        no_baker.reveal().autofill().sign().inject()
+        if no_baker.balance() == 0:
+            donor = self.manager
+            donor.transaction(destination=pkh(no_baker), amount=100000000000).autofill().sign().inject()
+            self.bake_block()
+            no_baker.reveal().autofill().sign().inject()
         return no_baker
 
     def deploy_kernel_governance(self, custom_config=None) -> KernelGovernance:
-        """Deploys KErnel Governance contract"""
+        """Deploys Kernel Governance contract"""
 
         opg = KernelGovernance.originate(self.manager, custom_config=custom_config).send()
         self.bake_block()

@@ -77,13 +77,6 @@ def pack(object: Any, type_expression: str) -> bytes:
     return to_michelson_type(object, type_expression).pack()
 
 
-def make_address_bytes(address: str) -> str:
-    """Converts address string to bytes"""
-
-    # packing address to bytes and taking the last 22 bytes:
-    return pack(address, 'address')[-22:].hex()
-
-
 def originate_from_file(
     filename: str, client: PyTezosClient, storage: Any
 ) -> OperationGroup:

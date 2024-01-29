@@ -1,10 +1,10 @@
 #import "errors.mligo" "Errors"
 
-let assert_no_xtz_deposit
+let assert_no_xtz_in_transaction
         (unit : unit)
         : unit =
     if Tezos.get_amount () > 0mutez
-        then failwith Errors.xtz_deposit_disallowed 
+        then failwith Errors.xtz_in_transaction_disallowed 
         else unit
 
 let asssert_sender_is_key_hash_owner      

@@ -24,12 +24,12 @@ module KernelGovernance = struct
             : return_t = 
         let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
-        let _ = Utils.assert_no_xtz_deposit () in
+        let _ = Utils.assert_no_xtz_in_transaction () in
         let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
         let _ = Voting.assert_current_period_proposal voting_context in
         let proposer = Tezos.get_sender () in
-        let _ = Voting.assert_new_proposal_allowed voting_context.proposals storage.config proposer in
+        let _ = Voting.assert_new_proposal_allowed voting_context.proposals storage.config proposer in //TODO: move into add_new_proposal function
         let updated_proposals = Voting.add_new_proposal params.hash params.url proposer voting_power voting_context.proposals in
         [], { storage with voting_context = { voting_context with proposals = updated_proposals } }
   
@@ -47,7 +47,7 @@ module KernelGovernance = struct
             : return_t = 
         let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
-        let _ = Utils.assert_no_xtz_deposit () in
+        let _ = Utils.assert_no_xtz_in_transaction () in
         let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
         let _ = Voting.assert_current_period_proposal voting_context in
@@ -68,7 +68,7 @@ module KernelGovernance = struct
             : return_t =
         let voting_power = Tezos.voting_power params.sender_key_hash in
         let voting_context = Voting.get_voting_context storage in
-        let _ = Utils.assert_no_xtz_deposit () in
+        let _ = Utils.assert_no_xtz_in_transaction () in
         let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
         let _ = Utils.assert_voting_power_positive voting_power in
         let _ = Voting.assert_current_period_promotion voting_context in
@@ -83,7 +83,7 @@ module KernelGovernance = struct
             (rollup_address : address) // TODO: Think about passing desired kernel_hash
             (storage : storage_t) 
             : return_t =
-        let _ = Utils.assert_no_xtz_deposit () in
+        let _ = Utils.assert_no_xtz_in_transaction () in
         let rollup_entry = Rollup.get_entry rollup_address in
         let voting_context = Voting.get_voting_context storage in
         let kernel_hash = Option.unopt_with_error voting_context.last_winner_payload Errors.last_winner_hash_not_found in
