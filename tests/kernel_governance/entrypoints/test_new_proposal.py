@@ -1,6 +1,6 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.kernel_governance import PROMOTION_PERIOD
-from tests.helpers.utility import pkh
+from tests.helpers.utility import pkh, pack
 
 class KernelGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
@@ -116,10 +116,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert list(context['voting_context']['proposals'].values())[0] == {
-            'payload': b'\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01', 
+            'payload': pack(kernel_hash, 'bytes')[6:], 
             'url': 'abc.com', 
             'proposer': pkh(baker), 
             'voters': [pkh(baker)], 
             'up_votes_power': 4000000000000
         }
-        
