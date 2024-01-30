@@ -12,3 +12,8 @@ The testing stack for the contracts is based on Python and requires [poetry](htt
 ```
 poetry run pytest
 ```
+
+### Deploy Kernel Governance contract
+```
+poetry run deploy_kernel_governance
+```
