@@ -4,12 +4,12 @@ from tests.helpers.errors import (
     NO_VOTING_POWER, NOT_PROMOTION_PERIOD, PROMOTION_ALREADY_VOTED, 
     SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
 )
-from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
+from tests.helpers.utility import DEFAULT_VOTING_POWER, pkh
 
-class KernelGovernanceNewProposalTestCase(BaseTestCase):
+class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
-        governance = self.deploy_kernel_governance()
+        governance = self.deploy_committee_governance()
 
         with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).vote(pkh(baker), YAY_VOTE).with_amount(1).send()
@@ -17,21 +17,21 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_sender_is_not_key_hash_owner(self) -> None:
         no_baker = self.bootstrap_no_baker()
         baker = self.bootstrap_baker()
-        governance = self.deploy_kernel_governance()
+        governance = self.deploy_committee_governance()
 
         with self.raisesMichelsonError(SENDER_NOT_KEY_HASH_OWNER):
             governance.using(no_baker).vote(pkh(baker), YAY_VOTE).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:
         no_baker = self.bootstrap_no_baker()
-        governance = self.deploy_kernel_governance()
+        governance = self.deploy_committee_governance()
 
         with self.raisesMichelsonError(NO_VOTING_POWER):
             governance.using(no_baker).vote(pkh(no_baker), YAY_VOTE).send()
 
     def test_should_fail_if_current_period_is_not_promotion(self) -> None:
         baker = self.bootstrap_baker()
-        governance = self.deploy_kernel_governance()
+        governance = self.deploy_committee_governance()
 
         with self.raisesMichelsonError(NOT_PROMOTION_PERIOD):
             governance.using(baker).vote(pkh(baker), YAY_VOTE).send()
@@ -41,15 +41,15 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_kernel_governance(custom_config={
+        governance = self.deploy_committee_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 3,
             'min_proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        kernel_hash = '0101010101010101010101010101010101010101'
+        addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         # Period index: 0. Block: 2 of 3
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), addresses, 'abc.com').send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -72,7 +72,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
-        governance = self.deploy_kernel_governance(custom_config={
+        governance = self.deploy_committee_governance(custom_config={
             'started_at_block': governance_started_at_block,
             'period_length': 5,
             'proposals_limit_per_account': 2,
@@ -82,9 +82,10 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 0
         
-        kernel_hash = '0101010101010101010101010101010101010101'
+        addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
+        addresses.sort()
         # Period index: 0. Block: 2 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), addresses, 'abc.com').send()
         self.bake_block()
         # Period index: 0. Block: 3 of 5
         self.bake_block()
@@ -94,7 +95,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {
-            'proposal_payload': pack_kernel_hash(kernel_hash),
+            'proposal_payload': addresses,
             'voters': [],
             'yay_vote_power': 0,
             'nay_vote_power': 0,
@@ -108,7 +109,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {
-            'proposal_payload': pack_kernel_hash(kernel_hash),
+            'proposal_payload': addresses,
             'voters': [pkh(baker1)],
             'yay_vote_power': DEFAULT_VOTING_POWER,
             'nay_vote_power': 0,
@@ -124,7 +125,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {
-            'proposal_payload': pack_kernel_hash(kernel_hash),
+            'proposal_payload': addresses,
             'voters': expected_voters,
             'yay_vote_power': DEFAULT_VOTING_POWER,
             'nay_vote_power': DEFAULT_VOTING_POWER,
@@ -140,7 +141,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {
-            'proposal_payload': pack_kernel_hash(kernel_hash),
+            'proposal_payload': addresses,
             'voters': expected_voters,
             'yay_vote_power': DEFAULT_VOTING_POWER,
             'nay_vote_power': DEFAULT_VOTING_POWER,
@@ -156,7 +157,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert context['voting_context']['promotion'] == {
-            'proposal_payload': pack_kernel_hash(kernel_hash),
+            'proposal_payload': addresses,
             'voters': expected_voters,
             'yay_vote_power': DEFAULT_VOTING_POWER * 2,
             'nay_vote_power': DEFAULT_VOTING_POWER,

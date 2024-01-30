@@ -10,34 +10,34 @@ from os.path import join
 from tests.helpers.metadata import Metadata
 
 
-class KernelGovernance(GovernanceBase):
+class CommitteeGovernance(GovernanceBase):
     @classmethod
     def originate(self, client: PyTezosClient, custom_config=None) -> OperationGroup:
-        """Deploys Kernel Governance"""
+        """Deploys Committee Governance"""
 
         metadata = Metadata.make_default(
-            name='Kernel Governance',
-            description='The Kernel Governance contract allows bakers to make proposals and vote on kernel upgrade',
+            name='Sequencer Committee Governance',
+            description='The Sequencer Committee Governance contract allows bakers to make proposals and vote on sequencer committee',
         )
 
         storage = self.make_storage(metadata, custom_config)
-        filename = join(get_build_dir(), 'kernel_governance.tz')
+        filename = join(get_build_dir(), 'committee_governance.tz')
 
         return originate_from_file(filename, client, storage)
     
-    def new_proposal(self, sender_key_hash : str, hash : bytes, url : str) -> ContractCall:
+    def new_proposal(self, sender_key_hash : str, addresses: list[str],  url : str) -> ContractCall:
         """Creates a new proposal"""
 
         return self.contract.new_proposal(
-            {'sender_key_hash': sender_key_hash, 'hash': hash, 'url': url}
+            {'sender_key_hash': sender_key_hash, 'addresses': addresses, 'url': url}
         )
     
     
-    def upvote_proposal(self, sender_key_hash : str, hash : bytes) -> ContractCall:
+    def upvote_proposal(self, sender_key_hash : str, addresses: list[str]) -> ContractCall:
         """Upvotes an exist proposal"""
 
         return self.contract.upvote_proposal(
-            {'sender_key_hash': sender_key_hash, 'hash': hash}
+            {'sender_key_hash': sender_key_hash, 'addresses': addresses}
         )
     
     def vote(self, sender_key_hash : str, vote : str) -> ContractCall:

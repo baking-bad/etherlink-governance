@@ -1,5 +1,6 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.kernel_governance import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE, KernelGovernance
+from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
+from tests.helpers.contracts.kernel_governance import KernelGovernance
 from tests.helpers.utility import pkh
 from pytezos.client import PyTezosClient
 

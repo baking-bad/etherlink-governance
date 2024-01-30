@@ -1,5 +1,5 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.kernel_governance import PROPOSAL_PERIOD, PROMOTION_PERIOD
+from tests.helpers.contracts.governance_base import PROPOSAL_PERIOD, PROMOTION_PERIOD
 from tests.helpers.utility import pkh
 
 class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
