@@ -11,7 +11,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         baker = self.bootstrap_baker()
         governance = self.deploy_kernel_governance()
 
-        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).vote(pkh(baker), YAY_VOTE).with_amount(1).send()
 
@@ -20,7 +19,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         baker = self.bootstrap_baker()
         governance = self.deploy_kernel_governance()
 
-        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         with self.raisesMichelsonError(SENDER_NOT_KEY_HASH_OWNER):
             governance.using(no_baker).vote(pkh(baker), YAY_VOTE).send()
 
@@ -28,7 +26,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         no_baker = self.bootstrap_no_baker()
         governance = self.deploy_kernel_governance()
 
-        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         with self.raisesMichelsonError(NO_VOTING_POWER):
             governance.using(no_baker).vote(pkh(no_baker), YAY_VOTE).send()
 

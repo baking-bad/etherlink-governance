@@ -10,5 +10,5 @@ let proposal_already_upvoted = "PROPOSAL_ALREADY_UPVOTED"
 let promotion_already_voted = "PROMOTION_ALREADY_VOTED"
 let promotion_context_not_exist = "PROMOTION_CONTEXT_NOT_EXIST"
 let rollup_entryoint_not_found = "ROLLUP_ENTRYOINT_NOT_FOUND"
-let last_winner_hash_not_found = "LAST_WINNER_HASH_NOT_FOUND" // TODO: Think about name
+let last_winner_payload_not_found = "LAST_WINNER_PAYLOAD_NOT_FOUND" // TODO: Think about name
 let current_level_is_less_than_start_block = "CURRENT_LEVEL_IS_LESS_THAN_START_BLOCK" // TODO: Think about name

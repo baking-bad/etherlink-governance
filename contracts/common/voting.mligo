@@ -11,6 +11,7 @@ let get_period_index
         | Some blocks_after_start ->  blocks_after_start / config.period_length
         | None -> failwith Errors.current_level_is_less_than_start_block
 
+
 let get_proposal_winner
         (type pt)
         (proposals : pt Storage.proposals_t)
@@ -28,6 +29,7 @@ let get_proposal_winner
         then winner_payload
         else None
 
+
 let get_promotion_winner
         (type pt)
         (promotion : pt Storage.promotion_t)
@@ -39,6 +41,7 @@ let get_promotion_winner
     if quorum_reached && super_majority_reached 
         then Some proposal_payload
         else None
+
 
 let init_new_poposal_voting_contex
         (type pt)
@@ -52,6 +55,7 @@ let init_new_poposal_voting_contex
         proposals = Map.empty;
         promotion = None
     }   
+
 
 let init_new_promotion_voting_contex
         (type pt)
@@ -71,6 +75,7 @@ let init_new_promotion_voting_contex
             pass_vote_power = 0n;   
         }
     }   
+
 
 let init_new_voting_context
         (type pt)
@@ -95,6 +100,7 @@ let init_new_voting_context
                     }
                 | None -> new_proposal_voting_context)
 
+
 let get_voting_context
         (type pt)
         (storage : pt Storage.t)
@@ -104,6 +110,21 @@ let get_voting_context
         then storage.voting_context 
         else init_new_voting_context storage period_index in
     context
+
+
+type 'pt extended_voting_context_t = {
+    voting_context : 'pt Storage.voting_context_t;
+    total_voting_power : nat;
+}
+
+let get_extended_voting_context
+        (type pt)
+        (storage : pt Storage.t) 
+        : pt extended_voting_context_t = 
+    { 
+        voting_context = get_voting_context storage;
+        total_voting_power = Tezos.get_total_voting_power ();
+    }
 
 let assert_current_period_proposal 
         (type pt)
@@ -149,7 +170,9 @@ let add_new_proposal
         (proposer : address)
         (voting_power : nat)
         (proposals : pt Storage.proposals_t)
+        (config: Storage.config_t)
         : pt Storage.proposals_t =
+    let _ = assert_new_proposal_allowed proposals config proposer in
     let key = get_payload_key payload in
     let _ = match Map.find_opt key proposals with
         | Some _ -> failwith Errors.proposal_already_created
@@ -190,7 +213,7 @@ let vote_promotion
         (voting_power : nat)
         (promotion : pt Storage.promotion_t)
         : pt Storage.promotion_t =
-    let _ = if Set.mem voter promotion.voters // TODO: should we allow proposer to vote? 
+    let _ = if Set.mem voter promotion.voters
         then failwith Errors.promotion_already_voted
         else unit in
     let updated_promotion = match vote with

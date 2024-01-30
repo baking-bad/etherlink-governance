@@ -3,6 +3,7 @@
 #import "common/utils.mligo" "Utils"
 #import "common/voting.mligo" "Voting"
 #import "common/rollup.mligo" "Rollup"
+#import "common/entrypoints.mligo" "Entrypoints"
 
 module KernelGovernance = struct
 
@@ -22,18 +23,11 @@ module KernelGovernance = struct
             (params : new_proposal_params_t)
             (storage : storage_t) 
             : return_t = 
-        let voting_power = Tezos.voting_power params.sender_key_hash in
-        let voting_context = Voting.get_voting_context storage in
-        let _ = Utils.assert_no_xtz_in_transaction () in
-        let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
-        let _ = Utils.assert_voting_power_positive voting_power in
-        let _ = Voting.assert_current_period_proposal voting_context in
-        let proposer = Tezos.get_sender () in
-        let _ = Voting.assert_new_proposal_allowed voting_context.proposals storage.config proposer in //TODO: move into add_new_proposal function
-        let updated_proposals = Voting.add_new_proposal params.hash params.url proposer voting_power voting_context.proposals in
-        [], { storage with voting_context = { voting_context with proposals = updated_proposals } }
+        [], Entrypoints.new_proposal params.sender_key_hash params.hash params.url storage
   
+
     // TODO: think about additional entrypoint - update_proposal_url
+
 
     type upvote_proposal_params_t = {
         sender_key_hash : key_hash;
@@ -45,15 +39,7 @@ module KernelGovernance = struct
             (params : upvote_proposal_params_t) 
             (storage : storage_t) 
             : return_t = 
-        let voting_power = Tezos.voting_power params.sender_key_hash in
-        let voting_context = Voting.get_voting_context storage in
-        let _ = Utils.assert_no_xtz_in_transaction () in
-        let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
-        let _ = Utils.assert_voting_power_positive voting_power in
-        let _ = Voting.assert_current_period_proposal voting_context in
-        let voter = Tezos.get_sender () in
-        let updated_proposals = Voting.upvote_proposal params.hash voter voting_power voting_context.proposals in
-        [], { storage with voting_context = { voting_context with proposals = updated_proposals } }
+       [], Entrypoints.upvote_proposal params.sender_key_hash params.hash storage
   
 
     type vote_params_t = {
@@ -66,16 +52,7 @@ module KernelGovernance = struct
             (params : vote_params_t) 
             (storage : storage_t) 
             : return_t =
-        let voting_power = Tezos.voting_power params.sender_key_hash in
-        let voting_context = Voting.get_voting_context storage in
-        let _ = Utils.assert_no_xtz_in_transaction () in
-        let _ = Utils.asssert_sender_is_key_hash_owner params.sender_key_hash in
-        let _ = Utils.assert_voting_power_positive voting_power in
-        let _ = Voting.assert_current_period_promotion voting_context in
-        let voter = Tezos.get_sender () in
-        let promotion = Option.unopt_with_error voting_context.promotion Errors.promotion_context_not_exist in
-        let updated_promotion = Voting.vote_promotion params.vote voter voting_power promotion in
-        [], { storage with voting_context = { voting_context with promotion = Some updated_promotion } }
+        [], Entrypoints.vote params.sender_key_hash params.vote storage
   
 
     [@entry]
@@ -83,26 +60,18 @@ module KernelGovernance = struct
             (rollup_address : address) // TODO: Think about passing desired kernel_hash
             (storage : storage_t) 
             : return_t =
-        let _ = Utils.assert_no_xtz_in_transaction () in
+        let kernel_hash = Entrypoints.get_last_winner_payload storage in
         let rollup_entry = Rollup.get_entry rollup_address in
-        let voting_context = Voting.get_voting_context storage in
-        let kernel_hash = Option.unopt_with_error voting_context.last_winner_payload Errors.last_winner_hash_not_found in
         let upgrade_params = Rollup.get_upgrade_params kernel_hash in
         let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
         [upgrade_operation], storage
 
-    type extended_voting_context_t = {
-        voting_context : payload_t Storage.voting_context_t;
-        total_voting_power : nat;
-    }
 
     [@view] 
     let get_voting_context
             (_ : unit) 
-            (storage : storage_t) : extended_voting_context_t = 
-        { 
-            voting_context = Voting.get_voting_context storage;
-            total_voting_power = Tezos.get_total_voting_power ();
-        }
+            (storage : storage_t) 
+            : payload_t Voting.extended_voting_context_t = 
+        Voting.get_extended_voting_context storage
 
 end
