@@ -1,5 +1,6 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.kernel_governance import PROMOTION_PERIOD
+from tests.helpers.errors import NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSAL_LIMIT_EXCEEDED, SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
 
 class KernelGovernanceNewProposalTestCase(BaseTestCase):
@@ -8,7 +9,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance()
 
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        with self.raisesMichelsonError("XTZ_IN_TRANSACTION_DISALLOWED"):
+        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').with_amount(1).send()
 
     def test_should_fail_if_sender_is_not_key_hash_owner(self) -> None:
@@ -17,7 +18,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance()
 
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        with self.raisesMichelsonError("SENDER_NOT_KEY_HASH_OWNER"):
+        with self.raisesMichelsonError(SENDER_NOT_KEY_HASH_OWNER):
             governance.using(no_baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:
@@ -25,7 +26,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance()
 
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        with self.raisesMichelsonError("NO_VOTING_POWER"):
+        with self.raisesMichelsonError(NO_VOTING_POWER):
             governance.using(no_baker).new_proposal(pkh(no_baker), kernel_hash, 'abc.com').send()
 
     def test_should_fail_if_current_period_is_not_proposal(self) -> None:
@@ -51,7 +52,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
 
         # Period index: 1. Block: 2 of 2
         kernel_hash = bytes.fromhex('0202020202020202020202020202020202020202')
-        with self.raisesMichelsonError("NOT_PROPOSAL_PERIOD"):
+        with self.raisesMichelsonError(NOT_PROPOSAL_PERIOD):
             governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
 
     def test_should_fail_if_new_proposal_limit_is_exceeded(self) -> None:
@@ -72,7 +73,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker).new_proposal(pkh(baker), '0202020202020202020202020202020202020202', 'abc.com').send()
         self.bake_block()
 
-        with self.raisesMichelsonError("PROPOSAL_LIMIT_EXCEEDED"):
+        with self.raisesMichelsonError(PROPOSAL_LIMIT_EXCEEDED):
             governance.using(baker).new_proposal(pkh(baker), '0303030303030303030303030303030303030303', 'abc.com').send()
 
     def test_should_fail_if_new_proposal_already_created(self) -> None:
@@ -91,7 +92,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
         self.bake_block()
 
-        with self.raisesMichelsonError("PROPOSAL_ALREADY_CREATED"):
+        with self.raisesMichelsonError(PROPOSAL_ALREADY_CREATED):
             governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
 
     def test_should_create_new_proposal_with_correct_parameters(self) -> None:
