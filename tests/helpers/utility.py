@@ -10,6 +10,7 @@ from typing import Any
 
 # Default address used as a placeholder in the contract storage
 DEFAULT_ADDRESS = 'tz1burnburnburnburnburnburnburjAYjjX'
+DEFAULT_VOTING_POWER = 4000000000000
 
 
 def pkh(client: PyTezosClient) -> str:
@@ -75,6 +76,9 @@ def pack(object: Any, type_expression: str) -> bytes:
     """Packs Python object to bytes using given type expression"""
 
     return to_michelson_type(object, type_expression).pack()
+
+def pack_kernel_hash(kernel_hash: str) -> bytes:
+    return pack(kernel_hash, 'bytes')[6:]
 
 
 def originate_from_file(

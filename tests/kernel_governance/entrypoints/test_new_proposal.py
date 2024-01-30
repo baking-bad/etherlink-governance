@@ -1,6 +1,6 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.kernel_governance import PROMOTION_PERIOD
-from tests.helpers.utility import pkh, pack
+from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
 
 class KernelGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
@@ -95,7 +95,8 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
             governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
 
     def test_should_create_new_proposal_with_correct_parameters(self) -> None:
-        baker = self.bootstrap_baker()
+        baker1 = self.bootstrap_baker()
+        baker2 = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_block = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
@@ -108,17 +109,40 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 0
         
-        kernel_hash = '0101010101010101010101010101010101010101'
+        kernel_hash1 = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 1 of 5
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1, 'abc.com').send()
         self.bake_block()
 
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert list(context['voting_context']['proposals'].values())[0] == {
-            'payload': pack(kernel_hash, 'bytes')[6:], 
+            'payload': pack_kernel_hash(kernel_hash1), 
             'url': 'abc.com', 
-            'proposer': pkh(baker), 
-            'voters': [pkh(baker)], 
-            'up_votes_power': 4000000000000
+            'proposer': pkh(baker1), 
+            'voters': [pkh(baker1)], 
+            'up_votes_power': DEFAULT_VOTING_POWER
+        }
+
+
+        kernel_hash2 = '0202020202020202020202020202020202020202'
+        # Period index: 0. Block: 2 of 5
+        governance.using(baker2).new_proposal(pkh(baker2), kernel_hash2, 'bcd.com').send()
+        self.bake_block()
+
+        context = governance.get_voting_context()
+        assert len(context['voting_context']['proposals']) == 2
+        assert list(context['voting_context']['proposals'].values())[0] == {
+            'payload': pack_kernel_hash(kernel_hash1), 
+            'url': 'abc.com', 
+            'proposer': pkh(baker1), 
+            'voters': [pkh(baker1)], 
+            'up_votes_power': DEFAULT_VOTING_POWER
+        }
+        assert list(context['voting_context']['proposals'].values())[1] == {
+            'payload': pack_kernel_hash(kernel_hash2), 
+            'url': 'bcd.com', 
+            'proposer': pkh(baker2), 
+            'voters': [pkh(baker2)], 
+            'up_votes_power': DEFAULT_VOTING_POWER
         }
