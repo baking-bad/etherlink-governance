@@ -1,6 +1,9 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.kernel_governance import PROMOTION_PERIOD
-from tests.helpers.errors import NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_UPVOTED, SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
+from tests.helpers.errors import (
+    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_UPVOTED, 
+    SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
+)
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
 
 class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
