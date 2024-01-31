@@ -1,11 +1,8 @@
 #import "errors.mligo" "Errors"
 
-type deposit_t = (
-    bytes,
-    "",
-    nat * bytes option ticket,
-    ""
-) michelson_pair 
+type content_t = nat * bytes option
+type ticket_t = content_t ticket
+type deposit_t = bytes * ticket_t
 
 type deposit_or_bytes_t = (
     deposit_t,
