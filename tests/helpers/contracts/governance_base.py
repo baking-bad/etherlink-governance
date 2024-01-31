@@ -12,7 +12,7 @@ PASS_VOTE = 'pass'
 
 class GovernanceBase(ContractHelper):
     @staticmethod
-    def make_storage(metadata: dict[str, Any], custom_config=None) -> dict[str, Any]:
+    def make_storage(metadata: dict[str, Any], custom_config=None, last_winner_payload=None) -> dict[str, Any]:
         config = {
             'started_at_block': 0,
             'period_length': 10,
@@ -31,7 +31,7 @@ class GovernanceBase(ContractHelper):
                 'period_type' : PROPOSAL_PERIOD,
                 'proposals' : {},
                 'promotion' : None,  
-                'last_winner_payload' : None,
+                'last_winner_payload' : last_winner_payload if last_winner_payload is None else bytes.fromhex(last_winner_payload),
             },
             'metadata': metadata
         }

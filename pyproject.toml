@@ -22,4 +22,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-deploy_kernel_governance = "scripts.deploy:deploy_kernel_governance"
+deploy_kernel_governance = "scripts.governance:deploy_kernel_governance"
+trigger_kernel_upgrade = "scripts.governance:trigger_kernel_upgrade"
