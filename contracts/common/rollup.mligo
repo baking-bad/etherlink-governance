@@ -18,14 +18,14 @@ type t = (
     "u"
 ) michelson_or
 
-let get_entry
+let get_entry   // NOTE: the entrypoint is used to upgrade kernel and sequencer committee as well
         (rollup : address) 
         : t contract =
     match Tezos.get_contract_opt rollup with
         | None -> failwith Errors.rollup_entryoint_not_found
         | Some entry -> entry
 
-let get_upgrade_params
-        (kernel_hash : bytes)
+let get_upgrade_params 
+        (payload : bytes)
         : t =
-    M_right kernel_hash 
+    M_right payload 

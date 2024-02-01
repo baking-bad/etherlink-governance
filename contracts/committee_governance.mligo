@@ -52,18 +52,16 @@ module SequencerCommitteeGovernance = struct
         [], Entrypoints.vote params.sender_key_hash params.vote storage
   
 
-    //TODO: implement
     [@entry]
-    let trigger_committee_update // TODO: Think about better name
-            (rollup_address : address) // TODO: Think about passing desired kernel_hash
+    let trigger_committee_upgrade // TODO: Think about better name
+            (rollup_address : address)
             (storage : storage_t) 
             : return_t =
-        let _addresses = Entrypoints.get_last_winner_payload storage in
-        let _rollup_entry = Rollup.get_entry rollup_address in
-        // let upgrade_params = Rollup.get_upgrade_params kernel_hash in
-        // let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
-        // [upgrade_operation], storage
-        [], storage
+        let addresses = Entrypoints.get_last_winner_payload storage in
+        let rollup_entry = Rollup.get_entry rollup_address in
+        let upgrade_params = Rollup.get_upgrade_params (Bytes.pack addresses) in
+        let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
+        [upgrade_operation], storage
 
 
     [@view] 
