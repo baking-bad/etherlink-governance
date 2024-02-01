@@ -166,7 +166,6 @@ let get_payload_key
 let add_new_proposal
         (type pt)
         (payload : pt)
-        (url : string)
         (proposer : address)
         (voting_power : nat)
         (proposals : pt Storage.proposals_t)
@@ -179,7 +178,6 @@ let add_new_proposal
         | None -> unit in
     let value = {
         payload = payload;
-        url = url;
         proposer = proposer;
         voters = Set.literal [proposer];
         up_votes_power = voting_power;

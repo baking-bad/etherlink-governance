@@ -16,7 +16,6 @@ type config_t = {
 *)
 type 'pt proposal_t = {
     payload : 'pt;
-    url : string;
     proposer : address;
     voters: address set;
     up_votes_power: nat;

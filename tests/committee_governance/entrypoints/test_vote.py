@@ -49,7 +49,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         # Period index: 0. Block: 2 of 3
-        governance.using(baker).new_proposal(pkh(baker), addresses, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), addresses).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -85,7 +85,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         addresses.sort()
         # Period index: 0. Block: 2 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), addresses, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), addresses).send()
         self.bake_block()
         # Period index: 0. Block: 3 of 5
         self.bake_block()

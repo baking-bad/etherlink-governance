@@ -45,7 +45,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         
         kernel_hash = bytes.fromhex('0202020202020202020202020202020202020202')
         # Period index: 0. Block: 2 of 2
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
         self.bake_block()
 
         self.bake_block()
@@ -71,7 +71,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         
         kernel_hash = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 1 of 5
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
         self.bake_block()
 
         with self.raisesMichelsonError(PROPOSAL_ALREADY_UPVOTED):
@@ -91,7 +91,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         
         kernel_hash = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 1 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
 
         # Period index: 0. Block: 2 of 5
@@ -118,14 +118,13 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         
         kernel_hash = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 1 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
 
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert list(context['voting_context']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash), 
-            'url': 'abc.com', 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
             'up_votes_power': DEFAULT_VOTING_POWER
@@ -141,7 +140,6 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         assert len(context['voting_context']['proposals']) == 1
         assert list(context['voting_context']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash), 
-            'url': 'abc.com', 
             'proposer': pkh(baker1), 
             'voters': expected_voters, 
             'up_votes_power': DEFAULT_VOTING_POWER * 2

@@ -15,7 +15,6 @@ module KernelGovernance = struct
     type new_proposal_params_t = {
         sender_key_hash : key_hash;
         hash : payload_t;
-        url : string;
     }
 
     [@entry] 
@@ -23,11 +22,8 @@ module KernelGovernance = struct
             (params : new_proposal_params_t)
             (storage : storage_t) 
             : return_t = 
-        [], Entrypoints.new_proposal params.sender_key_hash params.hash params.url storage
+        [], Entrypoints.new_proposal params.sender_key_hash params.hash storage
   
-
-    // TODO: think about additional entrypoint - update_proposal_url
-
 
     type upvote_proposal_params_t = {
         sender_key_hash : key_hash;
@@ -47,6 +43,7 @@ module KernelGovernance = struct
         vote : Storage.promotion_vote_t;
     }
    
+
     [@entry]
     let vote 
             (params : vote_params_t) 

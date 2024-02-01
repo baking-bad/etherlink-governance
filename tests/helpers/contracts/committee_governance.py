@@ -25,11 +25,11 @@ class CommitteeGovernance(GovernanceBase):
 
         return originate_from_file(filename, client, storage)
     
-    def new_proposal(self, sender_key_hash : str, addresses: list[str],  url : str) -> ContractCall:
+    def new_proposal(self, sender_key_hash : str, addresses: list[str]) -> ContractCall:
         """Creates a new proposal"""
 
         return self.contract.new_proposal(
-            {'sender_key_hash': sender_key_hash, 'addresses': addresses, 'url': url}
+            {'sender_key_hash': sender_key_hash, 'addresses': addresses}
         )
     
     

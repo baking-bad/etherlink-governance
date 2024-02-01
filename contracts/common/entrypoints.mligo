@@ -9,7 +9,6 @@ let new_proposal
         (type pt)
         (sender_key_hash : key_hash)
         (payload : pt)
-        (url : string)
         (storage : pt Storage.t) 
         : pt Storage.t = 
     let voting_power = Tezos.voting_power sender_key_hash in
@@ -19,7 +18,7 @@ let new_proposal
     let _ = Utils.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_proposal voting_context in
     let proposer = Tezos.get_sender () in
-    let updated_proposals = Voting.add_new_proposal payload url proposer voting_power voting_context.proposals storage.config in
+    let updated_proposals = Voting.add_new_proposal payload proposer voting_power voting_context.proposals storage.config in
     { storage with voting_context = { voting_context with proposals = updated_proposals } }
 
 

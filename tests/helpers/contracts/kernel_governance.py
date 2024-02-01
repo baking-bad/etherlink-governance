@@ -32,11 +32,11 @@ class KernelGovernance(GovernanceBase):
         return self.contract.trigger_kernel_upgrade(rollup_address)
     
     
-    def new_proposal(self, sender_key_hash : str, hash : bytes, url : str) -> ContractCall:
+    def new_proposal(self, sender_key_hash : str, hash : bytes) -> ContractCall:
         """Creates a new proposal"""
 
         return self.contract.new_proposal(
-            {'sender_key_hash': sender_key_hash, 'hash': hash, 'url': url}
+            {'sender_key_hash': sender_key_hash, 'hash': hash}
         )
     
     

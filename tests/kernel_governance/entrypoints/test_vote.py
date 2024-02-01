@@ -49,7 +49,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         
         kernel_hash = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 3
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -84,7 +84,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         
         kernel_hash = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
         # Period index: 0. Block: 3 of 5
         self.bake_block()

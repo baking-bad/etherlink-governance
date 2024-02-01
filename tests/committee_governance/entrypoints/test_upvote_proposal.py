@@ -45,7 +45,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         # Period index: 0. Block: 2 of 2
-        governance.using(baker).new_proposal(pkh(baker), addresses, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), addresses).send()
         self.bake_block()
 
         self.bake_block()
@@ -74,13 +74,13 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         two_addresses_reversed = ['tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1', 'tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa']
         three_addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1', 'tz1Lc2qBKEWCBeDU8npG6zCeCqpmaegRi6Jg']
         # Period index: 0. Block: 1 of 5
-        governance.using(baker).new_proposal(pkh(baker), one_address, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), one_address).send()
         self.bake_block()
         # Period index: 0. Block: 2 of 5
-        governance.using(baker).new_proposal(pkh(baker), two_addresses, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), two_addresses).send()
         self.bake_block()
         # Period index: 0. Block: 3 of 5
-        governance.using(baker).new_proposal(pkh(baker), three_addresses, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), three_addresses).send()
         self.bake_block()
 
         with self.raisesMichelsonError(PROPOSAL_ALREADY_UPVOTED):
@@ -109,7 +109,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         # Period index: 0. Block: 1 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), addresses, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), addresses).send()
         self.bake_block()
 
         # Period index: 0. Block: 2 of 5
@@ -137,14 +137,13 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         addresses.sort()
         # Period index: 0. Block: 1 of 5
-        governance.using(baker1).new_proposal(pkh(baker1), addresses, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), addresses).send()
         self.bake_block()
 
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 1
         assert list(context['voting_context']['proposals'].values())[0] == {
             'payload': addresses, 
-            'url': 'abc.com', 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
             'up_votes_power': DEFAULT_VOTING_POWER
@@ -160,7 +159,6 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         assert len(context['voting_context']['proposals']) == 1
         assert list(context['voting_context']['proposals'].values())[0] == {
             'payload': addresses, 
-            'url': 'abc.com', 
             'proposer': pkh(baker1), 
             'voters': expected_voters, 
             'up_votes_power': DEFAULT_VOTING_POWER * 2

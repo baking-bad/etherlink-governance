@@ -23,7 +23,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        governance.using(proposer).new_proposal(pkh(proposer), kernel_hash, 'abc.com').send()
+        governance.using(proposer).new_proposal(pkh(proposer), kernel_hash).send()
         self.bake_block()
 
         self.bake_blocks(2)

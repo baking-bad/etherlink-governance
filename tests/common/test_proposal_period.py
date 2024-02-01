@@ -73,7 +73,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 2 of 2
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash, 'abc.com').send()
+        governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
         self.bake_block()
         
         context = governance.get_voting_context()
@@ -107,7 +107,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
         
         context = governance.get_voting_context()
@@ -153,7 +153,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 2 of 3
         kernel_hash1 = bytes.fromhex('0101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1).send()
         self.bake_block()
         
         context = governance.get_voting_context()
@@ -165,7 +165,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 3 of 3
         kernel_hash2 = bytes.fromhex('0202020202020202020202020202020202020202')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash2, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash2).send()
         self.bake_block()
         
         context = governance.get_voting_context()
@@ -200,7 +200,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
         
         context = governance.get_voting_context()
@@ -246,7 +246,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash, 'abc.com').send()
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
         
         context = governance.get_voting_context()

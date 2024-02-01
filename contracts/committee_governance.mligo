@@ -15,7 +15,6 @@ module SequencerCommitteeGovernance = struct
     type new_proposal_params_t = {
         sender_key_hash : key_hash;
         addresses : payload_t;
-        url : string;
     }
 
     [@entry] 
@@ -23,11 +22,8 @@ module SequencerCommitteeGovernance = struct
             (params : new_proposal_params_t)
             (storage : storage_t) 
             : return_t = 
-        [], Entrypoints.new_proposal params.sender_key_hash params.addresses params.url storage
+        [], Entrypoints.new_proposal params.sender_key_hash params.addresses storage
   
-
-    // TODO: think about additional entrypoint - update_proposal_url
-
 
     type upvote_proposal_params_t = {
         sender_key_hash : key_hash;
@@ -46,6 +42,7 @@ module SequencerCommitteeGovernance = struct
         sender_key_hash : key_hash;
         vote : Storage.promotion_vote_t;
     }
+
    
     [@entry]
     let vote 
@@ -67,6 +64,7 @@ module SequencerCommitteeGovernance = struct
         // let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
         // [upgrade_operation], storage
         [], storage
+
 
     [@view] 
     let get_voting_context
