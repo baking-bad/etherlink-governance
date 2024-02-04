@@ -86,8 +86,6 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         governance.using(baker1).vote(pkh(baker1), NAY_VOTE).send()
         self.bake_block()
 
-        print('voting_context', governance.get_voting_context())
-
         # Wait to skip one more period
         self.bake_blocks(2)
         # Period index: 2. Block: 1 of 3
@@ -114,7 +112,29 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         governance.using(baker2).vote(pkh(baker2), PASS_VOTE).send()
         self.bake_block()
 
-        print('voting_context', governance.get_voting_context())
+        # Wait to skip one more period
+        self.bake_blocks(2)
+        # Period index: 2. Block: 1 of 3
+        context = governance.get_voting_context()
+        assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert context['voting_context']['period_index'] == 2
+        assert len(context['voting_context']['proposals']) == 0
+        assert context['voting_context']['promotion'] == None
+        assert context['voting_context']['last_winner_payload'] == None
+
+    def test_should_reset_to_proposal_period_if_promotion_phase_has_only_pass_votes(self) -> None:
+        test = self.prepare_promotion_period({
+            'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)
+            'promotion_super_majority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
+        })
+        governance: KernelGovernance = test['governance']
+        baker2 = self.bootstrap_baker()
+
+        # Period index: 1. Block: 1 of 3
+        # governance.using(proposer).vote(pkh(proposer), YAY_VOTE).send()
+        # governance.using(baker1).vote(pkh(baker1), NAY_VOTE).send()
+        governance.using(baker2).vote(pkh(baker2), PASS_VOTE).send()
+        self.bake_block()
 
         # Wait to skip one more period
         self.bake_blocks(2)
@@ -142,8 +162,6 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         governance.using(baker1).vote(pkh(baker1), NAY_VOTE).send()
         governance.using(baker2).vote(pkh(baker2), PASS_VOTE).send()
         self.bake_block()
-
-        print('voting_context', governance.get_voting_context())
 
         # Wait to skip one more period
         self.bake_blocks(2)

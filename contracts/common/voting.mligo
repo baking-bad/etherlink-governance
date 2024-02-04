@@ -1,8 +1,6 @@
 #import "storage.mligo" "Storage"
 #import "errors.mligo" "Errors"
 
-// TODO: check division operations
-
 let get_period_index
         (config : Storage.config_t)
         : nat =
@@ -37,7 +35,10 @@ let get_promotion_winner
         : pt option =
     let { yay_votes_power; nay_votes_power; pass_votes_power; proposal_payload; voters = _; } = promotion in 
     let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * Storage.scale / Tezos.get_total_voting_power () >= config.promotion_quorum in
-    let super_majority_reached = yay_votes_power * Storage.scale / (yay_votes_power + nay_votes_power) >= config.promotion_super_majority in
+    let yay_nay_votes_sum = yay_votes_power + nay_votes_power in
+    let super_majority_reached = if yay_nay_votes_sum > 0n
+        then yay_votes_power * Storage.scale / yay_nay_votes_sum >= config.promotion_super_majority
+        else false in
     if quorum_reached && super_majority_reached 
         then Some proposal_payload
         else None
@@ -161,7 +162,7 @@ let get_payload_key
         (type pt)
         (payload : pt)
         : bytes =
-    Crypto.blake2b (Bytes.pack payload) //TODO: choose hash algoritm
+    Crypto.sha256 (Bytes.pack payload)
 
 let add_new_proposal_and_upvote
         (type pt)

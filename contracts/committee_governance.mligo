@@ -7,7 +7,7 @@
 
 module SequencerCommitteeGovernance = struct
 
-    type payload_t = (address set) // TODO: think about l2 addresse as well (in the future); should we limit the size of the set?
+    type payload_t = (address set) // TODO: think about l2 addresses as well (in the future); should we limit the size of the set?
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 

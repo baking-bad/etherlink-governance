@@ -113,7 +113,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         context = governance.get_voting_context()
         assert len(context['voting_context']['proposals']) == 0
         
-        kernel_hash1 = '0101010101010101010101010101010101010101'
+        kernel_hash1 = '0202020202020202020202020202020202020202'
         # Period index: 0. Block: 1 of 5
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1).send()
         self.bake_block()
@@ -128,7 +128,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         }
 
 
-        kernel_hash2 = '0202020202020202020202020202020202020202'
+        kernel_hash2 = '0101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 5
         governance.using(baker2).new_proposal(pkh(baker2), kernel_hash2).send()
         self.bake_block()
