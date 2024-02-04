@@ -51,19 +51,19 @@ def trigger_kernel_upgrade(
     help='The max number of new active proposals for each account, default: 20',
 )
 @click.option(
-    '--min_proposal_quorum',
+    '--proposal_quorum',
     default=10,
-    help='The min proposal quorum to move the proposal to next promotion phase, default: 10 (10%)',
+    help='The min proposal proposal_quorum to move the proposal to next promotion phase, default: 10 (10%)',
 )
 @click.option(
-    '--quorum',
+    '--promotion_quorum',
     default=10,
-    help='The min quorum for the proposal to be considered as a winner, default: 10 (10%)',
+    help='The min promotion_quorum for the proposal to be considered as a winner, default: 10 (10%)',
 )
 @click.option(
-    '--super_majority',
+    '--promotion_super_majority',
     default=10,
-    help='The min super_majority for the proposal be considered as a winner, default: 10 (10%)',
+    help='The min promotion_super_majority for the proposal be considered as a winner, default: 10 (10%)',
 )
 @click.option(
     '--last_winner_payload',
@@ -76,9 +76,9 @@ def deploy_kernel_governance(
     started_at_level: int,
     period_length: int,
     upvoting_limit: int,
-    min_proposal_quorum: int,
-    quorum: int,
-    super_majority: int,
+    proposal_quorum: int,
+    promotion_quorum: int,
+    promotion_super_majority: int,
     last_winner_payload: Optional[bytes],
     private_key: Optional[str],
     rpc_url: Optional[str],
@@ -93,9 +93,9 @@ def deploy_kernel_governance(
         'started_at_level': int(started_at_level),
         'period_length': int(period_length),
         'upvoting_limit': int(upvoting_limit),
-        'min_proposal_quorum': int(min_proposal_quorum),
-        'quorum': int(quorum),
-        'super_majority': int(super_majority),
+        'proposal_quorum': int(proposal_quorum),
+        'promotion_quorum': int(promotion_quorum),
+        'promotion_super_majority': int(promotion_super_majority),
     }
     opg = KernelGovernance.originate(manager, config, last_winner_payload).send()
     manager.wait(opg)

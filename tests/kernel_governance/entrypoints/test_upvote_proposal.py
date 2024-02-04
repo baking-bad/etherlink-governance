@@ -40,7 +40,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 2,
-            'min_proposal_quorum': 20 # 1 bakers out of 5 voted
+            'proposal_quorum': 20 # 1 bakers out of 5 voted
         })
         
         kernel_hash = bytes.fromhex('0202020202020202020202020202020202020202')

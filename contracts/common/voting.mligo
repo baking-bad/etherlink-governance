@@ -24,7 +24,7 @@ let get_proposal_winner
                 then (None, max_power)
                 else (winner, max_power) in
     let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposals (None, 0n) in
-    let proposal_quorum_reached = winner_upvotes_power * Storage.scale >= Tezos.get_total_voting_power () * config.min_proposal_quorum in
+    let proposal_quorum_reached = winner_upvotes_power * Storage.scale >= Tezos.get_total_voting_power () * config.proposal_quorum in
     if proposal_quorum_reached
         then winner_payload
         else None
@@ -36,8 +36,8 @@ let get_promotion_winner
         (config : Storage.config_t)
         : pt option =
     let { yay_votes_power; nay_votes_power; pass_votes_power; proposal_payload; voters = _; } = promotion in 
-    let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * Storage.scale / Tezos.get_total_voting_power () >= config.quorum in
-    let super_majority_reached = yay_votes_power * Storage.scale / (yay_votes_power + nay_votes_power) >= config.super_majority in
+    let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * Storage.scale / Tezos.get_total_voting_power () >= config.promotion_quorum in
+    let super_majority_reached = yay_votes_power * Storage.scale / (yay_votes_power + nay_votes_power) >= config.promotion_super_majority in
     if quorum_reached && super_majority_reached 
         then Some proposal_payload
         else None

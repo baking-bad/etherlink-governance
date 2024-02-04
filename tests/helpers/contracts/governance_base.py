@@ -17,9 +17,9 @@ class GovernanceBase(ContractHelper):
             'started_at_level': 0,
             'period_length': 10,
             'upvoting_limit': 20,
-            'min_proposal_quorum': 80,
-            'quorum': 80,
-            'super_majority': 80,
+            'proposal_quorum': 80,
+            'promotion_quorum': 80,
+            'promotion_super_majority': 80,
         }
         if custom_config is not None:
             config.update(custom_config)

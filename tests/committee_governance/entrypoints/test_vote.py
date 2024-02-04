@@ -44,7 +44,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'min_proposal_quorum': 20 # 1 baker out of 5 will vote
+            'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
@@ -76,7 +76,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'started_at_level': governance_started_at_level,
             'period_length': 5,
             'upvoting_limit': 2,
-            'min_proposal_quorum': 20 # 1 baker out of 5 will vote
+            'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
 
         context = governance.get_voting_context()

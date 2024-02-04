@@ -67,7 +67,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 2,
-            'min_proposal_quorum': 40 # 1 baker out of 5 will vote
+            'proposal_quorum': 40 # 1 baker out of 5 will vote
         })
         assert self.get_current_level() == governance_started_at_level
 
@@ -101,7 +101,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'min_proposal_quorum': 60 # 2 bakers out of 5 will vote
+            'proposal_quorum': 60 # 2 bakers out of 5 will vote
         })
         assert self.get_current_level() == governance_started_at_level
 
@@ -147,7 +147,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'min_proposal_quorum': 20 # 1 bakers out of 5 will vote for each proposal
+            'proposal_quorum': 20 # 1 bakers out of 5 will vote for each proposal
         })
         assert self.get_current_level() == governance_started_at_level
 
@@ -194,7 +194,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'min_proposal_quorum': 40 # 2 bakers out of 5 voted
+            'proposal_quorum': 40 # 2 bakers out of 5 voted
         })
         assert self.get_current_level() == governance_started_at_level
 
@@ -240,7 +240,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'min_proposal_quorum': 40 # 2 bakers out of 5 voted
+            'proposal_quorum': 40 # 2 bakers out of 5 voted
         })
         assert self.get_current_level() == governance_started_at_level
 
