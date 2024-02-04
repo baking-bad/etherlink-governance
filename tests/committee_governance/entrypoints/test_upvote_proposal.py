@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD
 from tests.helpers.errors import (
-    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_UPVOTED, 
+    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_UPVOTED, UPVOTING_LIMIT_EXCEEDED, 
     SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pkh
@@ -58,6 +58,42 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         with self.raisesMichelsonError(NOT_PROPOSAL_PERIOD):
             governance.using(baker).upvote_proposal(pkh(baker), addresses).send()
 
+    def test_should_fail_if_upvoting_limit_is_exceeded(self) -> None:
+        baker1 = self.bootstrap_baker()
+        baker2 = self.bootstrap_baker()
+        baker3 = self.bootstrap_baker()
+        # deploying will take 1 block
+        governance_started_at_level = self.get_current_level() + 1
+        # Period index: 0. Block: 1 of 7
+        governance = self.deploy_committee_governance(custom_config={
+            'started_at_level': governance_started_at_level,
+            'period_length': 7,
+            'upvoting_limit': 2
+        })
+        
+        addresses1 = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa']
+        # Period index: 0. Block: 2 of 7
+        governance.using(baker1).new_proposal(pkh(baker1), addresses1).send()
+        self.bake_block()
+        # Period index: 0. Block: 3 of 7
+        addresses2 = ['tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
+        governance.using(baker1).new_proposal(pkh(baker1), addresses2).send()
+        self.bake_block()
+        # Period index: 0. Block: 4 of 7
+        addresses3 = ['tz1Lc2qBKEWCBeDU8npG6zCeCqpmaegRi6Jg']
+        governance.using(baker2).new_proposal(pkh(baker2), addresses3).send()
+        self.bake_block()
+        # Period index: 0. Block: 5 of 7
+        governance.using(baker3).upvote_proposal(pkh(baker3), addresses1).send()
+        self.bake_block()
+        # Period index: 0. Block: 6 of 7
+        governance.using(baker3).upvote_proposal(pkh(baker3), addresses2).send()
+        self.bake_block()
+
+        with self.raisesMichelsonError(UPVOTING_LIMIT_EXCEEDED):
+            governance.using(baker3).upvote_proposal(pkh(baker3), addresses3).send()
+
+
     def test_should_fail_if_proposal_already_upvoted_by_proposer(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
@@ -66,7 +102,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 5
+            'upvoting_limit': 5
         })
         
         one_address = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa']
@@ -104,7 +140,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
@@ -128,7 +164,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
 
         context = governance.get_voting_context()
@@ -146,7 +182,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
             'payload': addresses, 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
-            'up_votes_power': DEFAULT_VOTING_POWER
+            'upvotes_power': DEFAULT_VOTING_POWER
         }
 
         # Period index: 0. Block: 2 of 5
@@ -161,5 +197,5 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
             'payload': addresses, 
             'proposer': pkh(baker1), 
             'voters': expected_voters, 
-            'up_votes_power': DEFAULT_VOTING_POWER * 2
+            'upvotes_power': DEFAULT_VOTING_POWER * 2
         }

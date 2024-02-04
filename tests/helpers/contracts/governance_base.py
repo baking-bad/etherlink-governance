@@ -16,7 +16,7 @@ class GovernanceBase(ContractHelper):
         config = {
             'started_at_level': 0,
             'period_length': 10,
-            'proposals_limit_per_account': 20,
+            'upvoting_limit': 20,
             'min_proposal_quorum': 80,
             'quorum': 80,
             'super_majority': 80,

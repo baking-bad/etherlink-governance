@@ -8,7 +8,7 @@ let get_period_index
         : nat =
     let blocks_after_start_int = Tezos.get_level () - config.started_at_level in
     match is_nat blocks_after_start_int with
-        | Some blocks_after_start ->  blocks_after_start / config.period_length
+        | Some blocks_after_start -> blocks_after_start / config.period_length
         | None -> failwith Errors.current_level_is_less_than_start_level
 
 
@@ -18,13 +18,13 @@ let get_proposal_winner
         (config : Storage.config_t)
         : pt option =
     let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
-        if proposal.up_votes_power > max_power
-            then (Some(proposal.payload), proposal.up_votes_power)
-            else if proposal.up_votes_power = max_power
+        if proposal.upvotes_power > max_power
+            then (Some(proposal.payload), proposal.upvotes_power)
+            else if proposal.upvotes_power = max_power
                 then (None, max_power)
                 else (winner, max_power) in
-    let (winner_payload, winner_up_votes_power) = Map.fold get_winners proposals (None, 0n) in
-    let proposal_quorum_reached = winner_up_votes_power * Storage.scale >= Tezos.get_total_voting_power () * config.min_proposal_quorum in
+    let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposals (None, 0n) in
+    let proposal_quorum_reached = winner_upvotes_power * Storage.scale >= Tezos.get_total_voting_power () * config.min_proposal_quorum in
     if proposal_quorum_reached
         then winner_payload
         else None
@@ -35,9 +35,9 @@ let get_promotion_winner
         (promotion : pt Storage.promotion_t)
         (config : Storage.config_t)
         : pt option =
-    let { yay_vote_power; nay_vote_power; pass_vote_power; proposal_payload; voters = _; } = promotion in 
-    let quorum_reached = (yay_vote_power + nay_vote_power + pass_vote_power) * Storage.scale / Tezos.get_total_voting_power () >= config.quorum in
-    let super_majority_reached = yay_vote_power * Storage.scale / (yay_vote_power + nay_vote_power) >= config.super_majority in
+    let { yay_votes_power; nay_votes_power; pass_votes_power; proposal_payload; voters = _; } = promotion in 
+    let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * Storage.scale / Tezos.get_total_voting_power () >= config.quorum in
+    let super_majority_reached = yay_votes_power * Storage.scale / (yay_votes_power + nay_votes_power) >= config.super_majority in
     if quorum_reached && super_majority_reached 
         then Some proposal_payload
         else None
@@ -70,9 +70,9 @@ let init_new_promotion_voting_contex
         promotion = Some {
             proposal_payload = proposal_winner;
             voters = Set.empty;
-            yay_vote_power = 0n;
-            nay_vote_power = 0n;
-            pass_vote_power = 0n;   
+            yay_votes_power = 0n;
+            nay_votes_power = 0n;
+            pass_votes_power = 0n;   
         }
     }   
 
@@ -142,20 +142,20 @@ let assert_current_period_promotion
         | Promotion -> unit
         | Proposal -> failwith Errors.not_promotion_period
 
-let assert_new_proposal_allowed
+let assert_upvoting_allowed
         (type pt)
         (proposals : pt Storage.proposals_t)
         (config : Storage.config_t)
-        (proposer : address)
+        (voter : address)
         : unit =
-    let get_proposals_count = fun (acc, (_, proposal) : nat * (bytes * pt Storage.proposal_t)) ->
-        if proposal.proposer = proposer
+    let get_upvotes_count = fun (acc, (_, proposal) : nat * (bytes * pt Storage.proposal_t)) ->
+        if Set.mem voter proposal.voters
             then acc + 1n
             else acc in
-    let proposals_count = Map.fold get_proposals_count proposals 0n in
-    if proposals_count < config.proposals_limit_per_account
+    let votings_count = Map.fold get_upvotes_count proposals 0n in
+    if votings_count < config.upvoting_limit
         then unit
-        else failwith Errors.proposal_limit_exceeded
+        else failwith Errors.upvoting_limit_exceeded
 
 let get_payload_key
         (type pt)
@@ -163,7 +163,7 @@ let get_payload_key
         : bytes =
     Crypto.blake2b (Bytes.pack payload) //TODO: choose hash algoritm
 
-let add_new_proposal
+let add_new_proposal_and_upvote
         (type pt)
         (payload : pt)
         (proposer : address)
@@ -171,7 +171,7 @@ let add_new_proposal
         (proposals : pt Storage.proposals_t)
         (config: Storage.config_t)
         : pt Storage.proposals_t =
-    let _ = assert_new_proposal_allowed proposals config proposer in
+    let _ = assert_upvoting_allowed proposals config proposer in
     let key = get_payload_key payload in
     let _ = match Map.find_opt key proposals with
         | Some _ -> failwith Errors.proposal_already_created
@@ -180,7 +180,7 @@ let add_new_proposal
         payload = payload;
         proposer = proposer;
         voters = Set.literal [proposer];
-        up_votes_power = voting_power;
+        upvotes_power = voting_power;
     } in
     Map.add key value proposals
 
@@ -190,10 +190,11 @@ let upvote_proposal
         (voter : address)
         (voting_power : nat)
         (proposals : pt Storage.proposals_t)
+        (config: Storage.config_t)
         : pt Storage.proposals_t =
+    let _ = assert_upvoting_allowed proposals config voter in
     let key = get_payload_key payload in
     let proposal_opt = Map.find_opt key proposals in
-    // TODO: Assert maximum 20 upvotes allowed
     let proposal = Option.unopt_with_error proposal_opt Errors.proposal_not_found in
     let _ = if Set.mem voter proposal.voters
         then failwith Errors.proposal_already_upvoted
@@ -201,7 +202,7 @@ let upvote_proposal
     let updated_proposal = { 
         proposal with
         voters = Set.add voter proposal.voters;
-        up_votes_power = proposal.up_votes_power + voting_power;  
+        upvotes_power = proposal.upvotes_power + voting_power;  
     } in
     Map.update key (Some updated_proposal) proposals
 
@@ -216,9 +217,9 @@ let vote_promotion
         then failwith Errors.promotion_already_voted
         else unit in
     let updated_promotion = match vote with
-        | Yay  -> { promotion with yay_vote_power = promotion.yay_vote_power + voting_power }
-        | Nay  -> { promotion with nay_vote_power = promotion.nay_vote_power + voting_power }
-        | Pass -> { promotion with pass_vote_power = promotion.pass_vote_power + voting_power } in
+        | Yay  -> { promotion with yay_votes_power = promotion.yay_votes_power + voting_power }
+        | Nay  -> { promotion with nay_votes_power = promotion.nay_votes_power + voting_power }
+        | Pass -> { promotion with pass_votes_power = promotion.pass_votes_power + voting_power } in
     { 
         updated_promotion with 
         voters = Set.add voter promotion.voters;

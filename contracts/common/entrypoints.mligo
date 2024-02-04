@@ -18,7 +18,7 @@ let new_proposal
     let _ = Utils.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_proposal voting_context in
     let proposer = Tezos.get_sender () in
-    let updated_proposals = Voting.add_new_proposal payload proposer voting_power voting_context.proposals storage.config in
+    let updated_proposals = Voting.add_new_proposal_and_upvote payload proposer voting_power voting_context.proposals storage.config in
     { storage with voting_context = { voting_context with proposals = updated_proposals } }
 
 
@@ -35,7 +35,7 @@ let upvote_proposal
     let _ = Utils.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_proposal voting_context in
     let voter = Tezos.get_sender () in
-    let updated_proposals = Voting.upvote_proposal payload voter voting_power voting_context.proposals in
+    let updated_proposals = Voting.upvote_proposal payload voter voting_power voting_context.proposals storage.config in
     { storage with voting_context = { voting_context with proposals = updated_proposals } }
 
 

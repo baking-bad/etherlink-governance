@@ -277,8 +277,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert context['voting_context']['promotion'] == {
             'proposal_payload': kernel_hash,
             'voters': [],
-            'yay_vote_power': 0,
-            'nay_vote_power': 0,
-            'pass_vote_power': 0,
+            'yay_votes_power': 0,
+            'nay_votes_power': 0,
+            'pass_votes_power': 0,
         }
         assert context['voting_context']['last_winner_payload'] == None

@@ -2,7 +2,7 @@ from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD
 from tests.helpers.errors import (
     NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_UPVOTED, 
-    SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
+    SENDER_NOT_KEY_HASH_OWNER, UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
 
@@ -58,6 +58,43 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         with self.raisesMichelsonError(NOT_PROPOSAL_PERIOD):
             governance.using(baker).upvote_proposal(pkh(baker), kernel_hash).send()
 
+
+    def test_should_fail_if_upvoting_limit_is_exceeded(self) -> None:
+        baker1 = self.bootstrap_baker()
+        baker2 = self.bootstrap_baker()
+        baker3 = self.bootstrap_baker()
+        # deploying will take 1 block
+        governance_started_at_level = self.get_current_level() + 1
+        # Period index: 0. Block: 1 of 7
+        governance = self.deploy_kernel_governance(custom_config={
+            'started_at_level': governance_started_at_level,
+            'period_length': 7,
+            'upvoting_limit': 2
+        })
+        
+        kernel_hash1 = bytes.fromhex('0101010101010101010101010101010101010101')
+        # Period index: 0. Block: 2 of 7
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1).send()
+        self.bake_block()
+        # Period index: 0. Block: 3 of 7
+        kernel_hash2 = bytes.fromhex('0202020202020202020202020202020202020202')
+        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash2).send()
+        self.bake_block()
+        # Period index: 0. Block: 4 of 7
+        kernel_hash3 = bytes.fromhex('0303030303030303030303030303030303030303')
+        governance.using(baker2).new_proposal(pkh(baker2), kernel_hash3).send()
+        self.bake_block()
+        # Period index: 0. Block: 5 of 7
+        governance.using(baker3).upvote_proposal(pkh(baker3), kernel_hash1).send()
+        self.bake_block()
+        # Period index: 0. Block: 6 of 7
+        governance.using(baker3).upvote_proposal(pkh(baker3), kernel_hash2).send()
+        self.bake_block()
+
+        with self.raisesMichelsonError(UPVOTING_LIMIT_EXCEEDED):
+            governance.using(baker3).upvote_proposal(pkh(baker3), kernel_hash3).send()
+
+
     def test_should_fail_if_proposal_already_upvoted_by_proposer(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
@@ -66,7 +103,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
         
         kernel_hash = '0101010101010101010101010101010101010101'
@@ -86,7 +123,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
         
         kernel_hash = '0101010101010101010101010101010101010101'
@@ -110,7 +147,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
 
         context = governance.get_voting_context()
@@ -127,7 +164,7 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
             'payload': pack_kernel_hash(kernel_hash), 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
-            'up_votes_power': DEFAULT_VOTING_POWER
+            'upvotes_power': DEFAULT_VOTING_POWER
         }
 
         # Period index: 0. Block: 2 of 5
@@ -142,5 +179,5 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
             'payload': pack_kernel_hash(kernel_hash), 
             'proposer': pkh(baker1), 
             'voters': expected_voters, 
-            'up_votes_power': DEFAULT_VOTING_POWER * 2
+            'upvotes_power': DEFAULT_VOTING_POWER * 2
         }

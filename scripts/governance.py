@@ -46,7 +46,7 @@ def trigger_kernel_upgrade(
     help='The period life-time (in blocks), default: 75',
 )
 @click.option(
-    '--proposals_limit_per_account',
+    '--upvoting_limit',
     default=20,
     help='The max number of new active proposals for each account, default: 20',
 )
@@ -75,7 +75,7 @@ def trigger_kernel_upgrade(
 def deploy_kernel_governance(
     started_at_level: int,
     period_length: int,
-    proposals_limit_per_account: int,
+    upvoting_limit: int,
     min_proposal_quorum: int,
     quorum: int,
     super_majority: int,
@@ -92,7 +92,7 @@ def deploy_kernel_governance(
     config = {
         'started_at_level': int(started_at_level),
         'period_length': int(period_length),
-        'proposals_limit_per_account': int(proposals_limit_per_account),
+        'upvoting_limit': int(upvoting_limit),
         'min_proposal_quorum': int(min_proposal_quorum),
         'quorum': int(quorum),
         'super_majority': int(super_majority),

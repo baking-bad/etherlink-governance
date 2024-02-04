@@ -2,7 +2,7 @@ from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD
 from tests.helpers.errors import (
     NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, 
-    PROPOSAL_LIMIT_EXCEEDED, SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
+    UPVOTING_LIMIT_EXCEEDED, SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
 
@@ -67,7 +67,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
         
         # Period index: 0. Block: 2 of 5
@@ -77,7 +77,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker).new_proposal(pkh(baker), ['tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']).send()
         self.bake_block()
 
-        with self.raisesMichelsonError(PROPOSAL_LIMIT_EXCEEDED):
+        with self.raisesMichelsonError(UPVOTING_LIMIT_EXCEEDED):
             governance.using(baker).new_proposal(pkh(baker), ['tz1Lc2qBKEWCBeDU8npG6zCeCqpmaegRi6Jg']).send()
 
     def test_should_fail_if_new_proposal_already_created(self) -> None:
@@ -88,7 +88,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 5
+            'upvoting_limit': 5
         })
         
         one_address = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa']
@@ -126,7 +126,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_committee_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2
+            'upvoting_limit': 2
         })
 
         context = governance.get_voting_context()
@@ -144,7 +144,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'payload': addresses1, 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
-            'up_votes_power': DEFAULT_VOTING_POWER
+            'upvotes_power': DEFAULT_VOTING_POWER
         }
 
         addresses2 = ['tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
@@ -158,11 +158,11 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'payload': addresses1, 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
-            'up_votes_power': DEFAULT_VOTING_POWER
+            'upvotes_power': DEFAULT_VOTING_POWER
         }
         assert list(context['voting_context']['proposals'].values())[1] == {
             'payload': addresses2, 
             'proposer': pkh(baker2), 
             'voters': [pkh(baker2)], 
-            'up_votes_power': DEFAULT_VOTING_POWER
+            'upvotes_power': DEFAULT_VOTING_POWER
         }

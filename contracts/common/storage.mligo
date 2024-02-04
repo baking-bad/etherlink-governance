@@ -6,8 +6,8 @@ let scale = 100n
 type config_t = {
     started_at_level : nat;             // used to align with protocol governance cycles
     period_length : nat;                // represented in blocks
-    proposals_limit_per_account : nat;
-    min_proposal_quorum : nat;          // min_winning_stake_ratio
+    upvoting_limit : nat;               // number of proposals that an account may upvote 
+    min_proposal_quorum : nat;          // TODO: rename
     quorum : nat;
     super_majority : nat;
 }
@@ -17,8 +17,8 @@ type config_t = {
 type 'pt proposal_t = {
     payload : 'pt;
     proposer : address;
-    voters: address set;
-    up_votes_power: nat;
+    voters : address set;
+    upvotes_power : nat;
 }
 
 type 'pt proposals_t = (bytes, ('pt proposal_t)) map
@@ -26,9 +26,9 @@ type 'pt proposals_t = (bytes, ('pt proposal_t)) map
 type 'pt promotion_t = {
     proposal_payload : 'pt;
     voters : address set;
-    yay_vote_power : nat;
-    nay_vote_power : nat;
-    pass_vote_power : nat;
+    yay_votes_power : nat;
+    nay_votes_power : nat;
+    pass_votes_power : nat;
 }
 
 type period_type_t = Proposal | Promotion

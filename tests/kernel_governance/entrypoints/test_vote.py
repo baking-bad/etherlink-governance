@@ -75,7 +75,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
-            'proposals_limit_per_account': 2,
+            'upvoting_limit': 2,
             'min_proposal_quorum': 20 # 1 baker out of 5 will vote
         })
 
@@ -96,9 +96,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert context['voting_context']['promotion'] == {
             'proposal_payload': pack_kernel_hash(kernel_hash),
             'voters': [],
-            'yay_vote_power': 0,
-            'nay_vote_power': 0,
-            'pass_vote_power': 0,
+            'yay_votes_power': 0,
+            'nay_votes_power': 0,
+            'pass_votes_power': 0,
         }
 
         # Period index: 1. Block: 2 of 5
@@ -110,9 +110,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert context['voting_context']['promotion'] == {
             'proposal_payload': pack_kernel_hash(kernel_hash),
             'voters': [pkh(baker1)],
-            'yay_vote_power': DEFAULT_VOTING_POWER,
-            'nay_vote_power': 0,
-            'pass_vote_power': 0,
+            'yay_votes_power': DEFAULT_VOTING_POWER,
+            'nay_votes_power': 0,
+            'pass_votes_power': 0,
         }
 
         # Period index: 1. Block: 3 of 5
@@ -126,9 +126,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert context['voting_context']['promotion'] == {
             'proposal_payload': pack_kernel_hash(kernel_hash),
             'voters': expected_voters,
-            'yay_vote_power': DEFAULT_VOTING_POWER,
-            'nay_vote_power': DEFAULT_VOTING_POWER,
-            'pass_vote_power': 0,
+            'yay_votes_power': DEFAULT_VOTING_POWER,
+            'nay_votes_power': DEFAULT_VOTING_POWER,
+            'pass_votes_power': 0,
         }
 
         # Period index: 1. Block: 4 of 5
@@ -142,9 +142,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert context['voting_context']['promotion'] == {
             'proposal_payload': pack_kernel_hash(kernel_hash),
             'voters': expected_voters,
-            'yay_vote_power': DEFAULT_VOTING_POWER,
-            'nay_vote_power': DEFAULT_VOTING_POWER,
-            'pass_vote_power': DEFAULT_VOTING_POWER,
+            'yay_votes_power': DEFAULT_VOTING_POWER,
+            'nay_votes_power': DEFAULT_VOTING_POWER,
+            'pass_votes_power': DEFAULT_VOTING_POWER,
         }
 
         # Period index: 1. Block: 5 of 5
@@ -158,7 +158,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert context['voting_context']['promotion'] == {
             'proposal_payload': pack_kernel_hash(kernel_hash),
             'voters': expected_voters,
-            'yay_vote_power': DEFAULT_VOTING_POWER * 2,
-            'nay_vote_power': DEFAULT_VOTING_POWER,
-            'pass_vote_power': DEFAULT_VOTING_POWER,
+            'yay_votes_power': DEFAULT_VOTING_POWER * 2,
+            'nay_votes_power': DEFAULT_VOTING_POWER,
+            'pass_votes_power': DEFAULT_VOTING_POWER,
         }
