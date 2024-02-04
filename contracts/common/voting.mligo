@@ -6,10 +6,10 @@
 let get_period_index
         (config : Storage.config_t)
         : nat =
-    let blocks_after_start_int = Tezos.get_level () - config.started_at_block in
-    match is_nat blocks_after_start_int with // TODO: move to helper func
+    let blocks_after_start_int = Tezos.get_level () - config.started_at_level in
+    match is_nat blocks_after_start_int with
         | Some blocks_after_start ->  blocks_after_start / config.period_length
-        | None -> failwith Errors.current_level_is_less_than_start_block
+        | None -> failwith Errors.current_level_is_less_than_start_level
 
 
 let get_proposal_winner
@@ -193,6 +193,7 @@ let upvote_proposal
         : pt Storage.proposals_t =
     let key = get_payload_key payload in
     let proposal_opt = Map.find_opt key proposals in
+    // TODO: Assert maximum 20 upvotes allowed
     let proposal = Option.unopt_with_error proposal_opt Errors.proposal_not_found in
     let _ = if Set.mem voter proposal.voters
         then failwith Errors.proposal_already_upvoted

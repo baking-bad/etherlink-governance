@@ -5,13 +5,13 @@ from tests.helpers.utility import pkh
 class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
     def test_should_reset_proposals_when_no_proposals(self) -> None:
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3
         })
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         context = governance.get_voting_context()
         assert context['voting_context']['period_type'] == PROPOSAL_PERIOD
@@ -62,14 +62,14 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
     def test_should_reset_proposals_when_period_is_finished_with_no_votes_except_proposer(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1 
+        governance_started_at_level = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 2
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 2,
             'min_proposal_quorum': 40 # 1 baker out of 5 will vote
         })
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 2
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
@@ -96,14 +96,14 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1 
+        governance_started_at_level = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3,
             'min_proposal_quorum': 60 # 2 bakers out of 5 will vote
         })
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
@@ -142,14 +142,14 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1 
+        governance_started_at_level = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3,
             'min_proposal_quorum': 20 # 1 bakers out of 5 will vote for each proposal
         })
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
         kernel_hash1 = bytes.fromhex('0101010101010101010101010101010101010101')
@@ -189,14 +189,14 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1 
+        governance_started_at_level = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3,
             'min_proposal_quorum': 40 # 2 bakers out of 5 voted
         })
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
@@ -235,14 +235,14 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1 
+        governance_started_at_level = self.get_current_level() + 1 
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3,
             'min_proposal_quorum': 40 # 2 bakers out of 5 voted
         })
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')

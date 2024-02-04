@@ -35,10 +35,10 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
     def test_should_fail_if_current_period_is_not_proposal(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 2
         governance = self.deploy_committee_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 2,
             'min_proposal_quorum': 20 # 1 bakers out of 5 voted
         })
@@ -61,10 +61,10 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
     def test_should_fail_if_proposal_already_upvoted_by_proposer(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
         governance = self.deploy_committee_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 5,
             'proposals_limit_per_account': 5
         })
@@ -99,10 +99,10 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
         governance = self.deploy_committee_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 5,
             'proposals_limit_per_account': 2
         })
@@ -123,10 +123,10 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
         governance = self.deploy_committee_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 5,
             'proposals_limit_per_account': 2
         })

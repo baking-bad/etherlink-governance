@@ -36,7 +36,7 @@ def trigger_kernel_upgrade(
 
 @click.command()
 @click.option(
-    '--started_at_block',
+    '--started_at_level',
     required=True,
     help='Block at which the first period of voting will start',
 )
@@ -73,7 +73,7 @@ def trigger_kernel_upgrade(
 @click.option('--private-key', default=None, help='Use the provided private key.')
 @click.option('--rpc-url', default=None, help='Tezos RPC URL.')
 def deploy_kernel_governance(
-    started_at_block: int,
+    started_at_level: int,
     period_length: int,
     proposals_limit_per_account: int,
     min_proposal_quorum: int,
@@ -90,7 +90,7 @@ def deploy_kernel_governance(
 
     manager = pytezos.using(shell=rpc_url, key=private_key)
     config = {
-        'started_at_block': int(started_at_block),
+        'started_at_level': int(started_at_level),
         'period_length': int(period_length),
         'proposals_limit_per_account': int(proposals_limit_per_account),
         'min_proposal_quorum': int(min_proposal_quorum),

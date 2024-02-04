@@ -11,7 +11,6 @@ module SequencerCommitteeGovernance = struct
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
-    // TODO: think about adding period_index as a parameter
     type new_proposal_params_t = {
         sender_key_hash : key_hash;
         addresses : payload_t;
@@ -53,7 +52,7 @@ module SequencerCommitteeGovernance = struct
   
 
     [@entry]
-    let trigger_committee_upgrade // TODO: Think about better name
+    let trigger_committee_upgrade
             (rollup_address : address)
             (storage : storage_t) 
             : return_t =

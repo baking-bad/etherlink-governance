@@ -8,9 +8,9 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def prepare_promotion_period(self, custom_config=None):
         proposer = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         config = {
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3,
             'min_proposal_quorum': 10 # 1 bakers out of 5 voted
         }
@@ -19,7 +19,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
 
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config=config)
-        assert self.get_current_level() == governance_started_at_block
+        assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')

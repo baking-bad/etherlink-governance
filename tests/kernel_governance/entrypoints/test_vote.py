@@ -39,10 +39,10 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_proposal_already_voted(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 3
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 3,
             'min_proposal_quorum': 20 # 1 baker out of 5 will vote
         })
@@ -70,10 +70,10 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         baker3 = self.bootstrap_baker()
         baker4 = self.bootstrap_baker()
         # deploying will take 1 block
-        governance_started_at_block = self.get_current_level() + 1
+        governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
         governance = self.deploy_kernel_governance(custom_config={
-            'started_at_block': governance_started_at_block,
+            'started_at_level': governance_started_at_level,
             'period_length': 5,
             'proposals_limit_per_account': 2,
             'min_proposal_quorum': 20 # 1 baker out of 5 will vote

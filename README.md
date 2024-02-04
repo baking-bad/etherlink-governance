@@ -2,11 +2,12 @@
 
 todo
 
+## Commands
+
 ### Build
 ```
 make compile
 ```
-
 ### Test
 The testing stack for the contracts is based on Python and requires [poetry](https://python-poetry.org/), [pytezos](https://pytezos.org/), and [pytest](https://docs.pytest.org/en/7.4.x/) to be installed.
 ```
@@ -17,16 +18,17 @@ poetry run pytest
 ```
 poetry run deploy_kernel_governance
 ```
-#### Example
-```
-poetry run deploy_kernel_governance --started_at_block 2926576
-```
 
 ### Trigger Kernel Upgrade
 ```
 poetry run trigger_kernel_upgrade
 ```
-#### Example
-```
-poetry run trigger_kernel_upgrade --governance_contract_address KT1GhARSyMVChJXoo8pUfPzgqGU7c5hsuVtE --rollup_address sr1BQvjNrvPLjPTHTTKLFNY6cNHrWFxc9wjB
-```
+## Deployed contracts
+
+### Kernel Governance
+
+| Network    | Contract address                       |
+|------------|:--------------------------------------:|
+| nairobinet |  KT1C5dyTp5HhM9rp9mY6xs3SdNe1RjfFx9df  |
+| weeklynet  |  N/A  |
+| daylynet   |  N/A  |

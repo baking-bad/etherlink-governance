@@ -14,7 +14,7 @@ class GovernanceBase(ContractHelper):
     @staticmethod
     def make_storage(metadata: dict[str, Any], custom_config=None, last_winner_payload=None) -> dict[str, Any]:
         config = {
-            'started_at_block': 0,
+            'started_at_level': 0,
             'period_length': 10,
             'proposals_limit_per_account': 20,
             'min_proposal_quorum': 80,

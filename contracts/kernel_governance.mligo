@@ -11,7 +11,6 @@ module KernelGovernance = struct
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
-    // TODO: think about adding period_index as a parameter
     type new_proposal_params_t = {
         sender_key_hash : key_hash;
         hash : payload_t;
@@ -53,8 +52,8 @@ module KernelGovernance = struct
   
 
     [@entry]
-    let trigger_kernel_upgrade // TODO: Think about better name
-            (rollup_address : address) // TODO: Think about passing desired kernel_hash
+    let trigger_kernel_upgrade
+            (rollup_address : address)
             (storage : storage_t) 
             : return_t =
         let kernel_hash = Entrypoints.get_last_winner_payload storage in
