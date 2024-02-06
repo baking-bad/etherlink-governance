@@ -1,5 +1,6 @@
 #import "storage.mligo" "Storage"
 #import "errors.mligo" "Errors"
+#import "events.mligo" "Events"
 
 let get_period_index
         (config : Storage.config_t)
@@ -78,37 +79,67 @@ let init_new_promotion_voting_contex
     }   
 
 
+type 'pt voting_context_with_events_t = {
+    voting_context : 'pt Storage.voting_context_t;
+    events : operation list;
+}
+
 let init_new_voting_context
         (type pt)
         (storage : pt Storage.t)
         (period_index : nat)
-        : pt Storage.voting_context_t =
+        : pt voting_context_with_events_t =
     let { voting_context; config; metadata = _} = storage in
     match storage.voting_context.period_type with
         | Proposal -> 
             if period_index = voting_context.period_index + 1n
                 then (match get_proposal_winner voting_context.proposals config with
-                    | Some proposal_winner -> init_new_promotion_voting_contex voting_context period_index proposal_winner
-                    | None -> init_new_poposal_voting_contex voting_context period_index)
-                else init_new_poposal_voting_contex voting_context period_index
+                    | Some proposal_winner -> 
+                        {
+                            voting_context = init_new_promotion_voting_contex voting_context period_index proposal_winner;
+                            events = [];
+                        }
+                    | None -> 
+                        {
+                            voting_context = init_new_poposal_voting_contex voting_context period_index;
+                            events = [];
+                        })
+                else 
+                    {
+                        voting_context = init_new_poposal_voting_contex voting_context period_index;
+                        events = [];
+                    }
         | Promotion ->
             let new_proposal_voting_context = init_new_poposal_voting_contex voting_context period_index in
-            (match get_promotion_winner (Option.unopt voting_context.promotion) config with
-                | Some promotion_winner -> 
-                    { 
+            let promotion = Option.unopt voting_context.promotion in
+            (match get_promotion_winner promotion config with
+                | Some promotion_winner ->
+                    let new_proposal_voting_context_with_new_winner = { 
                         new_proposal_voting_context with 
                         last_winner_payload = Some promotion_winner
+                    } in
+                    let new_voting_winner_event = Events.create_new_voting_winner_event voting_context.period_index voting_context.proposals promotion promotion_winner in
+                    { 
+                        voting_context = new_proposal_voting_context_with_new_winner;
+                        events = [new_voting_winner_event];
                     }
-                | None -> new_proposal_voting_context)
+                | None -> 
+                    {
+                        voting_context = new_proposal_voting_context;
+                        events = [];
+                    })
 
 
 let get_voting_context
         (type pt)
         (storage : pt Storage.t)
-        : pt Storage.voting_context_t = 
+        : pt voting_context_with_events_t = 
     let period_index = get_period_index storage.config in
     let context = if period_index = storage.voting_context.period_index 
-        then storage.voting_context 
+        then {
+            voting_context = storage.voting_context;
+            events = []
+        } 
         else init_new_voting_context storage period_index in
     context
 
@@ -122,10 +153,12 @@ let get_extended_voting_context
         (type pt)
         (storage : pt Storage.t) 
         : pt extended_voting_context_t = 
+    let {voting_context; events=_} = get_voting_context storage in
     { 
-        voting_context = get_voting_context storage;
+        voting_context = voting_context;
         total_voting_power = Tezos.get_total_voting_power ();
     }
+
 
 let assert_current_period_proposal 
         (type pt)
@@ -135,6 +168,7 @@ let assert_current_period_proposal
         | Proposal -> unit
         | Promotion -> failwith Errors.not_proposal_period
 
+
 let assert_current_period_promotion 
         (type pt)
         (voting_context : pt Storage.voting_context_t)
@@ -142,6 +176,7 @@ let assert_current_period_promotion
     match voting_context.period_type with
         | Promotion -> unit
         | Proposal -> failwith Errors.not_promotion_period
+
 
 let assert_upvoting_allowed
         (type pt)
@@ -158,11 +193,13 @@ let assert_upvoting_allowed
         then unit
         else failwith Errors.upvoting_limit_exceeded
 
+
 let get_payload_key
         (type pt)
         (payload : pt)
         : bytes =
     Crypto.sha256 (Bytes.pack payload)
+
 
 let add_new_proposal_and_upvote
         (type pt)
@@ -185,6 +222,7 @@ let add_new_proposal_and_upvote
     } in
     Map.add key value proposals
 
+
 let upvote_proposal
         (type pt)
         (payload : pt)
@@ -206,6 +244,7 @@ let upvote_proposal
         upvotes_power = proposal.upvotes_power + voting_power;  
     } in
     Map.update key (Some updated_proposal) proposals
+
 
 let vote_promotion
         (type pt)

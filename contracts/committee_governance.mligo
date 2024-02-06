@@ -21,7 +21,7 @@ module SequencerCommitteeGovernance = struct
             (params : new_proposal_params_t)
             (storage : storage_t) 
             : return_t = 
-        [], Entrypoints.new_proposal params.sender_key_hash params.addresses storage
+        Entrypoints.new_proposal params.sender_key_hash params.addresses storage
   
 
     type upvote_proposal_params_t = {
@@ -34,7 +34,7 @@ module SequencerCommitteeGovernance = struct
             (params : upvote_proposal_params_t) 
             (storage : storage_t) 
             : return_t = 
-       [], Entrypoints.upvote_proposal params.sender_key_hash params.addresses storage
+       Entrypoints.upvote_proposal params.sender_key_hash params.addresses storage
   
 
     type vote_params_t = {
@@ -48,7 +48,7 @@ module SequencerCommitteeGovernance = struct
             (params : vote_params_t) 
             (storage : storage_t) 
             : return_t =
-        [], Entrypoints.vote params.sender_key_hash params.vote storage
+        Entrypoints.vote params.sender_key_hash params.vote storage
   
 
     [@entry]
