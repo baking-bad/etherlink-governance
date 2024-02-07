@@ -56,18 +56,13 @@ module KernelGovernance = struct
             (rollup_address : address)
             (storage : storage_t) 
             : return_t =
-        let kernel_hash = Entrypoints.get_last_winner_payload storage in
-        let rollup_entry = Rollup.get_entry rollup_address in
-        let upgrade_params = Rollup.get_upgrade_params kernel_hash in
-        let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in 
-        [upgrade_operation], storage
+        Entrypoints.trigger_rollup_upgrade rollup_address storage (fun kernal_hash -> kernal_hash)
 
 
     [@view] 
-    let get_voting_context
+    let get_voting_state
             (_ : unit) 
             (storage : storage_t) 
-            : payload_t Voting.extended_voting_context_t = 
-        Voting.get_extended_voting_context storage
-
+            : payload_t Voting.voting_state_t = 
+        Voting.get_voting_state storage
 end

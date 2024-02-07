@@ -49,9 +49,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
 
         self.bake_block()
         # Period index: 1. Block: 1 of 2
-        context = governance.get_voting_context()
-        assert context['voting_context']['period_index'] == 1
-        assert context['voting_context']['period_type'] == PROMOTION_PERIOD
+        state = governance.get_voting_state()
+        assert state['voting_context']['period_index'] == 1
+        assert state['voting_context']['period_type'] == PROMOTION_PERIOD
 
         # Period index: 1. Block: 2 of 2
         kernel_hash = bytes.fromhex('0202020202020202020202020202020202020202')
@@ -110,17 +110,17 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
             'upvoting_limit': 2
         })
 
-        context = governance.get_voting_context()
-        assert len(context['voting_context']['proposals']) == 0
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 0
         
         kernel_hash1 = '0202020202020202020202020202020202020202'
         # Period index: 0. Block: 1 of 5
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1).send()
         self.bake_block()
 
-        context = governance.get_voting_context()
-        assert len(context['voting_context']['proposals']) == 1
-        assert list(context['voting_context']['proposals'].values())[0] == {
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+        assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash1), 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
@@ -133,15 +133,15 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker2).new_proposal(pkh(baker2), kernel_hash2).send()
         self.bake_block()
 
-        context = governance.get_voting_context()
-        assert len(context['voting_context']['proposals']) == 2
-        assert list(context['voting_context']['proposals'].values())[0] == {
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 2
+        assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash1), 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
             'upvotes_power': DEFAULT_VOTING_POWER
         }
-        assert list(context['voting_context']['proposals'].values())[1] == {
+        assert list(state['voting_context']['proposal_period']['proposals'].values())[1] == {
             'payload': pack_kernel_hash(kernel_hash2), 
             'proposer': pkh(baker2), 
             'voters': [pkh(baker2)], 

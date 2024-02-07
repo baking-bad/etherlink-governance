@@ -23,12 +23,18 @@ type 'pt proposal_t = {
 
 type 'pt proposals_t = (bytes, ('pt proposal_t)) map
 
-type 'pt promotion_t = {
-    proposal_payload : 'pt;
+type 'pt proposal_period_t = {
+    proposals : 'pt proposals_t;
+    total_voting_power : nat;
+}
+
+type 'pt promotion_period_t = {
+    payload : 'pt;
     voters : address set;
     yay_votes_power : nat;
     nay_votes_power : nat;
     pass_votes_power : nat;
+    total_voting_power : nat;
 }
 
 type period_type_t = Proposal | Promotion
@@ -36,14 +42,14 @@ type period_type_t = Proposal | Promotion
 type 'pt voting_context_t = {
     period_index : nat;
     period_type : period_type_t;
-    proposals : 'pt proposals_t;
-    promotion : 'pt promotion_t option;  
+    proposal_period : 'pt proposal_period_t;
+    promotion_period : 'pt promotion_period_t option;
     last_winner_payload : 'pt option;
 }
 
 type 'pt t = {
     config : config_t;
-    voting_context : 'pt voting_context_t;
+    voting_context : ('pt voting_context_t) option;
     metadata : (string, bytes) big_map;
 }
 

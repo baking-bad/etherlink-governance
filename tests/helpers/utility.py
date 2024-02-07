@@ -11,6 +11,7 @@ from typing import Any
 # Default address used as a placeholder in the contract storage
 DEFAULT_ADDRESS = 'tz1burnburnburnburnburnburnburjAYjjX'
 DEFAULT_VOTING_POWER = 4000000000000
+DEFAULT_TOTAL_VOTING_POWER = 20000000000000
 
 
 def pkh(client: PyTezosClient) -> str:

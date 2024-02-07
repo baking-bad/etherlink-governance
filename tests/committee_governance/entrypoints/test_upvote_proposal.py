@@ -50,9 +50,9 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
 
         self.bake_block()
         # Period index: 1. Block: 1 of 2
-        context = governance.get_voting_context()
-        assert context['voting_context']['period_index'] == 1
-        assert context['voting_context']['period_type'] == PROMOTION_PERIOD
+        state = governance.get_voting_state()
+        assert state['voting_context']['period_index'] == 1
+        assert state['voting_context']['period_type'] == PROMOTION_PERIOD
 
         # Period index: 1. Block: 2 of 2
         with self.raisesMichelsonError(NOT_PROPOSAL_PERIOD):
@@ -167,8 +167,8 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
             'upvoting_limit': 2
         })
 
-        context = governance.get_voting_context()
-        assert len(context['voting_context']['proposals']) == 0
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 0
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         addresses.sort()
@@ -176,9 +176,9 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(pkh(baker1), addresses).send()
         self.bake_block()
 
-        context = governance.get_voting_context()
-        assert len(context['voting_context']['proposals']) == 1
-        assert list(context['voting_context']['proposals'].values())[0] == {
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+        assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': addresses, 
             'proposer': pkh(baker1), 
             'voters': [pkh(baker1)], 
@@ -191,9 +191,9 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
 
         expected_voters = [pkh(baker1), pkh(baker2)]
         expected_voters.sort()
-        context = governance.get_voting_context()
-        assert len(context['voting_context']['proposals']) == 1
-        assert list(context['voting_context']['proposals'].values())[0] == {
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+        assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': addresses, 
             'proposer': pkh(baker1), 
             'voters': expected_voters, 

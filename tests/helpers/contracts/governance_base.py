@@ -26,15 +26,16 @@ class GovernanceBase(ContractHelper):
 
         return {
             'config' : config,
-            'voting_context' : {
-                'period_index' : 0,
-                'period_type' : PROPOSAL_PERIOD,
-                'proposals' : {},
-                'promotion' : None,  
-                'last_winner_payload' : last_winner_payload if last_winner_payload is None else bytes.fromhex(last_winner_payload),
-            },
+            # 'voting_context' : {
+            #     'period_index' : 0,
+            #     'period_type' : PROPOSAL_PERIOD,
+            #     'proposals' : {},
+            #     'promotion' : None,  
+            #     'last_winner_payload' : last_winner_payload if last_winner_payload is None else bytes.fromhex(last_winner_payload),
+            # },
+            'voting_context' : None,
             'metadata': metadata
         }
 
-    def get_voting_context(self):
-        return self.contract.get_voting_context().run_view()
+    def get_voting_state(self):
+        return self.contract.get_voting_state().run_view()
