@@ -1,12 +1,12 @@
 (*
-    proposal_quorum, promotion_quorum and promotion_super_majority
-    are represented with scale = 100, ex. 80 = .80 = 80%
+    proposal_quorum, promotion_quorum and promotion_super_majority are represented with scale. 
+    For example if scale = 100 and proposal_quorum = 80 then proposal_quorum == .80 == 80%
 *)
-let scale = 100n
 type config_t = {
     started_at_level : nat;             // used to align with protocol governance cycles
     period_length : nat;                // represented in blocks
     upvoting_limit : nat;               // number of proposals that an account may upvote 
+    scale : nat;
     proposal_quorum : nat;
     promotion_quorum : nat;
     promotion_super_majority : nat;

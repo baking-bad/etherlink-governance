@@ -23,7 +23,7 @@ let get_proposal_winner
                 then (None, max_power)
                 else (winner, max_power) in
     let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
-    let proposal_quorum_reached = winner_upvotes_power * Storage.scale >= proposal_period.total_voting_power * config.proposal_quorum in
+    let proposal_quorum_reached = winner_upvotes_power * config.scale >= proposal_period.total_voting_power * config.proposal_quorum in
     if proposal_quorum_reached
         then winner_payload
         else None
@@ -35,10 +35,10 @@ let get_promotion_winner
         (config : Storage.config_t)
         : pt option =
     let { yay_votes_power; nay_votes_power; pass_votes_power; payload; total_voting_power; voters = _; } = promotion_period in 
-    let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * Storage.scale / total_voting_power >= config.promotion_quorum in
+    let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * config.scale / total_voting_power >= config.promotion_quorum in
     let yay_nay_votes_sum = yay_votes_power + nay_votes_power in
     let super_majority_reached = if yay_nay_votes_sum > 0n
-        then yay_votes_power * Storage.scale / yay_nay_votes_sum >= config.promotion_super_majority
+        then yay_votes_power * config.scale / yay_nay_votes_sum >= config.promotion_super_majority
         else false in
     if quorum_reached && super_majority_reached 
         then Some payload

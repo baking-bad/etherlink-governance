@@ -66,9 +66,9 @@ def trigger_kernel_upgrade(
     help='The min promotion_super_majority for the proposal be considered as a winner, default: 10 (10%)',
 )
 @click.option(
-    '--last_winner_payload',
-    default=None,
-    help='The last winner payload for testing purposes, to allow trigger kernel upgrade right after origination without voting',
+    '--scale',
+    default=100,
+    help='For example if scale = 100 and proposal_quorum = 80 then proposal_quorum == .80 == 80%',
 )
 @click.option('--private-key', default=None, help='Use the provided private key.')
 @click.option('--rpc-url', default=None, help='Tezos RPC URL.')
@@ -79,7 +79,7 @@ def deploy_kernel_governance(
     proposal_quorum: int,
     promotion_quorum: int,
     promotion_super_majority: int,
-    last_winner_payload: Optional[bytes],
+    scale : int,
     private_key: Optional[str],
     rpc_url: Optional[str],
 ) -> KernelGovernance:
@@ -93,11 +93,12 @@ def deploy_kernel_governance(
         'started_at_level': int(started_at_level),
         'period_length': int(period_length),
         'upvoting_limit': int(upvoting_limit),
+        'scale': int(scale),
         'proposal_quorum': int(proposal_quorum),
         'promotion_quorum': int(promotion_quorum),
         'promotion_super_majority': int(promotion_super_majority),
     }
-    opg = KernelGovernance.originate(manager, config, last_winner_payload).send()
+    opg = KernelGovernance.originate(manager, config).send()
     manager.wait(opg)
     kernelGovernance = KernelGovernance.from_opg(manager, opg)
     return kernelGovernance

@@ -12,7 +12,7 @@ from tests.helpers.metadata import Metadata
 
 class KernelGovernance(GovernanceBase):
     @classmethod
-    def originate(self, client: PyTezosClient, custom_config=None, last_winner_payload : str | None = None) -> OperationGroup:
+    def originate(self, client: PyTezosClient, custom_config=None) -> OperationGroup:
         """Deploys Kernel Governance"""
 
         metadata = Metadata.make_default(
@@ -20,7 +20,7 @@ class KernelGovernance(GovernanceBase):
             description='The Kernel Governance contract allows bakers to make proposals and vote on kernel upgrade',
         )
 
-        storage = self.make_storage(metadata, custom_config, last_winner_payload)
+        storage = self.make_storage(metadata, custom_config)
         filename = join(get_build_dir(), 'kernel_governance.tz')
 
         return originate_from_file(filename, client, storage)
