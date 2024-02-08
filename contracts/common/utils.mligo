@@ -21,3 +21,13 @@ let assert_voting_power_positive
     if voting_power > 0n
         then unit
         else failwith Errors.no_voting_power
+
+let assert_proposer_allowed
+        (proposer : address)
+        (allowed_proposers : address set)
+        : unit =
+    if (Set.size allowed_proposers) = 0n
+        then unit
+        else if Set.mem proposer allowed_proposers
+            then unit
+            else failwith Errors.proposer_not_allowed

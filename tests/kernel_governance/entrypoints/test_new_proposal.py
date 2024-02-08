@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD
 from tests.helpers.errors import (
-    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, 
+    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
     UPVOTING_LIMIT_EXCEEDED, SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
@@ -97,6 +97,43 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
 
         with self.raisesMichelsonError(PROPOSAL_ALREADY_CREATED):
             governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
+
+    def test_should_fail_if_proposer_is_not_in_the_allowed_proposers_list(self) -> None:
+        allowed_baker = self.bootstrap_baker()
+        another_allowed_baker = self.bootstrap_baker()
+        disallowed_baker = self.bootstrap_baker()
+        governance = self.deploy_kernel_governance(custom_config={
+            'allowed_proposers': [pkh(allowed_baker), pkh(another_allowed_baker)]
+        })
+
+        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
+        with self.raisesMichelsonError(PROPOSER_NOT_ALLOWED):
+            governance.using(disallowed_baker).new_proposal(pkh(disallowed_baker), kernel_hash).send()
+
+    def test_should_not_fail_if_allowed_proposers_list_is_empty(self) -> None:
+        disallowed_baker = self.bootstrap_baker()
+        governance = self.deploy_kernel_governance(custom_config={
+            'allowed_proposers': []
+        })
+
+        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
+        governance.using(disallowed_baker).new_proposal(pkh(disallowed_baker), kernel_hash).send()
+        self.bake_block()
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+
+    def test_should_not_fail_if_proposer_is_in_the_allowed_proposers_list(self) -> None:
+        allowed_baker = self.bootstrap_baker()
+        another_allowed_baker = self.bootstrap_baker()
+        governance = self.deploy_kernel_governance(custom_config={
+            'allowed_proposers': [pkh(allowed_baker), pkh(another_allowed_baker)]
+        })
+
+        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
+        governance.using(allowed_baker).new_proposal(pkh(allowed_baker), kernel_hash).send()
+        self.bake_block()
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 1
 
     def test_should_create_new_proposal_with_correct_parameters(self) -> None:
         baker1 = self.bootstrap_baker()

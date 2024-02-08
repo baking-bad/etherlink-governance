@@ -5,7 +5,8 @@
 type config_t = {
     started_at_level : nat;             // used to align with protocol governance cycles
     period_length : nat;                // represented in blocks
-    upvoting_limit : nat;               // number of proposals that an account may upvote 
+    upvoting_limit : nat;               // number of proposals that an account may upvote
+    allowed_proposers : address set;    // an accounts that can submit new proposals (if set is empty then anyone is allowed)
     scale : nat;
     proposal_quorum : nat;
     promotion_quorum : nat;

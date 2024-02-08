@@ -17,6 +17,7 @@ class GovernanceBase(ContractHelper):
             'started_at_level': 0,
             'period_length': 10,
             'upvoting_limit': 20,
+            'allowed_proposers': [],
             'scale': 100,
             'proposal_quorum': 80,
             'promotion_quorum': 80,
@@ -28,7 +29,8 @@ class GovernanceBase(ContractHelper):
         return {
             'config' : config,
             'voting_context' : None,
-            'metadata': metadata
+            'metadata': {}
+            # 'metadata': metadata
         }
 
     def get_voting_state(self):

@@ -16,19 +16,13 @@ poetry run pytest
 
 ### Deploy Kernel Governance contract
 ```
-poetry run deploy_kernel_governance
+poetry run deploy_kernel_governance --started_at_level 5370247 --scale 10000 --proposal_quorum 2 --promotion_quorum 2 --promotion_super_majority 5000 --rpc-url https://rpc.tzkt.io/ghostnet
 ```
 
-### Trigger Kernel Upgrade
-```
-poetry run trigger_kernel_upgrade
-```
 ## Deployed contracts
 
 ### Kernel Governance
 
 | Network    | Contract address                       |
 |------------|:--------------------------------------:|
-| nairobinet |  KT1C5dyTp5HhM9rp9mY6xs3SdNe1RjfFx9df  |
-| weeklynet  |  N/A  |
-| daylynet   |  N/A  |
+| ghostnet   |  KT1LULMiqQ8WNmAGNt5jq55AdvrqQTt7cGYX  |

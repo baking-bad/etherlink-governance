@@ -14,11 +14,12 @@ let new_proposal
         : operation list * pt Storage.t = 
     let voting_power = Tezos.voting_power sender_key_hash in
     let {voting_context; finished_voting} = Voting.get_voting_state storage in
+    let proposer = Tezos.get_sender () in
     let _ = Utils.assert_no_xtz_in_transaction () in
     let _ = Utils.assert_sender_is_key_hash_owner sender_key_hash in
     let _ = Utils.assert_voting_power_positive voting_power in
+    let _ = Utils.assert_proposer_allowed proposer storage.config.allowed_proposers in
     let _ = Voting.assert_current_period_proposal voting_context in
-    let proposer = Tezos.get_sender () in
     let updated_proposal_period = Voting.add_new_proposal_and_upvote payload proposer voting_power voting_context.proposal_period storage.config in
     let operations = match finished_voting with
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
