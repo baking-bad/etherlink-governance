@@ -21,7 +21,7 @@ class GovernanceBase(ContractHelper):
             'scale': 100,
             'proposal_quorum': 80,
             'promotion_quorum': 80,
-            'promotion_super_majority': 80,
+            'promotion_supermajority': 80,
         }
         if custom_config is not None:
             config.update(custom_config)

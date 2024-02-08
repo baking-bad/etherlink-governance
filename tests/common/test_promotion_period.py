@@ -105,7 +105,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_if_promotion_quorum_is_not_reached(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 2 bakers out of 5 will vote (40%)
-            'promotion_super_majority': 10, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 10, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -150,10 +150,10 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'winner_payload': None
         }
 
-    def test_should_reset_to_proposal_period_if_promotion_super_majority_is_not_reached(self) -> None:
+    def test_should_reset_to_proposal_period_if_promotion_supermajority_is_not_reached(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)
-            'promotion_super_majority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -203,7 +203,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_if_promotion_phase_has_only_pass_votes(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)
-            'promotion_super_majority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -252,7 +252,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_with_a_new_winner_and_event_if_promotion_period_passed_successfully(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)  
-            'promotion_super_majority': 40, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 40, # 1 baker will vote yay, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']

@@ -32,9 +32,9 @@ from scripts.environment import load_or_ask
     help='The min promotion_quorum for the proposal to be considered as a winner, default: 10 (10%)',
 )
 @click.option(
-    '--promotion_super_majority',
+    '--promotion_supermajority',
     default=10,
-    help='The min promotion_super_majority for the proposal be considered as a winner, default: 10 (10%)',
+    help='The min promotion_supermajority for the proposal be considered as a winner, default: 10 (10%)',
 )
 @click.option(
     '--scale',
@@ -55,7 +55,7 @@ def deploy_kernel_governance(
     upvoting_limit: int,
     proposal_quorum: int,
     promotion_quorum: int,
-    promotion_super_majority: int,
+    promotion_supermajority: int,
     scale : int,
     allowed_proposer : list[str],
     private_key: Optional[str],
@@ -74,7 +74,7 @@ def deploy_kernel_governance(
         'allowed_proposers': list(allowed_proposer),
         'proposal_quorum': int(proposal_quorum),
         'promotion_quorum': int(promotion_quorum),
-        'promotion_super_majority': int(promotion_super_majority),
+        'promotion_supermajority': int(promotion_supermajority),
     }
     
     manager = pytezos.using(shell=rpc_url, key=private_key)

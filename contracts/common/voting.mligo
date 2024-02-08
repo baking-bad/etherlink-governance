@@ -38,7 +38,7 @@ let get_promotion_winner
     let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * config.scale / total_voting_power >= config.promotion_quorum in
     let yay_nay_votes_sum = yay_votes_power + nay_votes_power in
     let super_majority_reached = if yay_nay_votes_sum > 0n
-        then yay_votes_power * config.scale / yay_nay_votes_sum >= config.promotion_super_majority
+        then yay_votes_power * config.scale / yay_nay_votes_sum >= config.promotion_supermajority
         else false in
     if quorum_reached && super_majority_reached 
         then Some payload
