@@ -173,10 +173,8 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert len(state['voting_context']['proposal_period']['proposals']) == 0
         assert state['voting_context']['promotion_period'] == None
         assert state['voting_context']['last_winner_payload'] == kernel_hash
-        assert len(state['pending_events']) == 1
-        assert state['pending_events'][0] == {
-            'started_at_period_index': 0, 
-            'ended_at_period_index': 2, 
+        assert state['finished_voting'] == {
+            'finished_at_period_index': 2, 
             'proposal_period': {
                 'proposals': {
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {

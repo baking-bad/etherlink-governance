@@ -1,8 +1,14 @@
 {
     "cSpell.words": [
         "Etherlink",
+        "failwith",
         "pytezos",
         "rollup",
-        "Sandboxed"
+        "Sandboxed",
+        "struct",
+        "upvote",
+        "upvoted",
+        "upvotes",
+        "upvoting"
     ]
 }

@@ -7,7 +7,7 @@ let assert_no_xtz_in_transaction
         then failwith Errors.xtz_in_transaction_disallowed 
         else unit
 
-let asssert_sender_is_key_hash_owner      
+let assert_sender_is_key_hash_owner      
         (key_hash : key_hash)
         : unit =
     let address_from_key_hash = Tezos.address (Tezos.implicit_account key_hash) in

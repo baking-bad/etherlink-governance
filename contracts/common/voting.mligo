@@ -13,19 +13,24 @@ let get_period_index
 
 let get_proposal_winner
         (type pt)
-        (proposal_period : pt Storage.proposal_period_t)
+        (voting_context : pt Storage.voting_context_t)
+        (current_period_index : nat)
         (config : Storage.config_t)
         : pt option =
-    let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
-        if proposal.upvotes_power > max_power
-            then (Some(proposal.payload), proposal.upvotes_power)
-            else if proposal.upvotes_power = max_power
-                then (None, max_power)
-                else (winner, max_power) in
-    let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
-    let proposal_quorum_reached = winner_upvotes_power * config.scale >= proposal_period.total_voting_power * config.proposal_quorum in
-    if proposal_quorum_reached
-        then winner_payload
+    if current_period_index = voting_context.period_index + 1n
+        then
+            let proposal_period = voting_context.proposal_period in
+            let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
+                if proposal.upvotes_power > max_power
+                    then (Some(proposal.payload), proposal.upvotes_power)
+                    else if proposal.upvotes_power = max_power
+                        then (None, max_power)
+                        else (winner, max_power) in
+            let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
+            let proposal_quorum_reached = winner_upvotes_power * config.scale >= proposal_period.total_voting_power * config.proposal_quorum in
+            if proposal_quorum_reached
+                then winner_payload
+                else None
         else None
 
 
@@ -45,7 +50,7 @@ let get_promotion_winner
         else None
 
 
-let init_new_poposal_voting_period
+let init_new_proposal_voting_period
         (type pt)
         (period_index : nat)
         (last_winner_payload : pt option)
@@ -85,7 +90,7 @@ let init_new_promotion_voting_period
 
 type 'pt voting_state_t = {
     voting_context : 'pt Storage.voting_context_t;
-    pending_events : 'pt Events.event_t list;
+    finished_voting : 'pt Events.voting_finished_event_payload_t option;
 }
 
 let init_new_voting_state
@@ -96,46 +101,36 @@ let init_new_voting_state
         : pt voting_state_t =
     match voting_context.period_type with
         | Proposal -> 
-            if period_index = voting_context.period_index + 1n
-                then (match get_proposal_winner voting_context.proposal_period config with
-                    | Some proposal_winner -> 
-                        {
-                            voting_context = init_new_promotion_voting_period voting_context period_index proposal_winner;
-                            pending_events = [];
-                        }
-                    | None -> 
-                        {
-                            voting_context = init_new_poposal_voting_period period_index voting_context.last_winner_payload;
-                            pending_events = [];
-                        })
-                else 
+            (match get_proposal_winner voting_context period_index config with
+                | Some proposal_winner -> 
                     {
-                        voting_context = init_new_poposal_voting_period period_index voting_context.last_winner_payload;
-                        pending_events = [];
-                    }
-        | Promotion ->
-            let new_proposal_voting_context = init_new_poposal_voting_period period_index voting_context.last_winner_payload in
-            let promotion_period = Option.unopt voting_context.promotion_period in
-            (match get_promotion_winner promotion_period config with
-                | Some promotion_winner ->
-                    let new_proposal_voting_context_with_new_winner = { 
-                        new_proposal_voting_context with 
-                        last_winner_payload = Some promotion_winner
-                    } in
-                    let new_voting_winner_event = Events.create_new_voting_winner_event
-                        voting_context.period_index 
-                        voting_context.proposal_period 
-                        promotion_period 
-                        promotion_winner in
-                    { 
-                        voting_context = new_proposal_voting_context_with_new_winner;
-                        pending_events = [new_voting_winner_event];
+                        voting_context = init_new_promotion_voting_period voting_context period_index proposal_winner;
+                        finished_voting = None;
                     }
                 | None -> 
+                    let finished_voting = if Map.size voting_context.proposal_period.proposals > 0n 
+                        then Some (Events.create_voting_finished_event voting_context None)
+                        else None in
                     {
-                        voting_context = new_proposal_voting_context;
-                        pending_events = [];
+                        voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
+                        finished_voting = finished_voting;
                     })
+        | Promotion ->
+            let new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload in
+            let promotion_period = Option.unopt voting_context.promotion_period in
+            let promotion_winner = get_promotion_winner promotion_period config in
+            let finished_voting = Some (Events.create_voting_finished_event voting_context promotion_winner) in
+            let updated_voting_context = (match promotion_winner with
+                | Some promotion_winner -> 
+                    { 
+                        new_proposal_voting_context with 
+                        last_winner_payload = Some promotion_winner
+                    }
+                | None -> new_proposal_voting_context) in
+            { 
+                voting_context = updated_voting_context;
+                finished_voting = finished_voting;
+            }
 
 
 let get_voting_state
@@ -145,19 +140,14 @@ let get_voting_state
     let period_index = get_period_index storage.config in
     match storage.voting_context with
         | None ->  
-                {
-                    voting_context = init_new_poposal_voting_period period_index None;
-                    pending_events = []
-                }
+            {
+                voting_context = init_new_proposal_voting_period period_index None;
+                finished_voting = None
+            }
         | Some voting_context -> 
-            let context = if period_index = voting_context.period_index 
-                then 
-                    {
-                        voting_context = voting_context;
-                        pending_events = []
-                    } 
-                else init_new_voting_state voting_context storage.config period_index in
-            context
+            if period_index = voting_context.period_index 
+                then { voting_context = voting_context; finished_voting = None; } 
+                else init_new_voting_state voting_context storage.config period_index
 
 
 let assert_current_period_proposal 
@@ -188,8 +178,8 @@ let assert_upvoting_allowed
         if Set.mem voter proposal.voters
             then acc + 1n
             else acc in
-    let votings_count = Map.fold get_upvotes_count proposals 0n in
-    if votings_count < config.upvoting_limit
+    let upvotes_count = Map.fold get_upvotes_count proposals 0n in
+    if upvotes_count < config.upvoting_limit
         then unit
         else failwith Errors.upvoting_limit_exceeded
 

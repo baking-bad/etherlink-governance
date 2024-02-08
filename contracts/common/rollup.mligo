@@ -22,7 +22,7 @@ let get_entry   // NOTE: the entrypoint is used to upgrade kernel and sequencer 
         (rollup : address) 
         : t contract =
     match Tezos.get_contract_opt rollup with
-        | None -> failwith Errors.rollup_entryoint_not_found
+        | None -> failwith Errors.rollup_entrypoint_not_found
         | Some entry -> entry
 
 let get_upgrade_params 

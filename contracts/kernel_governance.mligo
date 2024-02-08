@@ -56,7 +56,7 @@ module KernelGovernance = struct
             (rollup_address : address)
             (storage : storage_t) 
             : return_t =
-        Entrypoints.trigger_rollup_upgrade rollup_address storage (fun kernal_hash -> kernal_hash)
+        Entrypoints.trigger_rollup_upgrade rollup_address storage (fun kernel_hash -> kernel_hash)
 
 
     [@view] 
