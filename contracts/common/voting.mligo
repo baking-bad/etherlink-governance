@@ -13,25 +13,20 @@ let get_period_index
 
 let get_proposal_winner
         (type pt)
-        (voting_context : pt Storage.voting_context_t)
-        (current_period_index : nat)
+        (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt option =
-    if current_period_index = voting_context.period_index + 1n
-        then
-            let proposal_period = voting_context.proposal_period in
-            let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
-                if proposal.upvotes_power > max_power
-                    then (Some(proposal.payload), proposal.upvotes_power)
-                    else if proposal.upvotes_power = max_power
-                        then (None, max_power)
-                        else (winner, max_power) in
-            let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
-            let proposal_quorum_reached = winner_upvotes_power * config.scale >= proposal_period.total_voting_power * config.proposal_quorum in
-            if proposal_quorum_reached
-                then winner_payload
-                else None
-        else None
+        let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
+            if proposal.upvotes_power > max_power
+                then (Some(proposal.payload), proposal.upvotes_power)
+                else if proposal.upvotes_power = max_power
+                    then (None, max_power)
+                    else (winner, max_power) in
+        let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
+        let proposal_quorum_reached = winner_upvotes_power * config.scale >= proposal_period.total_voting_power * config.proposal_quorum in
+        if proposal_quorum_reached
+            then winner_payload
+            else None
 
 
 let get_promotion_winner
@@ -101,13 +96,22 @@ let init_new_voting_state
         : pt voting_state_t =
     match voting_context.period_type with
         | Proposal -> 
-            (match get_proposal_winner voting_context period_index config with
+            (match get_proposal_winner voting_context.proposal_period config with
                 | Some proposal_winner -> 
-                    {
-                        voting_context = init_new_promotion_voting_period voting_context period_index proposal_winner;
-                        finished_voting = None;
-                    }
-                | None -> 
+                    let next_period_index = voting_context.period_index + 1n in
+                    (if period_index = next_period_index
+                        then 
+                            {
+                                voting_context = init_new_promotion_voting_period voting_context period_index proposal_winner;
+                                finished_voting = None;
+                            }
+                        else 
+                            let voting_context_with_promotion_phase = init_new_promotion_voting_period voting_context next_period_index proposal_winner in
+                            {
+                                voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
+                                finished_voting = Some (Events.create_voting_finished_event voting_context_with_promotion_phase None);
+                            })
+                | None ->
                     let finished_voting = if Map.size voting_context.proposal_period.proposals > 0n 
                         then Some (Events.create_voting_finished_event voting_context None)
                         else None in
