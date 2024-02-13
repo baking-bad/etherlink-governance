@@ -41,11 +41,15 @@ Creates and upvotes a new proposal.
 
 #### Client command
 
-`octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "Pair \"%YOUR_ADDRESS%\" %KERNEL_HASH%"`
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "Pair \"%YOUR_ADDRESS%\" %KERNEL_HASH%"
+```
 
 #### Example
 
-`octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "new_proposal" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 0x9978f3a5f8bee0be78686c5c568109d2e6148f13"`
+```bash
+octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "new_proposal" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 0x9978f3a5f8bee0be78686c5c568109d2e6148f13"
+```
 
 ### upvote_proposal
 
@@ -53,11 +57,15 @@ Upvotes an existing proposal.
 
 #### Client command
 
-`octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "Pair \"%YOUR_ADDRESS%\" %KERNEL_HASH%"`
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "Pair \"%YOUR_ADDRESS%\" %KERNEL_HASH%"
+```
 
 #### Example
 
-`octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "upvote_proposal" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 0x9978f3a5f8bee0be78686c5c568109d2e6148f13"`
+```bash
+octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "upvote_proposal" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 0x9978f3a5f8bee0be78686c5c568109d2e6148f13"
+```
 
 ## Promotion period
 
@@ -67,18 +75,21 @@ Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the
 
 #### Client command
 
-`octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "vote" --arg "Pair \"%YOUR_ADDRESS%\" %YOUR_VOTE%"`
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "vote" --arg "Pair \"%YOUR_ADDRESS%\" %YOUR_VOTE%"
+```
 
-:::info
-where `%YOUR_VOTE%` is 
+where `%YOUR_VOTE%` is one of the values:
 * `(Left Unit)` for yay
 * `(Right (Left Unit))` for nay
 * `(Right (Right Unit))` for pass
-:::
+
 
 #### Example
 
-`octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" (Left Unit)"`
+```bash
+octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" (Left Unit)"
+```
 
 ## Send upgrade to kernel
 
@@ -88,17 +99,21 @@ Calls a smart rollup's upgrade entrypoint and passes the latest voting winner pa
 
 #### Client command
 
-`octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "trigger_kernel_upgrade" --arg "\"%SMART_ROLLUP_ADDRESS%\""`
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "trigger_kernel_upgrade" --arg "\"%SMART_ROLLUP_ADDRESS%\""
+```
 
 #### Example
 
-`octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "trigger_kernel_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""`
+```bash
+octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "trigger_kernel_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
+```
 
 
 # The get_voting_state on-chain view and voting_finished events
-:::warning
-Note: Don't use the storage to get the actual state
-:::
+
+**Note: Don't use the storage to get the actual state**
+
 
 Use the [get_voting_state](https://better-call.dev/ghostnet/KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL/views) view to obtain the actual state of current voting process at the time of the call. This returns the actual recalculated `voting_context` value as well as pending `voting_finished` event payload in case if the latest voting period is finished but the event was not sent to blockchain yet. The event will be sent after the next successful call to any entrypoint.
 
@@ -108,22 +123,56 @@ Use the [contract events](https://better-call.dev/ghostnet/KT1JA6kdnWJqXRpKKHU5e
 # Config
 
 How to read values stored in the smart contract storage config
-```
+```ocaml
 (*
-    started_at_level and period_length values should be chosen carefully to be sure that the contract governance periods 
-    never cross the boundaries of the tezos protocol governance periods. This ensures the immutability of voting power throughout the entire voting period 
-
-    proposal_quorum, promotion_quorum and promotion_supermajority are represented with scale. 
-    For example if config.scale = 100 and config.proposal_quorum = 80 then proposal_quorum_% == 80 / 100 == .80 == 80%
+    NOTE:
+    started_at_level and period_length values should be chosen carefully 
+    to be sure that the contract governance periods 
+    never cross the boundaries of the tezos protocol governance periods. 
+    This ensures the immutability of voting power throughout the entire voting period 
 *)
 type config_t = {
-    started_at_level : nat;             // used to align voting periods with protocol governance periods. Should be the start level of the current protocol governance period
-    period_length : nat;                // the duration of the of proposal and promotion periods represented in blocks. Should be a divisor of protocol governance period length
-    upvoting_limit : nat;               // number of proposals that an account may upvote and submit
-    allowed_proposers : address set;    // accounts that can submit new proposals (if set is empty then anyone is allowed)
-    scale : nat;                        // denominator for proposal_quorum, promotion_quorum and promotion_supermajority values
-    proposal_quorum : nat;              // minimum ratio of all the cumulated stake of a proposal upvotes to the total stake to advance the proposal to promotion period 
-    promotion_quorum : nat;             // minimum ratio of all the cumulated stake of cast ballots (yay, nay, and pass ballots) to the total stake to consider the proposal as a voting winner
-    promotion_supermajority : nat;      // minimum ratio of cumulated stake of Yay ballots to the cumulated stake of Yay and Nay ballots to consider the proposal as a voting winner
+    (* 
+        Used to align voting periods with protocol governance periods. 
+        Should be the start level of the current protocol governance period 
+    *)
+    started_at_level : nat;
+
+    (* 
+        The duration of the of proposal and promotion periods represented in blocks. 
+        period_length = tezos_governance_period_length / N, where N is integer divisor (factor)
+    *)
+    period_length : nat;
+
+    (* Number of proposals that an account may upvote and submit *)
+    upvoting_limit : nat;               
+
+    (* Accounts that can submit new proposals (if set is empty then anyone is allowed) *)
+    allowed_proposers : address set;
+
+    (* 
+        The scale for proposal_quorum, promotion_quorum and promotion_supermajority params. 
+        For example if config.scale = 100 and config.proposal_quorum = 80 
+        then proposal_quorum_% == 80 / 100 == .80 == 80%
+    *)
+    scale : nat;       
+
+    (* 
+        Minimum ratio of all the cumulated stake of a proposal upvotes to the total stake 
+        to advance the proposal to promotion period 
+    *)
+    proposal_quorum : nat;     
+
+    (* 
+        Minimum ratio of all the cumulated stake of cast ballots (yay, nay, and pass ballots) 
+        to the total stake to consider the proposal as a voting winner 
+    *)
+    promotion_quorum : nat;    
+
+    (* 
+        Minimum ratio of cumulated stake of Yay ballots to the cumulated stake 
+        of Yay and Nay ballots to consider the proposal as a voting winner
+    *)
+    promotion_supermajority : nat;      
 }
 ```

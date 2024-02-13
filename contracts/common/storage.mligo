@@ -1,20 +1,55 @@
 (*
-    started_at_level and period_length values should be chosen carefully to be sure that the contract governance periods 
-    never cross the boundaries of the tezos protocol governance periods. This ensures the immutability of voting power throughout the entire voting period 
-
-    proposal_quorum, promotion_quorum and promotion_supermajority are represented with scale. 
-    For example if config.scale = 100 and config.proposal_quorum = 80 then proposal_quorum_% == 80 / 100 == .80 == 80%
+    NOTE:
+    started_at_level and period_length values should be chosen carefully 
+    to be sure that the contract governance periods 
+    never cross the boundaries of the tezos protocol governance periods. 
+    This ensures the immutability of voting power throughout the entire voting period 
 *)
 type config_t = {
-    started_at_level : nat;             // used to align voting periods with protocol governance periods. Should be the start level of the current protocol governance period
-    period_length : nat;                // the duration of the of proposal and promotion periods represented in blocks. Should be a divisor of protocol governance period length
-    upvoting_limit : nat;               // number of proposals that an account may upvote and submit
-    allowed_proposers : address set;    // accounts that can submit new proposals (if set is empty then anyone is allowed)
-    scale : nat;                        // denominator for proposal_quorum, promotion_quorum and promotion_supermajority values
-    proposal_quorum : nat;              // minimum ratio of all the cumulated stake of a proposal upvotes to the total stake to move the proposal to promotion period 
-    promotion_quorum : nat;             // minimum ratio of all the cumulated stake of cast ballots (yay, nay, and pass ballots) to the total stake to consider the proposal as a voting winner
-    promotion_supermajority : nat;      // minimum ratio of cumulated stake of Yay ballots to the cumulated stake of Yay and Nay ballots to consider the proposal as a voting winner
+    (* 
+        Used to align voting periods with protocol governance periods. 
+        Should be the start level of the current protocol governance period 
+    *)
+    started_at_level : nat;
+
+    (* 
+        The duration of the of proposal and promotion periods represented in blocks. 
+        period_length = tezos_governance_period_length / N, where N is integer divisor (factor)
+    *)
+    period_length : nat;
+
+    (* Number of proposals that an account may upvote and submit *)
+    upvoting_limit : nat;               
+
+    (* Accounts that can submit new proposals (if set is empty then anyone is allowed) *)
+    allowed_proposers : address set;
+
+    (* 
+        The scale for proposal_quorum, promotion_quorum and promotion_supermajority params. 
+        For example if config.scale = 100 and config.proposal_quorum = 80 
+        then proposal_quorum_% == 80 / 100 == .80 == 80%
+    *)
+    scale : nat;       
+
+    (* 
+        Minimum ratio of all the cumulated stake of a proposal upvotes to the total stake 
+        to advance the proposal to promotion period 
+    *)
+    proposal_quorum : nat;     
+
+    (* 
+        Minimum ratio of all the cumulated stake of cast ballots (yay, nay, and pass ballots) 
+        to the total stake to consider the proposal as a voting winner 
+    *)
+    promotion_quorum : nat;    
+
+    (* 
+        Minimum ratio of cumulated stake of Yay ballots to the cumulated stake 
+        of Yay and Nay ballots to consider the proposal as a voting winner
+    *)
+    promotion_supermajority : nat;      
 }
+
 (*
     'pt - payload type. for kernel governance it is bytes, for committee governance it is address set
 *)
