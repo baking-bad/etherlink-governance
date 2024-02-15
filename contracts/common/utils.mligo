@@ -24,10 +24,11 @@ let assert_voting_power_positive
 
 let assert_proposer_allowed
         (proposer : address)
+        (voting_power : nat)
         (allowed_proposers : address set)
         : unit =
     if (Set.size allowed_proposers) = 0n
-        then unit
+        then assert_voting_power_positive voting_power
         else if Set.mem proposer allowed_proposers
             then unit
             else failwith Errors.proposer_not_allowed

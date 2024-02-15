@@ -1332,11 +1332,6 @@
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DUP 4 ;
-                     DIG 7 ;
-                     SWAP ;
-                     EXEC ;
-                     DROP ;
                      DUP 6 ;
                      CAR ;
                      GET 7 ;
@@ -1345,8 +1340,12 @@
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF { DROP }
-                        { DUP 2 ; MEM ; IF {} { PUSH string "PROPOSER_NOT_ALLOWED" ; FAILWITH } } ;
+                     IF { DROP ; DUP 4 ; DIG 7 ; SWAP ; EXEC ; DROP }
+                        { DIG 7 ;
+                          DROP ;
+                          DUP 2 ;
+                          MEM ;
+                          IF {} { PUSH string "PROPOSER_NOT_ALLOWED" ; FAILWITH } } ;
                      DUP 2 ;
                      GET 3 ;
                      IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;

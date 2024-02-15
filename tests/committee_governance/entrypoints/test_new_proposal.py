@@ -154,6 +154,18 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
 
+    def test_should_not_fail_if_no_baker_is_in_the_allowed_proposers_list(self) -> None:
+        no_baker = self.bootstrap_no_baker()
+        governance = self.deploy_committee_governance(custom_config={
+            'allowed_proposers': [pkh(no_baker)]
+        })
+
+        addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
+        governance.using(no_baker).new_proposal(pkh(no_baker), addresses).send()
+        self.bake_block()
+        state = governance.get_voting_state()
+        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+
     def test_should_create_new_proposal_with_correct_parameters(self) -> None:
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
