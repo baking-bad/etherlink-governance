@@ -105,8 +105,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(baker), 
-                        'voters': [pkh(baker)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(baker): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
@@ -169,8 +170,10 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(baker1), 
-                        'voters': [pkh(baker2), pkh(baker1)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER * 2
+                        'votes': {
+                            pkh(baker1): DEFAULT_VOTING_POWER,
+                            pkh(baker2): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
@@ -234,14 +237,16 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
                     b'?\x0b\xfd\xe2*9\xb7\xd2\x9c\xfc\x1f\x13\x9f\xdbuy\xec\xf6\xc9+\\\x16L&\xbdK\xd7\xce\xe4\xf3\xa7\x9b': {
                         'payload': pack_kernel_hash(kernel_hash2), 
                         'proposer': pkh(baker2), 
-                        'voters': [pkh(baker2)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(baker2): DEFAULT_VOTING_POWER
+                        },
                     },
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash1), 
                         'proposer': pkh(baker1), 
-                        'voters': [pkh(baker1)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(baker1): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
@@ -304,18 +309,17 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(baker1), 
-                        'voters': [pkh(baker2), pkh(baker1)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER * 2
+                        'votes': {
+                            pkh(baker1): DEFAULT_VOTING_POWER,
+                            pkh(baker2): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
                 'payload': pack_kernel_hash(kernel_hash),
-                'voters': [],
-                'yay_votes_power': 0,
-                'nay_votes_power': 0,
-                'pass_votes_power': 0,
+                'votes': {},
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'winner_payload': None
@@ -368,10 +372,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': kernel_hash,
-            'voters': [],
-            'yay_votes_power': 0,
-            'nay_votes_power': 0,
-            'pass_votes_power': 0,
+            'votes': {},
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
         assert state['voting_context']['last_winner_payload'] == None

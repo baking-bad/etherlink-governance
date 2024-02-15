@@ -11,15 +11,24 @@ let get_period_index
         | None -> failwith Errors.current_level_is_less_than_start_level
 
 
+let get_upvotes_power
+        (votes: (address, nat) map)
+        : nat =
+    let get_voting_power_sum = fun ((sum, (_, voting_power)) : (nat * (address * nat)) ) ->
+        sum + voting_power in
+    Map.fold get_voting_power_sum votes 0n
+
+
 let get_proposal_winner
         (type pt)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt option =
         let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
-            if proposal.upvotes_power > max_power
-                then (Some(proposal.payload), proposal.upvotes_power)
-                else if proposal.upvotes_power = max_power
+            let upvotes_power = get_upvotes_power proposal.votes in
+            if upvotes_power > max_power
+                then (Some(proposal.payload), upvotes_power)
+                else if upvotes_power = max_power
                     then (None, max_power)
                     else (winner, max_power) in
         let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
@@ -29,12 +38,31 @@ let get_proposal_winner
             else None
 
 
+type aggregated_promotion_voting_power_t = {
+    yay_votes_power : nat;
+    nay_votes_power : nat;
+    pass_votes_power : nat;
+}
+
+let get_aggregated_promotion_voting_power
+        (votes: (address, Storage.promotion_vote_params_t) map)
+        : aggregated_promotion_voting_power_t =
+    let get_values = fun ((values), (_, vote_params) : (aggregated_promotion_voting_power_t * (address * Storage.promotion_vote_params_t) )) ->
+        match vote_params.vote with
+            | Yay  -> { values with yay_votes_power = values.yay_votes_power + vote_params.voting_power }
+            | Nay  -> { values with nay_votes_power = values.nay_votes_power + vote_params.voting_power }
+            | Pass -> { values with pass_votes_power = values.pass_votes_power + vote_params.voting_power } in
+    let result = { yay_votes_power = 0n; nay_votes_power = 0n; pass_votes_power = 0n } in
+    Map.fold get_values votes result
+
+
 let get_promotion_winner
         (type pt)
         (promotion_period : pt Storage.promotion_period_t)
         (config : Storage.config_t)
         : pt option =
-    let { yay_votes_power; nay_votes_power; pass_votes_power; payload; total_voting_power; voters = _; } = promotion_period in 
+    let { total_voting_power; votes; payload; } = promotion_period in 
+    let { yay_votes_power; nay_votes_power; pass_votes_power; } = get_aggregated_promotion_voting_power votes in 
     let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * config.scale / total_voting_power >= config.promotion_quorum in
     let yay_nay_votes_sum = yay_votes_power + nay_votes_power in
     let super_majority_reached = if yay_nay_votes_sum > 0n
@@ -55,7 +83,7 @@ let init_new_proposal_voting_period
         period_type = Proposal;
         proposal_period = {
             proposals = Map.empty;
-            total_voting_power = Tezos.get_total_voting_power ()
+            total_voting_power = Tezos.get_total_voting_power ();
         };
         promotion_period = None;
         last_winner_payload = last_winner_payload;
@@ -74,11 +102,8 @@ let init_new_promotion_voting_period
         period_type = Promotion;
         promotion_period = Some {
             payload = proposal_winner;
-            voters = Set.empty;
-            yay_votes_power = 0n;
-            nay_votes_power = 0n;
-            pass_votes_power = 0n;
-            total_voting_power = Tezos.get_total_voting_power ()
+            votes = Map.empty;
+            total_voting_power = Tezos.get_total_voting_power ();
         }
     }   
 
@@ -179,7 +204,7 @@ let assert_upvoting_allowed
         (voter : address)
         : unit =
     let get_upvotes_count = fun (acc, (_, proposal) : nat * (bytes * pt Storage.proposal_t)) ->
-        if Set.mem voter proposal.voters
+        if Map.mem voter proposal.votes
             then acc + 1n
             else acc in
     let upvotes_count = Map.fold get_upvotes_count proposals 0n in
@@ -211,8 +236,7 @@ let add_new_proposal_and_upvote
     let value = {
         payload = payload;
         proposer = proposer;
-        voters = Set.literal [proposer];
-        upvotes_power = voting_power;
+        votes = Map.literal [(proposer, voting_power)];
     } in
     {
         proposal_period with
@@ -232,13 +256,12 @@ let upvote_proposal
     let key = get_payload_key payload in
     let proposal_opt = Map.find_opt key proposal_period.proposals in
     let proposal = Option.unopt_with_error proposal_opt Errors.proposal_not_found in
-    let _ = if Set.mem voter proposal.voters
+    let _ = if Map.mem voter proposal.votes
         then failwith Errors.proposal_already_upvoted
         else unit in
     let updated_proposal = { 
         proposal with
-        voters = Set.add voter proposal.voters;
-        upvotes_power = proposal.upvotes_power + voting_power;  
+        votes = Map.add voter voting_power proposal.votes;
     } in
     {
         proposal_period with
@@ -253,14 +276,8 @@ let vote_promotion
         (voting_power : nat)
         (promotion_period : pt Storage.promotion_period_t)
         : pt Storage.promotion_period_t =
-    let _ = if Set.mem voter promotion_period.voters
+    let _ = if Map.mem voter promotion_period.votes
         then failwith Errors.promotion_already_voted
         else unit in
-    let updated_promotion = match vote with
-        | Yay  -> { promotion_period with yay_votes_power = promotion_period.yay_votes_power + voting_power }
-        | Nay  -> { promotion_period with nay_votes_power = promotion_period.nay_votes_power + voting_power }
-        | Pass -> { promotion_period with pass_votes_power = promotion_period.pass_votes_power + voting_power } in
-    { 
-        updated_promotion with 
-        voters = Set.add voter promotion_period.voters;
-    }
+    let updated_votes = Map.add voter { vote = vote; voting_power = voting_power; } promotion_period.votes in
+    { promotion_period with votes = updated_votes }

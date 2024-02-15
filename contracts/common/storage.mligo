@@ -56,8 +56,7 @@ type config_t = {
 type 'pt proposal_t = {
     payload : 'pt;
     proposer : address;
-    voters : address set;
-    upvotes_power : nat;
+    votes : (address, nat) map;
 }
 
 type 'pt proposals_t = (bytes, ('pt proposal_t)) map
@@ -67,12 +66,16 @@ type 'pt proposal_period_t = {
     total_voting_power : nat;
 }
 
+type promotion_vote_t = Yay | Nay | Pass
+
+type promotion_vote_params_t = {
+    vote: promotion_vote_t;
+    voting_power: nat;
+}
+
 type 'pt promotion_period_t = {
     payload : 'pt;
-    voters : address set;
-    yay_votes_power : nat;
-    nay_votes_power : nat;
-    pass_votes_power : nat;
+    votes : (address, promotion_vote_params_t) map;
     total_voting_power : nat;
 }
 
@@ -91,5 +94,3 @@ type 'pt t = {
     voting_context : ('pt voting_context_t) option;
     metadata : (string, bytes) big_map;
 }
-
-type promotion_vote_t = Yay | Nay | Pass

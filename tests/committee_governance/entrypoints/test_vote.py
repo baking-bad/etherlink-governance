@@ -96,10 +96,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': addresses,
-            'voters': [],
-            'yay_votes_power': 0,
-            'nay_votes_power': 0,
-            'pass_votes_power': 0,
+            'votes': {},
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
 
@@ -111,10 +108,12 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': addresses,
-            'voters': [pkh(baker1)],
-            'yay_votes_power': DEFAULT_VOTING_POWER,
-            'nay_votes_power': 0,
-            'pass_votes_power': 0,
+            'votes': {
+                pkh(baker1): {
+                    'vote': YAY_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                }
+            },
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
 
@@ -122,16 +121,20 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker2).vote(pkh(baker2), NAY_VOTE).send()
         self.bake_block()
 
-        expected_voters = [pkh(baker1), pkh(baker2)]
-        expected_voters.sort()
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': addresses,
-            'voters': expected_voters,
-            'yay_votes_power': DEFAULT_VOTING_POWER,
-            'nay_votes_power': DEFAULT_VOTING_POWER,
-            'pass_votes_power': 0,
+            'votes': {
+                pkh(baker1): {
+                    'vote': YAY_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                },
+                pkh(baker2): {
+                    'vote': NAY_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                }
+            },
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
 
@@ -139,16 +142,24 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker3).vote(pkh(baker3), PASS_VOTE).send()
         self.bake_block()
 
-        expected_voters = [pkh(baker1), pkh(baker2), pkh(baker3)]
-        expected_voters.sort()
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': addresses,
-            'voters': expected_voters,
-            'yay_votes_power': DEFAULT_VOTING_POWER,
-            'nay_votes_power': DEFAULT_VOTING_POWER,
-            'pass_votes_power': DEFAULT_VOTING_POWER,
+            'votes': {
+                pkh(baker1): {
+                    'vote' : YAY_VOTE,
+                    'voting_power' : DEFAULT_VOTING_POWER
+                },
+                pkh(baker2): {
+                    'vote': NAY_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                },
+                pkh(baker3): {
+                    'vote': PASS_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                }
+            },
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
 
@@ -156,15 +167,27 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker4).vote(pkh(baker4), YAY_VOTE).send()
         self.bake_block()
 
-        expected_voters = [pkh(baker1), pkh(baker2), pkh(baker3), pkh(baker4)]
-        expected_voters.sort()
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': addresses,
-            'voters': expected_voters,
-            'yay_votes_power': DEFAULT_VOTING_POWER * 2,
-            'nay_votes_power': DEFAULT_VOTING_POWER,
-            'pass_votes_power': DEFAULT_VOTING_POWER,
+            'votes': {
+                pkh(baker1): {
+                    'vote' : YAY_VOTE,
+                    'voting_power' : DEFAULT_VOTING_POWER
+                },
+                pkh(baker2): {
+                    'vote': NAY_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                },
+                pkh(baker3): {
+                    'vote': PASS_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                },
+                pkh(baker4): {
+                    'vote': YAY_VOTE,
+                    'voting_power': DEFAULT_VOTING_POWER
+                },
+            },
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }

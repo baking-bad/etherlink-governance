@@ -180,8 +180,9 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': addresses1, 
             'proposer': pkh(baker1), 
-            'voters': [pkh(baker1)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker1): DEFAULT_VOTING_POWER
+            },
         }
 
         addresses2 = ['tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
@@ -194,12 +195,14 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': addresses1, 
             'proposer': pkh(baker1), 
-            'voters': [pkh(baker1)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker1): DEFAULT_VOTING_POWER
+            },
         }
         assert list(state['voting_context']['proposal_period']['proposals'].values())[1] == {
             'payload': addresses2, 
             'proposer': pkh(baker2), 
-            'voters': [pkh(baker2)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker2): DEFAULT_VOTING_POWER
+            },
         }

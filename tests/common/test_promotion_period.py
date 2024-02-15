@@ -35,10 +35,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
             'payload': kernel_hash,
-            'voters': [],
-            'yay_votes_power': 0,
-            'nay_votes_power': 0,
-            'pass_votes_power': 0,
+            'votes': {},
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
         assert state['voting_context']['last_winner_payload'] == None
@@ -63,18 +60,16 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
-                        'voters': [pkh(proposer)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(proposer): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
                 'payload': pack_kernel_hash(kernel_hash),
-                'voters': [],
-                'yay_votes_power': 0,
-                'nay_votes_power': 0,
-                'pass_votes_power': 0,
+                'votes': {},
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'winner_payload': None
@@ -133,18 +128,25 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
-                        'voters': [pkh(proposer)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(proposer): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
                 'payload': pack_kernel_hash(kernel_hash),
-                'voters': [pkh(baker1), pkh(proposer)],
-                'yay_votes_power': DEFAULT_VOTING_POWER,
-                'nay_votes_power': DEFAULT_VOTING_POWER,
-                'pass_votes_power': 0,
+                'votes': {
+                    pkh(proposer): {
+                        'vote': YAY_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                    pkh(baker1): {
+                        'vote': NAY_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'winner_payload': None
@@ -183,18 +185,29 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
-                        'voters': [pkh(proposer)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(proposer): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
                 'payload': pack_kernel_hash(kernel_hash),
-                'voters': [pkh(baker2), pkh(baker1), pkh(proposer)],
-                'yay_votes_power': DEFAULT_VOTING_POWER,
-                'nay_votes_power': DEFAULT_VOTING_POWER,
-                'pass_votes_power': DEFAULT_VOTING_POWER,
+                'votes': {
+                    pkh(proposer): {
+                        'vote': YAY_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                    pkh(baker1): {
+                        'vote': NAY_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                    pkh(baker2): {
+                        'vote': PASS_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'winner_payload': None
@@ -232,18 +245,21 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
-                        'voters': [pkh(proposer)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(proposer): DEFAULT_VOTING_POWER
+                        },
                     },
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
                 'payload': pack_kernel_hash(kernel_hash),
-                'voters': [pkh(baker2)],
-                'yay_votes_power': 0,
-                'nay_votes_power': 0,
-                'pass_votes_power': DEFAULT_VOTING_POWER,
+                'votes': {
+                    pkh(baker2): {
+                        'vote': PASS_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'winner_payload': None
@@ -277,18 +293,29 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                     b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
-                        'voters': [pkh(proposer)], 
-                        'upvotes_power': DEFAULT_VOTING_POWER
+                        'votes': {
+                            pkh(proposer): DEFAULT_VOTING_POWER
+                        },
                     }
                 }, 
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'promotion_period': {
                 'payload': pack_kernel_hash(kernel_hash), 
-                'voters': [pkh(baker2), pkh(baker1), pkh(proposer)], 
-                'yay_votes_power': DEFAULT_VOTING_POWER, 
-                'nay_votes_power': DEFAULT_VOTING_POWER, 
-                'pass_votes_power': DEFAULT_VOTING_POWER, 
+                'votes': {
+                    pkh(proposer): {
+                        'vote': YAY_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                    pkh(baker1): {
+                        'vote': NAY_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                    pkh(baker2): {
+                        'vote': PASS_VOTE,
+                        'voting_power' : DEFAULT_VOTING_POWER
+                    },
+                },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'winner_payload': pack_kernel_hash(kernel_hash)

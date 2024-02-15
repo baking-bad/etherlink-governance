@@ -163,21 +163,22 @@ class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
         assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash), 
             'proposer': pkh(baker1), 
-            'voters': [pkh(baker1)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker1): DEFAULT_VOTING_POWER
+            },
         }
 
         # Period index: 0. Block: 2 of 5
         governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
         self.bake_block()
 
-        expected_voters = [pkh(baker1), pkh(baker2)]
-        expected_voters.sort()
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash), 
             'proposer': pkh(baker1), 
-            'voters': expected_voters, 
-            'upvotes_power': DEFAULT_VOTING_POWER * 2
+            'votes': {
+                pkh(baker1): DEFAULT_VOTING_POWER,
+                pkh(baker2): DEFAULT_VOTING_POWER
+            },
         }

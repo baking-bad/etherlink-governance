@@ -160,8 +160,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash1), 
             'proposer': pkh(baker1), 
-            'voters': [pkh(baker1)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker1): DEFAULT_VOTING_POWER
+            },
         }
 
 
@@ -175,12 +176,14 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
             'payload': pack_kernel_hash(kernel_hash1), 
             'proposer': pkh(baker1), 
-            'voters': [pkh(baker1)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker1): DEFAULT_VOTING_POWER
+            },
         }
         assert list(state['voting_context']['proposal_period']['proposals'].values())[1] == {
             'payload': pack_kernel_hash(kernel_hash2), 
             'proposer': pkh(baker2), 
-            'voters': [pkh(baker2)], 
-            'upvotes_power': DEFAULT_VOTING_POWER
+            'votes': {
+                pkh(baker2): DEFAULT_VOTING_POWER
+            },
         }
