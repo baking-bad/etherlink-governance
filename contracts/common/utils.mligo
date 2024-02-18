@@ -32,3 +32,14 @@ let assert_proposer_allowed
         else if Set.mem proposer allowed_proposers
             then unit
             else failwith Errors.proposer_not_allowed
+
+let assert_payload_not_last_winner
+        (type pt)
+        (payload : pt)
+        (last_winner_payload_opt : pt option) =
+    match last_winner_payload_opt with
+        | Some last_winner_payload ->
+            if Bytes.pack payload = Bytes.pack last_winner_payload
+                then failwith Errors.payload_same_as_last_winner 
+                else unit
+        | None -> unit

@@ -68,7 +68,7 @@
              SUB ;
              ISNAT ;
              IF_NONE
-               { DROP ; PUSH string "CURRENT_LEVEL_IS_LESS_THAN_START_LEVEL" ; FAILWITH }
+               { DROP ; PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ; FAILWITH }
                { SWAP ;
                  GET 3 ;
                  SWAP ;
@@ -1347,6 +1347,16 @@
                           MEM ;
                           IF {} { PUSH string "PROPOSER_NOT_ALLOWED" ; FAILWITH } } ;
                      DUP 2 ;
+                     GET 8 ;
+                     IF_NONE
+                       {}
+                       { PACK ;
+                         DUP 6 ;
+                         PACK ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH string "PAYLOAD_SAME_AS_LAST_WINNER" ; FAILWITH } {} } ;
+                     DUP 2 ;
                      GET 3 ;
                      IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;
                      DUP 2 ;
@@ -1456,7 +1466,7 @@
          SUB ;
          ISNAT ;
          IF_NONE
-           { DROP ; PUSH string "CURRENT_LEVEL_IS_LESS_THAN_START_LEVEL" ; FAILWITH }
+           { DROP ; PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ; FAILWITH }
            { SWAP ;
              GET 3 ;
              SWAP ;

@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import PROMOTION_PERIOD
+from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, YAY_VOTE
 from tests.helpers.errors import (
-    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
+    NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PAYLOAD_SAME_AS_LAST_WINNER, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
     UPVOTING_LIMIT_EXCEEDED, SENDER_NOT_KEY_HASH_OWNER, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
@@ -31,6 +31,32 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
         with self.raisesMichelsonError(NO_VOTING_POWER):
             governance.using(no_baker).new_proposal(pkh(no_baker), kernel_hash).send()
+
+    def test_should_fail_payload_same_as_last_winner(self) -> None:
+        baker = self.bootstrap_baker()
+        # deploying will take 1 block
+        governance_started_at_level = self.get_current_level() + 1
+        # Period index: 0. Block: 1 of 2
+        governance = self.deploy_kernel_governance(custom_config={
+            'started_at_level': governance_started_at_level,
+            'period_length': 2,
+            'proposal_quorum': 20, # 1 bakers out of 5 voted
+            'promotion_quorum': 20, # 1 bakers out of 5 voted
+            'promotion_supermajority': 50, # 1 bakers out of 5 voted
+        })
+
+        # Period index: 0. Block: 2 of 2
+        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
+        governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
+        self.bake_blocks(2)
+
+        # Period index: 1. Block: 1 of 2
+        governance.using(baker).vote(pkh(baker), YAY_VOTE).send()
+        self.bake_blocks(2)
+
+        # Period index: 3. Block: 1 of 2
+        with self.raisesMichelsonError(PAYLOAD_SAME_AS_LAST_WINNER):
+            governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
 
     def test_should_fail_if_current_period_is_not_proposal(self) -> None:
         baker = self.bootstrap_baker()
