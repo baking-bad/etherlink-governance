@@ -46,3 +46,9 @@ class CommitteeGovernance(GovernanceBase):
         return self.contract.vote(
             {'sender_key_hash': sender_key_hash, 'vote': vote}
         )
+
+    def trigger_committee_upgrade(self, rollup_address : str) -> ContractCall:
+        """Triggers upgrade transaction to rollup with last winner committee addresses set"""
+
+        return self.contract.trigger_committee_upgrade(rollup_address)
+    
