@@ -36,21 +36,24 @@
          LAMBDA
            unit
            unit
-           { PUSH mutez 0 ;
+           { DROP ;
+             PUSH string "XTZ_IN_TRANSACTION_DISALLOWED" ;
+             PUSH mutez 0 ;
              AMOUNT ;
              COMPARE ;
-             GT ;
-             IF { DROP ; PUSH string "XTZ_IN_TRANSACTION_DISALLOWED" ; FAILWITH } {} } ;
+             EQ ;
+             IF { DROP ; UNIT } { FAILWITH } } ;
          LAMBDA
            key_hash
            unit
            { IMPLICIT_ACCOUNT ;
              ADDRESS ;
+             PUSH string "SENDER_NOT_KEY_HASH_OWNER" ;
              SENDER ;
-             SWAP ;
+             DIG 2 ;
              COMPARE ;
              EQ ;
-             IF { UNIT } { PUSH string "SENDER_NOT_KEY_HASH_OWNER" ; FAILWITH } } ;
+             IF { DROP ; UNIT } { FAILWITH } } ;
          LAMBDA
            nat
            unit
@@ -680,7 +683,8 @@
                  GET 3 ;
                  DUP 3 ;
                  MEM ;
-                 IF { PUSH string "PROMOTION_ALREADY_VOTED" ; FAILWITH } {} ;
+                 NOT ;
+                 IF {} { PUSH string "PROMOTION_ALREADY_VOTED" ; FAILWITH } ;
                  DIG 3 ;
                  IF_NONE
                    { NIL operation }
@@ -1021,7 +1025,8 @@
                      GET 4 ;
                      DUP 4 ;
                      MEM ;
-                     IF { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } {} ;
+                     NOT ;
+                     IF {} { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } ;
                      DIG 4 ;
                      IF_NONE
                        { NIL operation }
@@ -1349,12 +1354,14 @@
                      GET 8 ;
                      IF_NONE
                        {}
-                       { PACK ;
-                         DUP 6 ;
+                       { PUSH string "PAYLOAD_SAME_AS_LAST_WINNER" ;
+                         SWAP ;
+                         PACK ;
+                         DUP 7 ;
                          PACK ;
                          COMPARE ;
-                         EQ ;
-                         IF { PUSH string "PAYLOAD_SAME_AS_LAST_WINNER" ; FAILWITH } {} } ;
+                         NEQ ;
+                         IF { DROP } { FAILWITH } } ;
                      DUP 2 ;
                      GET 3 ;
                      IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;
@@ -1377,8 +1384,9 @@
                      DUP 2 ;
                      CAR ;
                      DUP 2 ;
-                     GET ;
-                     IF_NONE {} { DROP ; PUSH string "PROPOSAL_ALREADY_CREATED" ; FAILWITH } ;
+                     MEM ;
+                     NOT ;
+                     IF {} { PUSH string "PROPOSAL_ALREADY_CREATED" ; FAILWITH } ;
                      DIG 4 ;
                      IF_NONE
                        { NIL operation }

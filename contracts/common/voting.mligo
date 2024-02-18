@@ -208,9 +208,7 @@ let assert_upvoting_allowed
             then acc + 1n
             else acc in
     let upvotes_count = Map.fold get_upvotes_count proposals 0n in
-    if upvotes_count < config.upvoting_limit
-        then unit
-        else failwith Errors.upvoting_limit_exceeded
+    assert_with_error (upvotes_count < config.upvoting_limit) Errors.upvoting_limit_exceeded
 
 
 let get_payload_key
@@ -230,9 +228,7 @@ let add_new_proposal_and_upvote
         : pt Storage.proposal_period_t =
     let _ = assert_upvoting_allowed proposal_period.proposals config proposer in
     let key = get_payload_key payload in
-    let _ = match Map.find_opt key proposal_period.proposals with
-        | Some _ -> failwith Errors.proposal_already_created
-        | None -> unit in
+    let _ = assert_with_error (not Map.mem key proposal_period.proposals) Errors.proposal_already_created in
     let value = {
         payload = payload;
         proposer = proposer;
@@ -256,9 +252,7 @@ let upvote_proposal
     let key = get_payload_key payload in
     let proposal_opt = Map.find_opt key proposal_period.proposals in
     let proposal = Option.unopt_with_error proposal_opt Errors.proposal_not_found in
-    let _ = if Map.mem voter proposal.votes
-        then failwith Errors.proposal_already_upvoted
-        else unit in
+    let _ = assert_with_error (not Map.mem voter proposal.votes) Errors.proposal_already_upvoted in
     let updated_proposal = { 
         proposal with
         votes = Map.add voter voting_power proposal.votes;
@@ -276,8 +270,6 @@ let vote_promotion
         (voting_power : nat)
         (promotion_period : pt Storage.promotion_period_t)
         : pt Storage.promotion_period_t =
-    let _ = if Map.mem voter promotion_period.votes
-        then failwith Errors.promotion_already_voted
-        else unit in
+    let _ = assert_with_error (not Map.mem voter promotion_period.votes) Errors.promotion_already_voted in
     let updated_votes = Map.add voter { vote = vote; voting_power = voting_power; } promotion_period.votes in
     { promotion_period with votes = updated_votes }
