@@ -66,4 +66,11 @@ module SequencerCommitteeGovernance = struct
             : payload_t Voting.voting_state_t = 
         Voting.get_voting_state storage
 
+
+    [@view] 
+    let get_period_remaining_blocks
+            (_ : unit) 
+            (storage : storage_t) 
+            : nat = 
+        Voting.get_current_period_remaining_blocks storage.config
 end

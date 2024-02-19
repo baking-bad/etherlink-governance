@@ -1729,5 +1729,29 @@
                       SOME ;
                       SWAP ;
                       IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
-         PAIR } }
+         PAIR } ;
+  view "get_period_remaining_blocks"
+       unit
+       nat
+       { CDR ;
+         CAR ;
+         DUP ;
+         CAR ;
+         LEVEL ;
+         SUB ;
+         SWAP ;
+         GET 3 ;
+         SWAP ;
+         ISNAT ;
+         IF_NONE
+           { DROP ; PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ; FAILWITH }
+           { DUP 2 ;
+             SWAP ;
+             EDIV ;
+             IF_NONE { PUSH string "MOD by 0" ; FAILWITH } {} ;
+             CDR ;
+             SWAP ;
+             SUB ;
+             ISNAT ;
+             IF_NONE { PUSH string "option is None" ; FAILWITH } {} } } }
 

@@ -11,6 +11,18 @@ let get_period_index
         | None -> failwith Errors.current_level_less_than_start_level
 
 
+let get_current_period_remaining_blocks
+        (config : Storage.config_t)
+        : nat =
+    let blocks_after_start_int = Tezos.get_level () - config.started_at_level in
+    let period_length = config.period_length in
+    match is_nat blocks_after_start_int with
+        | Some blocks_after_start ->
+            let remainder = blocks_after_start mod period_length in
+            Option.unopt (is_nat (period_length - remainder))
+        | None -> failwith Errors.current_level_less_than_start_level
+
+
 let get_upvotes_power
         (votes: (address, nat) map)
         : nat =
@@ -224,7 +236,7 @@ let add_new_proposal_and_upvote
         (proposer : address)
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
-        (config: Storage.config_t)
+        (config : Storage.config_t)
         : pt Storage.proposal_period_t =
     let _ = assert_upvoting_allowed proposal_period.proposals config proposer in
     let key = get_payload_key payload in
@@ -246,7 +258,7 @@ let upvote_proposal
         (voter : address)
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
-        (config: Storage.config_t)
+        (config : Storage.config_t)
         : pt Storage.proposal_period_t =
     let _ = assert_upvoting_allowed proposal_period.proposals config voter in
     let key = get_payload_key payload in
