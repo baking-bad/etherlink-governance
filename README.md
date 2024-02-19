@@ -84,7 +84,7 @@ where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
 #### Example
 
 ```bash
-octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" "yay""
+octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" \"yay\""
 ```
 
 ## Send upgrade to kernel
