@@ -52,7 +52,7 @@ let upvote_proposal
 let vote
         (type pt)
         (sender_key_hash : key_hash)
-        (vote : Storage.promotion_vote_t)
+        (vote : string)
         (storage : pt Storage.t)
         : operation list * pt Storage.t =
     let voting_power = Tezos.voting_power sender_key_hash in

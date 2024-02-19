@@ -66,10 +66,8 @@ type 'pt proposal_period_t = {
     total_voting_power : nat;
 }
 
-type promotion_vote_t = Yay | Nay | Pass
-
 type promotion_vote_params_t = {
-    vote: promotion_vote_t;
+    vote: string;
     voting_power: nat;
 }
 

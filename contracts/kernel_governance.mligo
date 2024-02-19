@@ -39,7 +39,7 @@ module KernelGovernance = struct
 
     type vote_params_t = {
         sender_key_hash : key_hash;
-        vote : Storage.promotion_vote_t;
+        vote : string;
     }
    
 

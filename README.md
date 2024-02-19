@@ -76,19 +76,15 @@ Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "vote" --arg "Pair \"%YOUR_ADDRESS%\" %YOUR_VOTE%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "vote" --arg "Pair \"%YOUR_ADDRESS%\" \"%YOUR_VOTE%\""
 ```
 
-where `%YOUR_VOTE%` is one of the values:
-* `(Left Unit)` for yay
-* `(Right (Left Unit))` for nay
-* `(Right (Right Unit))` for pass
-
+where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
 
 #### Example
 
 ```bash
-octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" (Left Unit)"
+octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" "yay""
 ```
 
 ## Send upgrade to kernel

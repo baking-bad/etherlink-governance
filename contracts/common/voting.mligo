@@ -1,6 +1,7 @@
 #import "storage.mligo" "Storage"
 #import "errors.mligo" "Errors"
 #import "events.mligo" "Events"
+#import "constants.mligo" "Constants"
 
 let get_period_index
         (config : Storage.config_t)
@@ -60,10 +61,11 @@ let get_aggregated_promotion_voting_power
         (votes: (address, Storage.promotion_vote_params_t) map)
         : aggregated_promotion_voting_power_t =
     let get_values = fun ((values), (_, vote_params) : (aggregated_promotion_voting_power_t * (address * Storage.promotion_vote_params_t) )) ->
-        match vote_params.vote with
-            | Yay  -> { values with yay_votes_power = values.yay_votes_power + vote_params.voting_power }
-            | Nay  -> { values with nay_votes_power = values.nay_votes_power + vote_params.voting_power }
-            | Pass -> { values with pass_votes_power = values.pass_votes_power + vote_params.voting_power } in
+        if vote_params.vote = Constants.yay
+            then { values with yay_votes_power = values.yay_votes_power + vote_params.voting_power }
+            else if vote_params.vote = Constants.nay 
+                then { values with nay_votes_power = values.nay_votes_power + vote_params.voting_power }
+                else { values with pass_votes_power = values.pass_votes_power + vote_params.voting_power } in
     let result = { yay_votes_power = 0n; nay_votes_power = 0n; pass_votes_power = 0n } in
     Map.fold get_values votes result
 
@@ -223,6 +225,13 @@ let assert_upvoting_allowed
     assert_with_error (upvotes_count < config.upvoting_limit) Errors.upvoting_limit_exceeded
 
 
+let assert_vote_value_correct
+        (vote : string)
+        : unit =
+    assert_with_error value_is_correct Errors.incorrect_vote_value
+    let value_is_correct = (vote = Constants.yay or vote = Constants.nay or vote = Constants.pass) in
+
+
 let get_payload_key
         (type pt)
         (payload : pt)
@@ -277,11 +286,12 @@ let upvote_proposal
 
 let vote_promotion
         (type pt)
-        (vote : Storage.promotion_vote_t)
+        (vote : string)
         (voter : address)
         (voting_power : nat)
         (promotion_period : pt Storage.promotion_period_t)
         : pt Storage.promotion_period_t =
     let _ = assert_with_error (not Map.mem voter promotion_period.votes) Errors.promotion_already_voted in
+    let _ = assert_vote_value_correct vote in
     let updated_votes = Map.add voter { vote = vote; voting_power = voting_power; } promotion_period.votes in
     { promotion_period with votes = updated_votes }

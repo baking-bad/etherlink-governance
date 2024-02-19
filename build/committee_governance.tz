@@ -1,8 +1,6 @@
 { parameter
     (or (address %trigger_committee_upgrade)
-        (or (pair %vote
-               (key_hash %sender_key_hash)
-               (or %vote (unit %yay) (or (unit %nay) (unit %pass))))
+        (or (pair %vote (key_hash %sender_key_hash) (string %vote))
             (or (pair %upvote_proposal (key_hash %sender_key_hash) (set %addresses address))
                 (pair %new_proposal (key_hash %sender_key_hash) (set %addresses address))))) ;
   storage
@@ -25,14 +23,14 @@
                       (nat %total_voting_power))
                    (option %promotion_period
                       (pair (set %payload address)
-                            (map %votes
-                               address
-                               (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                            (map %votes address (pair (string %vote) (nat %voting_power)))
                             (nat %total_voting_power)))
                    (option %last_winner_payload (set address))))
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
          PUSH string "UPVOTING_LIMIT_EXCEEDED" ;
+         PUSH string "yay" ;
+         PUSH string "nay" ;
          LAMBDA
            unit
            unit
@@ -80,29 +78,47 @@
                  CAR } } ;
          LAMBDA (map address nat) nat { PUSH nat 0 ; SWAP ; ITER { CDR ; ADD } } ;
          LAMBDA
-           (map address (pair (or unit (or unit unit)) nat))
+           (pair (pair string string) (map address (pair string nat)))
            (pair nat nat nat)
-           { PUSH nat 0 ;
+           { UNPAIR ;
+             UNPAIR ;
+             DIG 2 ;
+             PUSH nat 0 ;
              PUSH nat 0 ;
              PUSH nat 0 ;
              PAIR 3 ;
              SWAP ;
              ITER { CDR ;
-                    DUP ;
+                    DUP 4 ;
+                    DUP 2 ;
                     CAR ;
-                    IF_LEFT
-                      { DROP ; DUP 2 ; SWAP ; CDR ; DIG 2 ; CAR ; ADD ; UPDATE 1 }
-                      { IF_LEFT
-                          { DROP ; DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 3 ; ADD ; UPDATE 3 }
-                          { DROP ; DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 4 ; ADD ; UPDATE 4 } } } } ;
-         DIG 8 ;
+                    COMPARE ;
+                    EQ ;
+                    IF { DUP 2 ; SWAP ; CDR ; DIG 2 ; CAR ; ADD ; UPDATE 1 }
+                       { DUP 3 ;
+                         DUP 2 ;
+                         CAR ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 3 ; ADD ; UPDATE 3 }
+                            { DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 4 ; ADD ; UPDATE 4 } } } ;
+             SWAP ;
+             DIG 2 ;
+             DROP 2 } ;
+         DUP 8 ;
+         DUP 8 ;
+         PAIR ;
+         APPLY ;
+         DIG 10 ;
          UNPAIR ;
          IF_LEFT
            { DIG 5 ;
              DIG 6 ;
              DIG 8 ;
              DIG 9 ;
-             DROP 4 ;
+             DIG 10 ;
+             DIG 11 ;
+             DROP 6 ;
              UNIT ;
              DIG 6 ;
              SWAP ;
@@ -121,10 +137,10 @@
                  DROP 2 ;
                  NONE (pair nat
                             (pair (map bytes (pair (set address) address (map address nat))) nat)
-                            (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                            (option (pair (set address) (map address (pair string nat)) nat))
                             (option (set address))) ;
                  NONE (set address) ;
-                 NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                 NONE (pair (set address) (map address (pair string nat)) nat) ;
                  TOTAL_VOTING_POWER ;
                  EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                  PAIR ;
@@ -143,7 +159,7 @@
                       DROP 3 ;
                       NONE (pair nat
                                  (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                 (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                 (option (pair (set address) (map address (pair string nat)) nat))
                                  (option (set address))) ;
                       SWAP }
                     { DUP 4 ;
@@ -217,11 +233,11 @@
                                    SOME }
                                  { NONE (pair nat
                                               (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                              (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                              (option (pair (set address) (map address (pair string nat)) nat))
                                               (option (set address))) } ;
                               SWAP ;
                               GET 8 ;
-                              NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                              NONE (pair (set address) (map address (pair string nat)) nat) ;
                               TOTAL_VOTING_POWER ;
                               EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                               PAIR ;
@@ -240,7 +256,7 @@
                               IF { DROP ;
                                    NONE (pair nat
                                               (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                              (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                              (option (pair (set address) (map address (pair string nat)) nat))
                                               (option (set address))) ;
                                    DIG 2 ;
                                    DIG 3 ;
@@ -249,7 +265,7 @@
                                    RIGHT unit ;
                                    UPDATE 3 ;
                                    TOTAL_VOTING_POWER ;
-                                   EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                   EMPTY_MAP address (pair string nat) ;
                                    DIG 4 ;
                                    PAIR 3 ;
                                    SOME ;
@@ -261,7 +277,7 @@
                                    RIGHT unit ;
                                    UPDATE 3 ;
                                    TOTAL_VOTING_POWER ;
-                                   EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                   EMPTY_MAP address (pair string nat) ;
                                    DIG 3 ;
                                    PAIR 3 ;
                                    SOME ;
@@ -279,7 +295,7 @@
                                    SOME ;
                                    SWAP ;
                                    GET 8 ;
-                                   NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                   NONE (pair (set address) (map address (pair string nat)) nat) ;
                                    TOTAL_VOTING_POWER ;
                                    EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                    PAIR ;
@@ -291,7 +307,7 @@
                           DROP 2 ;
                           DUP 2 ;
                           GET 8 ;
-                          NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                          NONE (pair (set address) (map address (pair string nat)) nat) ;
                           TOTAL_VOTING_POWER ;
                           EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                           PAIR ;
@@ -386,9 +402,7 @@
                             (nat %total_voting_power))
                          (option %promotion_period
                             (pair (set %payload address)
-                                  (map %votes
-                                     address
-                                     (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                                  (map %votes address (pair (string %vote) (nat %voting_power)))
                                   (nat %total_voting_power)))
                          (option %winner_payload (set address))) ;
                  CONS } ;
@@ -400,11 +414,10 @@
              DIG 2 ;
              CONS }
            { IF_LEFT
-               { DIG 8 ;
-                 DIG 9 ;
+               { DIG 10 ;
+                 DIG 11 ;
                  DROP 2 ;
-                 DUP ;
-                 CAR ;
+                 UNPAIR ;
                  DUP ;
                  VOTING_POWER ;
                  DUP 4 ;
@@ -420,10 +433,10 @@
                      DROP 2 ;
                      NONE (pair nat
                                 (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                (option (pair (set address) (map address (pair string nat)) nat))
                                 (option (set address))) ;
                      NONE (set address) ;
-                     NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                     NONE (pair (set address) (map address (pair string nat)) nat) ;
                      TOTAL_VOTING_POWER ;
                      EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                      PAIR ;
@@ -442,7 +455,7 @@
                           DROP 3 ;
                           NONE (pair nat
                                      (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                     (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                     (option (pair (set address) (map address (pair string nat)) nat))
                                      (option (set address))) ;
                           SWAP }
                         { DUP 6 ;
@@ -516,11 +529,11 @@
                                        SOME }
                                      { NONE (pair nat
                                                   (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                                  (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                                  (option (pair (set address) (map address (pair string nat)) nat))
                                                   (option (set address))) } ;
                                   SWAP ;
                                   GET 8 ;
-                                  NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                  NONE (pair (set address) (map address (pair string nat)) nat) ;
                                   TOTAL_VOTING_POWER ;
                                   EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                   PAIR ;
@@ -539,7 +552,7 @@
                                   IF { DROP ;
                                        NONE (pair nat
                                                   (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                                  (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                                  (option (pair (set address) (map address (pair string nat)) nat))
                                                   (option (set address))) ;
                                        DIG 2 ;
                                        DIG 3 ;
@@ -548,7 +561,7 @@
                                        RIGHT unit ;
                                        UPDATE 3 ;
                                        TOTAL_VOTING_POWER ;
-                                       EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                       EMPTY_MAP address (pair string nat) ;
                                        DIG 4 ;
                                        PAIR 3 ;
                                        SOME ;
@@ -560,7 +573,7 @@
                                        RIGHT unit ;
                                        UPDATE 3 ;
                                        TOTAL_VOTING_POWER ;
-                                       EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                       EMPTY_MAP address (pair string nat) ;
                                        DIG 3 ;
                                        PAIR 3 ;
                                        SOME ;
@@ -578,7 +591,7 @@
                                        SOME ;
                                        SWAP ;
                                        GET 8 ;
-                                       NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                       NONE (pair (set address) (map address (pair string nat)) nat) ;
                                        TOTAL_VOTING_POWER ;
                                        EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                        PAIR ;
@@ -590,7 +603,7 @@
                               DROP 2 ;
                               DUP 2 ;
                               GET 8 ;
-                              NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                              NONE (pair (set address) (map address (pair string nat)) nat) ;
                               TOTAL_VOTING_POWER ;
                               EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                               PAIR ;
@@ -686,6 +699,21 @@
                  MEM ;
                  NOT ;
                  IF {} { PUSH string "PROMOTION_ALREADY_VOTED" ; FAILWITH } ;
+                 PUSH string "pass" ;
+                 DUP 7 ;
+                 COMPARE ;
+                 EQ ;
+                 DIG 8 ;
+                 DUP 8 ;
+                 COMPARE ;
+                 EQ ;
+                 DIG 9 ;
+                 DUP 9 ;
+                 COMPARE ;
+                 EQ ;
+                 OR ;
+                 OR ;
+                 IF {} { PUSH string "INCORRECT_VOTE_VALUE" ; FAILWITH } ;
                  DIG 3 ;
                  IF_NONE
                    { NIL operation }
@@ -700,9 +728,7 @@
                                 (nat %total_voting_power))
                              (option %promotion_period
                                 (pair (set %payload address)
-                                      (map %votes
-                                         address
-                                         (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                                      (map %votes address (pair (string %vote) (nat %voting_power)))
                                       (nat %total_voting_power)))
                              (option %winner_payload (set address))) ;
                      CONS } ;
@@ -713,7 +739,6 @@
                  GET 3 ;
                  DIG 6 ;
                  DIG 7 ;
-                 CDR ;
                  PAIR ;
                  DIG 6 ;
                  SWAP ;
@@ -725,7 +750,10 @@
                  UPDATE 7 ;
                  SOME ;
                  UPDATE 3 }
-               { IF_LEFT
+               { DIG 8 ;
+                 DIG 9 ;
+                 DROP 2 ;
+                 IF_LEFT
                    { DUP ;
                      CAR ;
                      DUP ;
@@ -743,10 +771,10 @@
                          DROP 2 ;
                          NONE (pair nat
                                     (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                    (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                    (option (pair (set address) (map address (pair string nat)) nat))
                                     (option (set address))) ;
                          NONE (set address) ;
-                         NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                         NONE (pair (set address) (map address (pair string nat)) nat) ;
                          TOTAL_VOTING_POWER ;
                          EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                          PAIR ;
@@ -765,7 +793,7 @@
                               DROP 3 ;
                               NONE (pair nat
                                          (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                         (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                         (option (pair (set address) (map address (pair string nat)) nat))
                                          (option (set address))) ;
                               SWAP }
                             { DUP 6 ;
@@ -839,11 +867,11 @@
                                            SOME }
                                          { NONE (pair nat
                                                       (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                                      (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                                      (option (pair (set address) (map address (pair string nat)) nat))
                                                       (option (set address))) } ;
                                       SWAP ;
                                       GET 8 ;
-                                      NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                      NONE (pair (set address) (map address (pair string nat)) nat) ;
                                       TOTAL_VOTING_POWER ;
                                       EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                       PAIR ;
@@ -862,7 +890,7 @@
                                       IF { DROP ;
                                            NONE (pair nat
                                                       (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                                      (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                                      (option (pair (set address) (map address (pair string nat)) nat))
                                                       (option (set address))) ;
                                            DIG 2 ;
                                            DIG 3 ;
@@ -871,7 +899,7 @@
                                            RIGHT unit ;
                                            UPDATE 3 ;
                                            TOTAL_VOTING_POWER ;
-                                           EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                           EMPTY_MAP address (pair string nat) ;
                                            DIG 4 ;
                                            PAIR 3 ;
                                            SOME ;
@@ -883,7 +911,7 @@
                                            RIGHT unit ;
                                            UPDATE 3 ;
                                            TOTAL_VOTING_POWER ;
-                                           EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                           EMPTY_MAP address (pair string nat) ;
                                            DIG 3 ;
                                            PAIR 3 ;
                                            SOME ;
@@ -901,7 +929,7 @@
                                            SOME ;
                                            SWAP ;
                                            GET 8 ;
-                                           NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                           NONE (pair (set address) (map address (pair string nat)) nat) ;
                                            TOTAL_VOTING_POWER ;
                                            EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                            PAIR ;
@@ -913,7 +941,7 @@
                                   DROP 2 ;
                                   DUP 2 ;
                                   GET 8 ;
-                                  NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                  NONE (pair (set address) (map address (pair string nat)) nat) ;
                                   TOTAL_VOTING_POWER ;
                                   EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                   PAIR ;
@@ -1000,35 +1028,35 @@
                      GET 3 ;
                      IF_LEFT { DIG 7 ; DROP 2 } { DROP ; DIG 6 ; FAILWITH } ;
                      SENDER ;
-                     PUSH nat 0 ;
-                     DUP 3 ;
+                     DUP 2 ;
                      GET 5 ;
+                     PUSH nat 0 ;
+                     DUP 2 ;
                      CAR ;
-                     ITER { CDR ; GET 4 ; DUP 3 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
-                     DUP 7 ;
+                     ITER { CDR ; GET 4 ; DUP 4 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
+                     DUP 8 ;
                      CAR ;
                      GET 5 ;
                      SWAP ;
                      COMPARE ;
                      LT ;
-                     IF { DIG 6 ; DROP } { DIG 6 ; FAILWITH } ;
-                     DIG 4 ;
+                     IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
+                     DIG 5 ;
                      CDR ;
                      PACK ;
                      SHA256 ;
-                     DUP 3 ;
-                     GET 5 ;
+                     DUP 2 ;
                      CAR ;
                      DUP 2 ;
                      GET ;
                      IF_NONE { PUSH string "PROPOSAL_NOT_FOUND" ; FAILWITH } {} ;
                      DUP ;
                      GET 4 ;
-                     DUP 4 ;
+                     DUP 5 ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } ;
-                     DIG 4 ;
+                     DIG 5 ;
                      IF_NONE
                        { NIL operation }
                        { NIL operation ;
@@ -1042,18 +1070,14 @@
                                     (nat %total_voting_power))
                                  (option %promotion_period
                                     (pair (set %payload address)
-                                          (map %votes
-                                             address
-                                             (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                                          (map %votes address (pair (string %vote) (nat %voting_power)))
                                           (nat %total_voting_power)))
                                  (option %winner_payload (set address))) ;
                          CONS } ;
+                     DIG 7 ;
                      DIG 6 ;
                      DUP 6 ;
-                     DUP 7 ;
-                     GET 5 ;
-                     DIG 7 ;
-                     GET 5 ;
+                     DIG 6 ;
                      CAR ;
                      DUP 6 ;
                      DIG 6 ;
@@ -1088,10 +1112,10 @@
                          DROP 2 ;
                          NONE (pair nat
                                     (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                    (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                    (option (pair (set address) (map address (pair string nat)) nat))
                                     (option (set address))) ;
                          NONE (set address) ;
-                         NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                         NONE (pair (set address) (map address (pair string nat)) nat) ;
                          TOTAL_VOTING_POWER ;
                          EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                          PAIR ;
@@ -1110,7 +1134,7 @@
                               DROP 3 ;
                               NONE (pair nat
                                          (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                         (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                         (option (pair (set address) (map address (pair string nat)) nat))
                                          (option (set address))) ;
                               SWAP }
                             { DUP 6 ;
@@ -1184,11 +1208,11 @@
                                            SOME }
                                          { NONE (pair nat
                                                       (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                                      (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                                      (option (pair (set address) (map address (pair string nat)) nat))
                                                       (option (set address))) } ;
                                       SWAP ;
                                       GET 8 ;
-                                      NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                      NONE (pair (set address) (map address (pair string nat)) nat) ;
                                       TOTAL_VOTING_POWER ;
                                       EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                       PAIR ;
@@ -1207,7 +1231,7 @@
                                       IF { DROP ;
                                            NONE (pair nat
                                                       (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                                      (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                                      (option (pair (set address) (map address (pair string nat)) nat))
                                                       (option (set address))) ;
                                            DIG 2 ;
                                            DIG 3 ;
@@ -1216,7 +1240,7 @@
                                            RIGHT unit ;
                                            UPDATE 3 ;
                                            TOTAL_VOTING_POWER ;
-                                           EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                           EMPTY_MAP address (pair string nat) ;
                                            DIG 4 ;
                                            PAIR 3 ;
                                            SOME ;
@@ -1228,7 +1252,7 @@
                                            RIGHT unit ;
                                            UPDATE 3 ;
                                            TOTAL_VOTING_POWER ;
-                                           EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                                           EMPTY_MAP address (pair string nat) ;
                                            DIG 3 ;
                                            PAIR 3 ;
                                            SOME ;
@@ -1246,7 +1270,7 @@
                                            SOME ;
                                            SWAP ;
                                            GET 8 ;
-                                           NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                           NONE (pair (set address) (map address (pair string nat)) nat) ;
                                            TOTAL_VOTING_POWER ;
                                            EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                            PAIR ;
@@ -1258,7 +1282,7 @@
                                   DROP 2 ;
                                   DUP 2 ;
                                   GET 8 ;
-                                  NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                                  NONE (pair (set address) (map address (pair string nat)) nat) ;
                                   TOTAL_VOTING_POWER ;
                                   EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                   PAIR ;
@@ -1366,29 +1390,29 @@
                      DUP 2 ;
                      GET 3 ;
                      IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;
-                     DUP 2 ;
-                     GET 5 ;
                      PUSH nat 0 ;
-                     DUP 2 ;
+                     DUP 3 ;
+                     GET 5 ;
                      CAR ;
-                     ITER { CDR ; GET 4 ; DUP 4 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
-                     DUP 8 ;
+                     ITER { CDR ; GET 4 ; DUP 3 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
+                     DUP 7 ;
                      CAR ;
                      GET 5 ;
                      SWAP ;
                      COMPARE ;
                      LT ;
-                     IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
-                     DUP 6 ;
+                     IF { DIG 6 ; DROP } { DIG 6 ; FAILWITH } ;
+                     DUP 5 ;
                      PACK ;
                      SHA256 ;
-                     DUP 2 ;
+                     DUP 3 ;
+                     GET 5 ;
                      CAR ;
                      DUP 2 ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_CREATED" ; FAILWITH } ;
-                     DIG 4 ;
+                     DIG 3 ;
                      IF_NONE
                        { NIL operation }
                        { NIL operation ;
@@ -1402,16 +1426,16 @@
                                     (nat %total_voting_power))
                                  (option %promotion_period
                                     (pair (set %payload address)
-                                          (map %votes
-                                             address
-                                             (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                                          (map %votes address (pair (string %vote) (nat %voting_power)))
                                           (nat %total_voting_power)))
                                  (option %winner_payload (set address))) ;
                          CONS } ;
-                     DIG 7 ;
-                     DIG 5 ;
+                     DIG 6 ;
                      DUP 5 ;
-                     DIG 5 ;
+                     DUP 6 ;
+                     GET 5 ;
+                     DIG 6 ;
+                     GET 5 ;
                      CAR ;
                      EMPTY_MAP address nat ;
                      DIG 8 ;
@@ -1446,9 +1470,7 @@
                    (nat %total_voting_power))
                 (option %promotion_period
                    (pair (set %payload address)
-                         (map %votes
-                            address
-                            (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                         (map %votes address (pair (string %vote) (nat %voting_power)))
                          (nat %total_voting_power)))
                 (option %last_winner_payload (set address)))
              (option %finished_voting
@@ -1460,9 +1482,7 @@
                          (nat %total_voting_power))
                       (option %promotion_period
                          (pair (set %payload address)
-                               (map %votes
-                                  address
-                                  (pair (or %vote (unit %yay) (or (unit %nay) (unit %pass))) (nat %voting_power)))
+                               (map %votes address (pair (string %vote) (nat %voting_power)))
                                (nat %total_voting_power)))
                       (option %winner_payload (set address)))))
        { CDR ;
@@ -1488,10 +1508,10 @@
              DROP ;
              NONE (pair nat
                         (pair (map bytes (pair (set address) address (map address nat))) nat)
-                        (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                        (option (pair (set address) (map address (pair string nat)) nat))
                         (option (set address))) ;
              NONE (set address) ;
-             NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+             NONE (pair (set address) (map address (pair string nat)) nat) ;
              TOTAL_VOTING_POWER ;
              EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
              PAIR ;
@@ -1509,7 +1529,7 @@
                   DROP 2 ;
                   NONE (pair nat
                              (pair (map bytes (pair (set address) address (map address nat))) nat)
-                             (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                             (option (pair (set address) (map address (pair string nat)) nat))
                              (option (set address))) ;
                   SWAP }
                 { DIG 2 ;
@@ -1579,11 +1599,11 @@
                                SOME }
                              { NONE (pair nat
                                           (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                          (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                          (option (pair (set address) (map address (pair string nat)) nat))
                                           (option (set address))) } ;
                           SWAP ;
                           GET 8 ;
-                          NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                          NONE (pair (set address) (map address (pair string nat)) nat) ;
                           TOTAL_VOTING_POWER ;
                           EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                           PAIR ;
@@ -1602,7 +1622,7 @@
                           IF { DROP ;
                                NONE (pair nat
                                           (pair (map bytes (pair (set address) address (map address nat))) nat)
-                                          (option (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat))
+                                          (option (pair (set address) (map address (pair string nat)) nat))
                                           (option (set address))) ;
                                DIG 2 ;
                                DIG 3 ;
@@ -1611,7 +1631,7 @@
                                RIGHT unit ;
                                UPDATE 3 ;
                                TOTAL_VOTING_POWER ;
-                               EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                               EMPTY_MAP address (pair string nat) ;
                                DIG 4 ;
                                PAIR 3 ;
                                SOME ;
@@ -1623,7 +1643,7 @@
                                RIGHT unit ;
                                UPDATE 3 ;
                                TOTAL_VOTING_POWER ;
-                               EMPTY_MAP address (pair (or unit (or unit unit)) nat) ;
+                               EMPTY_MAP address (pair string nat) ;
                                DIG 3 ;
                                PAIR 3 ;
                                SOME ;
@@ -1641,7 +1661,7 @@
                                SOME ;
                                SWAP ;
                                GET 8 ;
-                               NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                               NONE (pair (set address) (map address (pair string nat)) nat) ;
                                TOTAL_VOTING_POWER ;
                                EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                                PAIR ;
@@ -1652,7 +1672,7 @@
                     { DROP ;
                       DUP 2 ;
                       GET 8 ;
-                      NONE (pair (set address) (map address (pair (or unit (or unit unit)) nat)) nat) ;
+                      NONE (pair (set address) (map address (pair string nat)) nat) ;
                       TOTAL_VOTING_POWER ;
                       EMPTY_MAP bytes (pair (set address) address (map address nat)) ;
                       PAIR ;
@@ -1670,13 +1690,19 @@
                       PAIR 3 ;
                       DIG 2 ;
                       ITER { CDR ;
-                             DUP ;
+                             PUSH string "yay" ;
+                             DUP 2 ;
                              CAR ;
-                             IF_LEFT
-                               { DROP ; DUP 2 ; SWAP ; CDR ; DIG 2 ; CAR ; ADD ; UPDATE 1 }
-                               { IF_LEFT
-                                   { DROP ; DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 3 ; ADD ; UPDATE 3 }
-                                   { DROP ; DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 4 ; ADD ; UPDATE 4 } } } ;
+                             COMPARE ;
+                             EQ ;
+                             IF { DUP 2 ; SWAP ; CDR ; DIG 2 ; CAR ; ADD ; UPDATE 1 }
+                                { PUSH string "nay" ;
+                                  DUP 2 ;
+                                  CAR ;
+                                  COMPARE ;
+                                  EQ ;
+                                  IF { DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 3 ; ADD ; UPDATE 3 }
+                                     { DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 4 ; ADD ; UPDATE 4 } } } ;
                       UNPAIR 3 ;
                       DUP 7 ;
                       GET 13 ;
