@@ -228,8 +228,8 @@ let assert_upvoting_allowed
 let assert_vote_value_correct
         (vote : string)
         : unit =
-    assert_with_error value_is_correct Errors.incorrect_vote_value
     let value_is_correct = (vote = Constants.yay or vote = Constants.nay or vote = Constants.pass) in
+    assert_with_error value_is_correct Errors.incorrect_vote_value
 
 
 let get_payload_key
