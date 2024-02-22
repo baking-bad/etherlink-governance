@@ -11,44 +11,28 @@ module SequencerCommitteeGovernance = struct
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
-    type new_proposal_params_t = {
-        sender_key_hash : key_hash;
-        addresses : payload_t;
-    }
-
     [@entry] 
     let new_proposal 
-            (params : new_proposal_params_t)
+            (addresses : payload_t)
             (storage : storage_t) 
             : return_t = 
-        Entrypoints.new_proposal params.sender_key_hash params.addresses storage
+        Entrypoints.new_proposal addresses storage
   
-
-    type upvote_proposal_params_t = {
-        sender_key_hash : key_hash;
-        addresses : payload_t;
-    }
 
     [@entry]
     let upvote_proposal 
-            (params : upvote_proposal_params_t) 
+            (addresses : payload_t)
             (storage : storage_t) 
             : return_t = 
-       Entrypoints.upvote_proposal params.sender_key_hash params.addresses storage
+       Entrypoints.upvote_proposal addresses storage
   
 
-    type vote_params_t = {
-        sender_key_hash : key_hash;
-        vote : string;
-    }
-
-   
     [@entry]
     let vote 
-            (params : vote_params_t) 
+            (vote : string) 
             (storage : storage_t) 
             : return_t =
-        Entrypoints.vote params.sender_key_hash params.vote storage
+        Entrypoints.vote vote storage
   
 
     [@entry]

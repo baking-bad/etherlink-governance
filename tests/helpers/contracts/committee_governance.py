@@ -25,27 +25,21 @@ class CommitteeGovernance(GovernanceBase):
 
         return originate_from_file(filename, client, storage)
     
-    def new_proposal(self, sender_key_hash : str, addresses: list[str]) -> ContractCall:
+    def new_proposal(self, addresses: list[str]) -> ContractCall:
         """Creates a new proposal"""
 
-        return self.contract.new_proposal(
-            {'sender_key_hash': sender_key_hash, 'addresses': addresses}
-        )
+        return self.contract.new_proposal(addresses)
     
     
-    def upvote_proposal(self, sender_key_hash : str, addresses: list[str]) -> ContractCall:
+    def upvote_proposal(self, addresses: list[str]) -> ContractCall:
         """Upvotes an exist proposal"""
 
-        return self.contract.upvote_proposal(
-            {'sender_key_hash': sender_key_hash, 'addresses': addresses}
-        )
+        return self.contract.upvote_proposal(addresses)
     
-    def vote(self, sender_key_hash : str, vote : str) -> ContractCall:
+    def vote(self, vote : str) -> ContractCall:
         """Votes for a hash in promotion period"""
 
-        return self.contract.vote(
-            {'sender_key_hash': sender_key_hash, 'vote': vote}
-        )
+        return self.contract.vote(vote)
 
     def trigger_committee_upgrade(self, rollup_address : str) -> ContractCall:
         """Triggers upgrade transaction to rollup with last winner committee addresses set"""

@@ -11,46 +11,30 @@ module KernelGovernance = struct
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
-    type new_proposal_params_t = {
-        sender_key_hash : key_hash;
-        hash : payload_t;
-    }
 
     [@entry] 
     let new_proposal 
-            (params : new_proposal_params_t)
+            (preimage_hash : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let preimage_hash = params.hash in
         let _ = Utils.assert_preimage_hash_has_correct_size preimage_hash in
-        Entrypoints.new_proposal params.sender_key_hash preimage_hash storage
+        Entrypoints.new_proposal preimage_hash storage
   
-
-    type upvote_proposal_params_t = {
-        sender_key_hash : key_hash;
-        hash : payload_t;
-    }
 
     [@entry]
     let upvote_proposal 
-            (params : upvote_proposal_params_t) 
+            (preimage_hash : payload_t)
             (storage : storage_t) 
             : return_t = 
-       Entrypoints.upvote_proposal params.sender_key_hash params.hash storage
+        Entrypoints.upvote_proposal preimage_hash storage
   
-
-    type vote_params_t = {
-        sender_key_hash : key_hash;
-        vote : string;
-    }
-   
 
     [@entry]
     let vote 
-            (params : vote_params_t) 
+            (vote : string) 
             (storage : storage_t) 
             : return_t =
-        Entrypoints.vote params.sender_key_hash params.vote storage
+        Entrypoints.vote vote storage
   
 
     [@entry]
@@ -61,8 +45,8 @@ module KernelGovernance = struct
         let pack_payload = fun 
                 (payload : payload_t) 
                 : bytes -> 
-            let activation_time = Tezos.get_now () + storage.config.cooldown_period_sec in
-            Rollup.get_upgrade_payload payload activation_time in
+            let activation_timestamp = Tezos.get_now () + storage.config.cooldown_period_sec in
+            Rollup.get_upgrade_payload payload activation_timestamp in
         Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
 
@@ -80,6 +64,7 @@ module KernelGovernance = struct
             (storage : storage_t) 
             : nat = 
         Voting.get_current_period_remaining_blocks storage.config
+
 
     type upgrade_payload_params_t = {
         preimage_hash : payload_t;

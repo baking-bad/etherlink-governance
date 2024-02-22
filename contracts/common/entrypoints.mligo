@@ -8,15 +8,13 @@
 
 let new_proposal 
         (type pt)
-        (sender_key_hash : key_hash)
         (payload : pt)
         (storage : pt Storage.t) 
         : operation list * pt Storage.t = 
-    let voting_power = Tezos.voting_power sender_key_hash in
     let { voting_context; finished_voting } = Voting.get_voting_state storage in
     let proposer = Tezos.get_sender () in
+    let voting_power = Tezos.voting_power (Utils.address_to_key_hash proposer) in
     let _ = Utils.assert_no_xtz_in_transaction () in
-    let _ = Utils.assert_sender_is_key_hash_owner sender_key_hash in
     let _ = Utils.assert_proposer_allowed proposer voting_power storage.config.allowed_proposers in
     let _ = Utils.assert_payload_not_last_winner payload voting_context.last_winner_payload in
     let _ = Voting.assert_current_period_proposal voting_context in
@@ -30,17 +28,15 @@ let new_proposal
 
 let upvote_proposal
         (type pt)
-        (sender_key_hash : key_hash)
         (payload : pt)
         (storage : pt Storage.t)
         : operation list * pt Storage.t = 
-    let voting_power = Tezos.voting_power sender_key_hash in
     let { voting_context; finished_voting } = Voting.get_voting_state storage in
+    let voter = Tezos.get_sender () in
+    let voting_power = Tezos.voting_power (Utils.address_to_key_hash voter) in
     let _ = Utils.assert_no_xtz_in_transaction () in
-    let _ = Utils.assert_sender_is_key_hash_owner sender_key_hash in
     let _ = Utils.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_proposal voting_context in
-    let voter = Tezos.get_sender () in
     let updated_proposal_period = Voting.upvote_proposal payload voter voting_power voting_context.proposal_period storage.config in
     let operations = match finished_voting with
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
@@ -51,17 +47,15 @@ let upvote_proposal
 
 let vote
         (type pt)
-        (sender_key_hash : key_hash)
         (vote : string)
         (storage : pt Storage.t)
         : operation list * pt Storage.t =
-    let voting_power = Tezos.voting_power sender_key_hash in
     let { voting_context; finished_voting } = Voting.get_voting_state storage in
+    let voter = Tezos.get_sender () in
+    let voting_power = Tezos.voting_power (Utils.address_to_key_hash voter) in
     let _ = Utils.assert_no_xtz_in_transaction () in
-    let _ = Utils.assert_sender_is_key_hash_owner sender_key_hash in
     let _ = Utils.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_promotion voting_context in
-    let voter = Tezos.get_sender () in
     let promotion_period = Option.unopt_with_error voting_context.promotion_period Errors.promotion_period_context_not_exist in
     let updated_promotion_period = Voting.vote_promotion vote voter voting_power promotion_period in
     let operations = match finished_voting with

@@ -1,6 +1,6 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROPOSAL_PERIOD, PROMOTION_PERIOD
-from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_kernel_hash, pkh
+from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_preimage_hash, pkh
 
 class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
     def test_should_reset_proposals_when_no_proposals(self) -> None:
@@ -78,8 +78,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 2
-        kernel_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
+        preimage_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
+        governance.using(baker).new_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -103,7 +103,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_hash(kernel_hash), 
+                        'payload': pack_preimage_hash(preimage_hash), 
                         'proposer': pkh(baker), 
                         'votes': {
                             pkh(baker): DEFAULT_VOTING_POWER
@@ -130,8 +130,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
-        kernel_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
+        preimage_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
+        governance.using(baker1).new_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -143,7 +143,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert state['finished_voting'] == None
 
         # Period index: 0. Block: 3 of 3
-        governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
+        governance.using(baker2).upvote_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -168,7 +168,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_hash(kernel_hash), 
+                        'payload': pack_preimage_hash(preimage_hash), 
                         'proposer': pkh(baker1), 
                         'votes': {
                             pkh(baker1): DEFAULT_VOTING_POWER,
@@ -196,8 +196,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
-        kernel_hash1 = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash1).send()
+        preimage_hash1 = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
+        governance.using(baker1).new_proposal(preimage_hash1).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -209,8 +209,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert state['finished_voting'] == None
 
         # Period index: 0. Block: 3 of 3
-        kernel_hash2 = bytes.fromhex('020202020202020202020202020202020202020202020202020202020202020202')
-        governance.using(baker2).new_proposal(pkh(baker2), kernel_hash2).send()
+        preimage_hash2 = bytes.fromhex('020202020202020202020202020202020202020202020202020202020202020202')
+        governance.using(baker2).new_proposal(preimage_hash2).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -235,14 +235,14 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'x\xac*\x14\xe8\xdd\xd4"KW\x92\x0f\xcb9\x9d\xc6\xd5\xf4(\xa6R\x9a\xf8\x86\x18\xd12\xe6o\xd0u\xf9': {
-                        'payload': pack_kernel_hash(kernel_hash2), 
+                        'payload': pack_preimage_hash(preimage_hash2), 
                         'proposer': pkh(baker2), 
                         'votes': {
                             pkh(baker2): DEFAULT_VOTING_POWER
                         },
                     },
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_hash(kernel_hash1), 
+                        'payload': pack_preimage_hash(preimage_hash1), 
                         'proposer': pkh(baker1), 
                         'votes': {
                             pkh(baker1): DEFAULT_VOTING_POWER
@@ -269,8 +269,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
-        kernel_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
+        preimage_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
+        governance.using(baker1).new_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -282,7 +282,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert state['finished_voting'] == None
 
         # Period index: 0. Block: 3 of 3
-        governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
+        governance.using(baker2).upvote_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -307,7 +307,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_hash(kernel_hash), 
+                        'payload': pack_preimage_hash(preimage_hash), 
                         'proposer': pkh(baker1), 
                         'votes': {
                             pkh(baker1): DEFAULT_VOTING_POWER,
@@ -318,7 +318,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
-                'payload': pack_kernel_hash(kernel_hash),
+                'payload': pack_preimage_hash(preimage_hash),
                 'votes': {},
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
@@ -339,8 +339,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
-        kernel_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
+        preimage_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
+        governance.using(baker1).new_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -352,7 +352,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert state['finished_voting'] == None
 
         # Period index: 0. Block: 3 of 3
-        governance.using(baker2).upvote_proposal(pkh(baker2), kernel_hash).send()
+        governance.using(baker2).upvote_proposal(preimage_hash).send()
         self.bake_block()
         
         state = governance.get_voting_state()
@@ -371,7 +371,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert state['voting_context']['period_index'] == 1
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': kernel_hash,
+            'payload': preimage_hash,
             'votes': {},
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }

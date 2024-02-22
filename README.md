@@ -42,13 +42,13 @@ Creates and upvotes a new proposal.
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "Pair \"%YOUR_ADDRESS%\" %KERNEL_HASH%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%PREIMAGE_HASH%"
 ```
 
 #### Example
 
 ```bash
-octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "new_proposal" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 0x9978f3a5f8bee0be78686c5c568109d2e6148f13"
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "new_proposal" --arg "0x009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abc"
 ```
 
 ### upvote_proposal
@@ -58,13 +58,13 @@ Upvotes an existing proposal.
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "Pair \"%YOUR_ADDRESS%\" %KERNEL_HASH%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%PREIMAGE_HASH%"
 ```
 
 #### Example
 
 ```bash
-octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "upvote_proposal" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 0x9978f3a5f8bee0be78686c5c568109d2e6148f13"
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "upvote_proposal" --arg "0x009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abc"
 ```
 
 ## Promotion period
@@ -76,7 +76,7 @@ Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "vote" --arg "Pair \"%YOUR_ADDRESS%\" \"%YOUR_VOTE%\""
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
 ```
 
 where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
@@ -84,7 +84,7 @@ where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
 #### Example
 
 ```bash
-octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "vote" --arg "Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" \"yay\""
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "vote" --arg "\"yay\""
 ```
 
 ## Send upgrade to kernel
@@ -96,13 +96,13 @@ Calls a smart rollup's upgrade entrypoint and passes the latest voting winner pa
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %KERNEL_GOVERNANCE_CONTRACT_ADDRESS% --entrypoint "trigger_kernel_upgrade" --arg "\"%SMART_ROLLUP_ADDRESS%\""
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "trigger_kernel_upgrade" --arg "\"%SMART_ROLLUP_ADDRESS%\""
 ```
 
 #### Example
 
 ```bash
-octez-client transfer 0 from tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx to KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL --entrypoint "trigger_kernel_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "trigger_kernel_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
 ```
 
 
@@ -139,6 +139,13 @@ type config_t = {
         period_length = tezos_governance_period_length / N, where N is integer divisor (factor)
     *)
     period_length : nat;
+
+    (* 
+        The duration of the l2 cooldown period counted in seconds. 
+        Used to generate an upgrade payload with activation timestamp 
+        on trigger_upgrade entrypoint call 
+    *)
+    cooldown_period_sec : int;
 
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               

@@ -5,12 +5,6 @@ let assert_no_xtz_in_transaction
         : unit =
     assert_with_error (Tezos.get_amount () = 0mutez) Errors.xtz_in_transaction_disallowed 
 
-let assert_sender_is_key_hash_owner      
-        (key_hash : key_hash)
-        : unit =
-    let address_from_key_hash = Tezos.address (Tezos.implicit_account key_hash) in
-    assert_with_error (address_from_key_hash = Tezos.get_sender ()) Errors.sender_not_key_hash_owner
-
 let assert_voting_power_positive
         (voting_power : nat)
         : unit =
@@ -39,12 +33,12 @@ let assert_payload_not_last_winner
             assert_with_error (Bytes.pack payload <> Bytes.pack last_winner_payload) Errors.payload_same_as_last_winner
         | None -> unit
 
-// let get_sender_key_hash
-//         (_ : unit)
-//         : key_hash =
-//     let address_packed = Bytes.pack (Tezos.get_sender ()) in
-//     let key_hash_packed = Bytes.concats [(Bytes.sub 0n 5n address_packed); 0x15; (Bytes.sub 7n 21n address_packed)] in
-//     Option.unopt (Bytes.unpack key_hash_packed)
+let address_to_key_hash
+        (address : address)
+        : key_hash =
+    let address_packed = Bytes.pack address in
+    let key_hash_packed = Bytes.concats [(Bytes.sub 0n 5n address_packed); 0x15; (Bytes.sub 7n 21n address_packed)] in
+    Option.unopt_with_error (Bytes.unpack key_hash_packed) Errors.not_implicit_address
 
 let timestamp_to_nat
         (value : timestamp)

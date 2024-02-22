@@ -78,8 +78,8 @@ def pack(object: Any, type_expression: str) -> bytes:
 
     return to_michelson_type(object, type_expression).pack()
 
-def pack_kernel_hash(kernel_hash: str) -> bytes:
-    return pack(kernel_hash, 'bytes')[6:]
+def pack_preimage_hash(preimage_hash: str) -> bytes:
+    return pack(preimage_hash, 'bytes')[6:]
 
 
 def originate_from_file(

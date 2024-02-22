@@ -32,27 +32,21 @@ class KernelGovernance(GovernanceBase):
         return self.contract.trigger_kernel_upgrade(rollup_address)
     
     
-    def new_proposal(self, sender_key_hash : str, hash : bytes) -> ContractCall:
+    def new_proposal(self, preimage_hash : bytes) -> ContractCall:
         """Creates a new proposal"""
 
-        return self.contract.new_proposal(
-            {'sender_key_hash': sender_key_hash, 'hash': hash}
-        )
+        return self.contract.new_proposal(preimage_hash)
     
     
-    def upvote_proposal(self, sender_key_hash : str, hash : bytes) -> ContractCall:
+    def upvote_proposal(self, preimage_hash : bytes) -> ContractCall:
         """Upvotes an exist proposal"""
 
-        return self.contract.upvote_proposal(
-            {'sender_key_hash': sender_key_hash, 'hash': hash}
-        )
+        return self.contract.upvote_proposal(preimage_hash)
     
-    def vote(self, sender_key_hash : str, vote : str) -> ContractCall:
-        """Votes for a hash in promotion period"""
+    def vote(self, vote : str) -> ContractCall:
+        """Votes for a preimage_hash in promotion period"""
 
-        return self.contract.vote(
-            {'sender_key_hash': sender_key_hash, 'vote': vote}
-        )
+        return self.contract.vote(vote )
 
     def get_upgrade_payload(self, preimage_hash : bytes, activation_timestamp : int):
         return self.contract.get_upgrade_payload(preimage_hash, activation_timestamp).run_view()

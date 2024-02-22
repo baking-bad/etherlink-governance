@@ -1,8 +1,6 @@
 { parameter
     (or (address %trigger_committee_upgrade)
-        (or (pair %vote (key_hash %sender_key_hash) (string %vote))
-            (or (pair %upvote_proposal (key_hash %sender_key_hash) (set %addresses address))
-                (pair %new_proposal (key_hash %sender_key_hash) (set %addresses address))))) ;
+        (or (string %vote) (or (set %upvote_proposal address) (set %new_proposal address)))) ;
   storage
     (pair (pair %config
              (nat %started_at_level)
@@ -41,17 +39,6 @@
              EQ ;
              IF { DROP ; UNIT } { FAILWITH } } ;
          LAMBDA
-           key_hash
-           unit
-           { IMPLICIT_ACCOUNT ;
-             ADDRESS ;
-             PUSH string "SENDER_NOT_KEY_HASH_OWNER" ;
-             SENDER ;
-             DIG 2 ;
-             COMPARE ;
-             EQ ;
-             IF { DROP ; UNIT } { FAILWITH } } ;
-         LAMBDA
            nat
            unit
            { PUSH nat 0 ;
@@ -59,6 +46,29 @@
              COMPARE ;
              GT ;
              IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
+         LAMBDA
+           address
+           key_hash
+           { PACK ;
+             PUSH string "NOT_IMPLICIT_ADDRESS" ;
+             NIL bytes ;
+             DUP 3 ;
+             PUSH nat 21 ;
+             PUSH nat 7 ;
+             SLICE ;
+             IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
+             CONS ;
+             PUSH bytes 0x15 ;
+             CONS ;
+             DIG 2 ;
+             PUSH nat 5 ;
+             PUSH nat 0 ;
+             SLICE ;
+             IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
+             CONS ;
+             CONCAT ;
+             UNPACK key_hash ;
+             IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          PUSH string "yay" ;
          PUSH string "nay" ;
          LAMBDA
@@ -418,19 +428,16 @@
                { DIG 10 ;
                  DIG 11 ;
                  DROP 2 ;
-                 UNPAIR ;
-                 DUP ;
-                 VOTING_POWER ;
-                 DUP 4 ;
+                 DUP 2 ;
                  CAR ;
-                 DIG 7 ;
+                 DIG 5 ;
                  SWAP ;
                  EXEC ;
-                 DUP 5 ;
+                 DUP 3 ;
                  GET 3 ;
                  IF_NONE
-                   { DIG 5 ;
-                     DIG 6 ;
+                   { DIG 3 ;
+                     DIG 4 ;
                      DROP 2 ;
                      NONE (pair nat
                                 (pair (map bytes (pair (set address) address (map address nat))) nat)
@@ -451,20 +458,20 @@
                      COMPARE ;
                      EQ ;
                      IF { SWAP ;
-                          DIG 6 ;
-                          DIG 7 ;
+                          DIG 4 ;
+                          DIG 5 ;
                           DROP 3 ;
                           NONE (pair nat
                                      (pair (map bytes (pair (set address) address (map address nat))) nat)
                                      (option (pair (set address) (map address (pair string nat)) nat))
                                      (option (set address))) ;
                           SWAP }
-                        { DUP 6 ;
+                        { DUP 4 ;
                           CAR ;
                           DUP 2 ;
                           GET 3 ;
                           IF_LEFT
-                            { DIG 8 ;
+                            { DIG 6 ;
                               DROP 2 ;
                               DUP 2 ;
                               GET 5 ;
@@ -478,7 +485,7 @@
                                      UNPAIR ;
                                      DUP 3 ;
                                      GET 4 ;
-                                     DUP 13 ;
+                                     DUP 11 ;
                                      SWAP ;
                                      EXEC ;
                                      DUP 3 ;
@@ -494,7 +501,7 @@
                                           EQ ;
                                           IF { DROP ; NONE (set address) } {} } ;
                                      PAIR } ;
-                              DIG 9 ;
+                              DIG 7 ;
                               DROP ;
                               UNPAIR ;
                               DUP 4 ;
@@ -600,7 +607,7 @@
                                        LEFT unit ;
                                        DIG 5 ;
                                        PAIR 5 } } }
-                            { DIG 9 ;
+                            { DIG 7 ;
                               DROP 2 ;
                               DUP 2 ;
                               GET 8 ;
@@ -617,7 +624,7 @@
                               IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
                               UNPAIR 3 ;
                               SWAP ;
-                              DIG 10 ;
+                              DIG 8 ;
                               SWAP ;
                               EXEC ;
                               UNPAIR 3 ;
@@ -672,31 +679,31 @@
                               SOME ;
                               SWAP ;
                               IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
+                 SENDER ;
+                 DUP ;
+                 DIG 8 ;
+                 SWAP ;
+                 EXEC ;
+                 VOTING_POWER ;
                  UNIT ;
-                 DIG 11 ;
+                 DIG 10 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
-                 DIG 3 ;
+                 DUP ;
                  DIG 9 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
                  DUP 3 ;
-                 DIG 8 ;
-                 SWAP ;
-                 EXEC ;
-                 DROP ;
-                 DUP ;
                  GET 3 ;
                  IF_LEFT { DROP ; PUSH string "NOT_PROMOTION_PERIOD" ; FAILWITH } { DROP } ;
-                 SENDER ;
-                 DUP 2 ;
+                 DUP 3 ;
                  GET 7 ;
                  IF_NONE { PUSH string "PROMOTION_PERIOD_CONTEXT_NOT_EXIST" ; FAILWITH } {} ;
                  DUP ;
                  GET 3 ;
-                 DUP 3 ;
+                 DUP 4 ;
                  MEM ;
                  NOT ;
                  IF {} { PUSH string "PROMOTION_ALREADY_VOTED" ; FAILWITH } ;
@@ -715,7 +722,7 @@
                  OR ;
                  OR ;
                  IF {} { PUSH string "INCORRECT_VOTE_VALUE" ; FAILWITH } ;
-                 DIG 3 ;
+                 DIG 4 ;
                  IF_NONE
                    { NIL operation }
                    { NIL operation ;
@@ -734,11 +741,11 @@
                              (option %winner_payload (set address))) ;
                      CONS } ;
                  DIG 6 ;
-                 DIG 4 ;
+                 DIG 5 ;
                  DUP 4 ;
                  DIG 4 ;
                  GET 3 ;
-                 DIG 6 ;
+                 DIG 5 ;
                  DIG 7 ;
                  PAIR ;
                  DIG 6 ;
@@ -755,20 +762,16 @@
                  DIG 6 ;
                  DROP 2 ;
                  IF_LEFT
-                   { DUP ;
+                   { DUP 2 ;
                      CAR ;
-                     DUP ;
-                     VOTING_POWER ;
-                     DUP 4 ;
-                     CAR ;
-                     DIG 7 ;
+                     DIG 5 ;
                      SWAP ;
                      EXEC ;
-                     DUP 5 ;
+                     DUP 3 ;
                      GET 3 ;
                      IF_NONE
-                       { DIG 5 ;
-                         DIG 6 ;
+                       { DIG 3 ;
+                         DIG 4 ;
                          DROP 2 ;
                          NONE (pair nat
                                     (pair (map bytes (pair (set address) address (map address nat))) nat)
@@ -789,20 +792,20 @@
                          COMPARE ;
                          EQ ;
                          IF { SWAP ;
-                              DIG 6 ;
-                              DIG 7 ;
+                              DIG 4 ;
+                              DIG 5 ;
                               DROP 3 ;
                               NONE (pair nat
                                          (pair (map bytes (pair (set address) address (map address nat))) nat)
                                          (option (pair (set address) (map address (pair string nat)) nat))
                                          (option (set address))) ;
                               SWAP }
-                            { DUP 6 ;
+                            { DUP 4 ;
                               CAR ;
                               DUP 2 ;
                               GET 3 ;
                               IF_LEFT
-                                { DIG 8 ;
+                                { DIG 6 ;
                                   DROP 2 ;
                                   DUP 2 ;
                                   GET 5 ;
@@ -816,7 +819,7 @@
                                          UNPAIR ;
                                          DUP 3 ;
                                          GET 4 ;
-                                         DUP 13 ;
+                                         DUP 11 ;
                                          SWAP ;
                                          EXEC ;
                                          DUP 3 ;
@@ -832,7 +835,7 @@
                                               EQ ;
                                               IF { DROP ; NONE (set address) } {} } ;
                                          PAIR } ;
-                                  DIG 9 ;
+                                  DIG 7 ;
                                   DROP ;
                                   UNPAIR ;
                                   DUP 4 ;
@@ -938,7 +941,7 @@
                                            LEFT unit ;
                                            DIG 5 ;
                                            PAIR 5 } } }
-                                { DIG 9 ;
+                                { DIG 7 ;
                                   DROP 2 ;
                                   DUP 2 ;
                                   GET 8 ;
@@ -955,7 +958,7 @@
                                   IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
                                   UNPAIR 3 ;
                                   SWAP ;
-                                  DIG 10 ;
+                                  DIG 8 ;
                                   SWAP ;
                                   EXEC ;
                                   UNPAIR 3 ;
@@ -1010,31 +1013,31 @@
                                   SOME ;
                                   SWAP ;
                                   IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
+                     SENDER ;
+                     DUP ;
+                     DIG 6 ;
+                     SWAP ;
+                     EXEC ;
+                     VOTING_POWER ;
                      UNIT ;
-                     DIG 9 ;
+                     DIG 8 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DIG 3 ;
+                     DUP ;
                      DIG 7 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
                      DUP 3 ;
-                     DIG 6 ;
-                     SWAP ;
-                     EXEC ;
-                     DROP ;
-                     DUP ;
                      GET 3 ;
-                     IF_LEFT { DIG 7 ; DROP 2 } { DROP ; DIG 6 ; FAILWITH } ;
-                     SENDER ;
-                     DUP 2 ;
+                     IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;
+                     DUP 3 ;
                      GET 5 ;
                      PUSH nat 0 ;
                      DUP 2 ;
                      CAR ;
-                     ITER { CDR ; GET 4 ; DUP 4 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
+                     ITER { CDR ; GET 4 ; DUP 5 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
                      DUP 8 ;
                      CAR ;
                      GET 7 ;
@@ -1043,7 +1046,6 @@
                      LT ;
                      IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
                      DIG 5 ;
-                     CDR ;
                      PACK ;
                      SHA256 ;
                      DUP 2 ;
@@ -1053,11 +1055,11 @@
                      IF_NONE { PUSH string "PROPOSAL_NOT_FOUND" ; FAILWITH } {} ;
                      DUP ;
                      GET 4 ;
-                     DUP 5 ;
+                     DUP 6 ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } ;
-                     DIG 5 ;
+                     DIG 6 ;
                      IF_NONE
                        { NIL operation }
                        { NIL operation ;
@@ -1076,14 +1078,14 @@
                                  (option %winner_payload (set address))) ;
                          CONS } ;
                      DIG 7 ;
-                     DIG 6 ;
+                     DIG 7 ;
                      DUP 6 ;
                      DIG 6 ;
                      CAR ;
                      DUP 6 ;
                      DIG 6 ;
                      GET 4 ;
-                     DIG 9 ;
+                     DIG 8 ;
                      DIG 9 ;
                      SWAP ;
                      SOME ;
@@ -1097,19 +1099,16 @@
                      UPDATE 5 ;
                      SOME ;
                      UPDATE 3 }
-                   { UNPAIR ;
-                     DUP ;
-                     VOTING_POWER ;
-                     DUP 4 ;
+                   { DUP 2 ;
                      CAR ;
-                     DIG 7 ;
+                     DIG 5 ;
                      SWAP ;
                      EXEC ;
-                     DUP 5 ;
+                     DUP 3 ;
                      GET 3 ;
                      IF_NONE
-                       { DIG 5 ;
-                         DIG 6 ;
+                       { DIG 3 ;
+                         DIG 4 ;
                          DROP 2 ;
                          NONE (pair nat
                                     (pair (map bytes (pair (set address) address (map address nat))) nat)
@@ -1130,20 +1129,20 @@
                          COMPARE ;
                          EQ ;
                          IF { SWAP ;
-                              DIG 6 ;
-                              DIG 7 ;
+                              DIG 4 ;
+                              DIG 5 ;
                               DROP 3 ;
                               NONE (pair nat
                                          (pair (map bytes (pair (set address) address (map address nat))) nat)
                                          (option (pair (set address) (map address (pair string nat)) nat))
                                          (option (set address))) ;
                               SWAP }
-                            { DUP 6 ;
+                            { DUP 4 ;
                               CAR ;
                               DUP 2 ;
                               GET 3 ;
                               IF_LEFT
-                                { DIG 8 ;
+                                { DIG 6 ;
                                   DROP 2 ;
                                   DUP 2 ;
                                   GET 5 ;
@@ -1157,7 +1156,7 @@
                                          UNPAIR ;
                                          DUP 3 ;
                                          GET 4 ;
-                                         DUP 13 ;
+                                         DUP 11 ;
                                          SWAP ;
                                          EXEC ;
                                          DUP 3 ;
@@ -1173,7 +1172,7 @@
                                               EQ ;
                                               IF { DROP ; NONE (set address) } {} } ;
                                          PAIR } ;
-                                  DIG 9 ;
+                                  DIG 7 ;
                                   DROP ;
                                   UNPAIR ;
                                   DUP 4 ;
@@ -1279,7 +1278,7 @@
                                            LEFT unit ;
                                            DIG 5 ;
                                            PAIR 5 } } }
-                                { DIG 9 ;
+                                { DIG 7 ;
                                   DROP 2 ;
                                   DUP 2 ;
                                   GET 8 ;
@@ -1296,7 +1295,7 @@
                                   IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
                                   UNPAIR 3 ;
                                   SWAP ;
-                                  DIG 10 ;
+                                  DIG 8 ;
                                   SWAP ;
                                   EXEC ;
                                   UNPAIR 3 ;
@@ -1352,12 +1351,12 @@
                                   SWAP ;
                                   IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
                      SENDER ;
-                     UNIT ;
-                     DIG 10 ;
+                     DUP ;
+                     DIG 6 ;
                      SWAP ;
                      EXEC ;
-                     DROP ;
-                     DIG 4 ;
+                     VOTING_POWER ;
+                     UNIT ;
                      DIG 8 ;
                      SWAP ;
                      EXEC ;
@@ -1370,13 +1369,13 @@
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF { DROP ; DUP 4 ; DIG 7 ; SWAP ; EXEC ; DROP }
+                     IF { DROP ; DUP ; DIG 7 ; SWAP ; EXEC ; DROP }
                         { DIG 7 ;
                           DROP ;
-                          DUP 2 ;
+                          DUP 3 ;
                           MEM ;
                           IF {} { PUSH string "PROPOSER_NOT_ALLOWED" ; FAILWITH } } ;
-                     DUP 2 ;
+                     DUP 3 ;
                      GET 8 ;
                      IF_NONE
                        {}
@@ -1388,14 +1387,14 @@
                          COMPARE ;
                          NEQ ;
                          IF { DROP } { FAILWITH } } ;
-                     DUP 2 ;
+                     DUP 3 ;
                      GET 3 ;
                      IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;
                      PUSH nat 0 ;
-                     DUP 3 ;
+                     DUP 4 ;
                      GET 5 ;
                      CAR ;
-                     ITER { CDR ; GET 4 ; DUP 3 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
+                     ITER { CDR ; GET 4 ; DUP 4 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
                      DUP 7 ;
                      CAR ;
                      GET 7 ;
@@ -1406,14 +1405,14 @@
                      DUP 5 ;
                      PACK ;
                      SHA256 ;
-                     DUP 3 ;
+                     DUP 4 ;
                      GET 5 ;
                      CAR ;
                      DUP 2 ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_CREATED" ; FAILWITH } ;
-                     DIG 3 ;
+                     DIG 4 ;
                      IF_NONE
                        { NIL operation }
                        { NIL operation ;
@@ -1432,14 +1431,14 @@
                                  (option %winner_payload (set address))) ;
                          CONS } ;
                      DIG 6 ;
-                     DUP 5 ;
                      DUP 6 ;
+                     DUP 7 ;
                      GET 5 ;
-                     DIG 6 ;
+                     DIG 7 ;
                      GET 5 ;
                      CAR ;
                      EMPTY_MAP address nat ;
-                     DIG 8 ;
+                     DIG 7 ;
                      DUP 9 ;
                      SWAP ;
                      SOME ;
