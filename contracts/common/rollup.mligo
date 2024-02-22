@@ -39,8 +39,8 @@ let timestamp_to_padded_little_endian_bytes
     Utils.pad_end timestamp_bytes 8n 0x00
 
 let get_upgrade_payload
-        (preimage_hash : bytes)
+        (kernel_root_hash : bytes)
         (activation_timestamp : timestamp)
         : bytes =
     let timestamp = timestamp_to_padded_little_endian_bytes activation_timestamp in
-    Bytes.concats [0xEBA1; preimage_hash; 0x88; timestamp]
+    Bytes.concats [0xEBA1; kernel_root_hash; 0x88; timestamp]

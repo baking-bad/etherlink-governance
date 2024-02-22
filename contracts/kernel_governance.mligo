@@ -14,19 +14,19 @@ module KernelGovernance = struct
 
     [@entry] 
     let new_proposal 
-            (preimage_hash : payload_t)
+            (kernel_root_hash : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = Utils.assert_preimage_hash_has_correct_size preimage_hash in
-        Entrypoints.new_proposal preimage_hash storage
+        let _ = Utils.assert_kernel_root_hash_has_correct_size kernel_root_hash in
+        Entrypoints.new_proposal kernel_root_hash storage
   
 
     [@entry]
     let upvote_proposal 
-            (preimage_hash : payload_t)
+            (kernel_root_hash : payload_t)
             (storage : storage_t) 
             : return_t = 
-        Entrypoints.upvote_proposal preimage_hash storage
+        Entrypoints.upvote_proposal kernel_root_hash storage
   
 
     [@entry]
@@ -67,7 +67,7 @@ module KernelGovernance = struct
 
 
     type upgrade_payload_params_t = {
-        preimage_hash : payload_t;
+        kernel_root_hash : payload_t;
         activation_timestamp : timestamp;
     }
 
@@ -76,6 +76,6 @@ module KernelGovernance = struct
             (params: upgrade_payload_params_t) 
             (_ : storage_t) 
             : bytes = 
-        let { preimage_hash; activation_timestamp } = params in
-        Rollup.get_upgrade_payload preimage_hash activation_timestamp
+        let { kernel_root_hash; activation_timestamp } = params in
+        Rollup.get_upgrade_payload kernel_root_hash activation_timestamp
 end

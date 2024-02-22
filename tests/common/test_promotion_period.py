@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
 from tests.helpers.contracts.kernel_governance import KernelGovernance
-from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_preimage_hash, pkh
+from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_kernel_root_hash, pkh
 from pytezos.client import PyTezosClient
 
 class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
@@ -22,8 +22,8 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
-        preimage_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        governance.using(proposer).new_proposal(preimage_hash).send()
+        kernel_root_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
+        governance.using(proposer).new_proposal(kernel_root_hash).send()
         self.bake_block()
 
         self.bake_blocks(2)
@@ -34,7 +34,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert state['voting_context']['period_index'] == 1
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': preimage_hash,
+            'payload': kernel_root_hash,
             'votes': {},
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
@@ -44,13 +44,13 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         return {
             'governance': governance,
             'proposer': proposer,
-            'preimage_hash': preimage_hash
+            'kernel_root_hash': kernel_root_hash
         }
 
     def test_should_reset_to_proposal_period_if_promotion_period_is_skipped(self) -> None:
         test = self.prepare_promotion_period()
         governance: KernelGovernance = test['governance']
-        preimage_hash = test['preimage_hash']
+        kernel_root_hash = test['kernel_root_hash']
         proposer: PyTezosClient = test['proposer']
 
         expected_finished_voting = {
@@ -58,7 +58,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_preimage_hash(preimage_hash), 
+                        'payload': pack_kernel_root_hash(kernel_root_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
                             pkh(proposer): DEFAULT_VOTING_POWER
@@ -68,7 +68,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
-                'payload': pack_preimage_hash(preimage_hash),
+                'payload': pack_kernel_root_hash(kernel_root_hash),
                 'votes': {},
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
@@ -104,7 +104,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
-        preimage_hash = test['preimage_hash']
+        kernel_root_hash = test['kernel_root_hash']
         baker1 = self.bootstrap_baker()
 
         # Period index: 1. Block: 1 of 3
@@ -126,7 +126,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_preimage_hash(preimage_hash), 
+                        'payload': pack_kernel_root_hash(kernel_root_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
                             pkh(proposer): DEFAULT_VOTING_POWER
@@ -136,7 +136,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
-                'payload': pack_preimage_hash(preimage_hash),
+                'payload': pack_kernel_root_hash(kernel_root_hash),
                 'votes': {
                     pkh(proposer): {
                         'vote': YAY_VOTE,
@@ -159,7 +159,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
-        preimage_hash = test['preimage_hash']
+        kernel_root_hash = test['kernel_root_hash']
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
 
@@ -183,7 +183,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_preimage_hash(preimage_hash), 
+                        'payload': pack_kernel_root_hash(kernel_root_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
                             pkh(proposer): DEFAULT_VOTING_POWER
@@ -193,7 +193,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
-                'payload': pack_preimage_hash(preimage_hash),
+                'payload': pack_kernel_root_hash(kernel_root_hash),
                 'votes': {
                     pkh(proposer): {
                         'vote': YAY_VOTE,
@@ -220,7 +220,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
-        preimage_hash = test['preimage_hash']
+        kernel_root_hash = test['kernel_root_hash']
         baker2 = self.bootstrap_baker()
 
         # Period index: 1. Block: 1 of 3
@@ -243,7 +243,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_preimage_hash(preimage_hash), 
+                        'payload': pack_kernel_root_hash(kernel_root_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
                             pkh(proposer): DEFAULT_VOTING_POWER
@@ -253,7 +253,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             },
             'promotion_period': {
-                'payload': pack_preimage_hash(preimage_hash),
+                'payload': pack_kernel_root_hash(kernel_root_hash),
                 'votes': {
                     pkh(baker2): {
                         'vote': PASS_VOTE,
@@ -272,7 +272,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
-        preimage_hash = test['preimage_hash']
+        kernel_root_hash = test['kernel_root_hash']
         baker1 = self.bootstrap_baker()
         baker2 = self.bootstrap_baker()
 
@@ -291,7 +291,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'proposal_period': {
                 'proposals': {
                     b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_preimage_hash(preimage_hash), 
+                        'payload': pack_kernel_root_hash(kernel_root_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
                             pkh(proposer): DEFAULT_VOTING_POWER
@@ -301,7 +301,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
             'promotion_period': {
-                'payload': pack_preimage_hash(preimage_hash), 
+                'payload': pack_kernel_root_hash(kernel_root_hash), 
                 'votes': {
                     pkh(proposer): {
                         'vote': YAY_VOTE,
@@ -318,13 +318,13 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
                 },
                 'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
             }, 
-            'winner_payload': pack_preimage_hash(preimage_hash)
+            'winner_payload': pack_kernel_root_hash(kernel_root_hash)
         }
         assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert state['voting_context']['period_index'] == 2
         assert len(state['voting_context']['proposal_period']['proposals']) == 0
         assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == preimage_hash
+        assert state['voting_context']['last_winner_payload'] == kernel_root_hash
         assert state['finished_voting'] == expected_finished_voting
 
         # Check that winner preserves in future periods
@@ -334,6 +334,6 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert state['voting_context']['period_index'] == 4
         assert len(state['voting_context']['proposal_period']['proposals']) == 0
         assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == preimage_hash
+        assert state['voting_context']['last_winner_payload'] == kernel_root_hash
         assert state['finished_voting'] == expected_finished_voting
 

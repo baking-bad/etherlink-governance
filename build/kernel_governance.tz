@@ -1175,7 +1175,7 @@
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF {} { PUSH string "INCORRECT_PREIMAGE_HASH_SIZE" ; FAILWITH } ;
+                     IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_SIZE" ; FAILWITH } ;
                      DUP 2 ;
                      CAR ;
                      DIG 5 ;
@@ -1858,7 +1858,7 @@
              ISNAT ;
              IF_NONE { PUSH string "option is None" ; FAILWITH } {} } } ;
   view "get_upgrade_payload"
-       (pair (bytes %preimage_hash) (timestamp %activation_timestamp))
+       (pair (bytes %kernel_root_hash) (timestamp %activation_timestamp))
        bytes
        { CAR ;
          UNPAIR ;

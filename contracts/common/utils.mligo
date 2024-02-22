@@ -19,10 +19,10 @@ let assert_proposer_allowed
         then assert_voting_power_positive voting_power
         else assert_with_error (Set.mem proposer allowed_proposers) Errors.proposer_not_allowed
 
-let assert_preimage_hash_has_correct_size
-        (preimage_hash : bytes)
+let assert_kernel_root_hash_has_correct_size
+        (kernel_root_hash : bytes)
         : unit =
-    assert_with_error ((Bytes.length preimage_hash) = 33n) Errors.incorrect_preimage_hash_size
+    assert_with_error ((Bytes.length kernel_root_hash) = 33n) Errors.incorrect_kernel_root_hash_size
 
 let assert_payload_not_last_winner
         (type pt)

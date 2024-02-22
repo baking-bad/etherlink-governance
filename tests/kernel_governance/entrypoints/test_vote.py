@@ -4,7 +4,7 @@ from tests.helpers.errors import (
     INCORRECT_VOTE_VALUE, NO_VOTING_POWER, NOT_PROMOTION_PERIOD, PROMOTION_ALREADY_VOTED, 
     XTZ_IN_TRANSACTION_DISALLOWED
 )
-from tests.helpers.utility import DEFAULT_VOTING_POWER, DEFAULT_TOTAL_VOTING_POWER, pack_preimage_hash, pkh
+from tests.helpers.utility import DEFAULT_VOTING_POWER, DEFAULT_TOTAL_VOTING_POWER, pack_kernel_root_hash, pkh
 
 class KernelGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
@@ -42,9 +42,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        preimage_hash = '010101010101010101010101010101010101010101010101010101010101010101'
+        kernel_root_hash = '010101010101010101010101010101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 3
-        governance.using(baker1).new_proposal(preimage_hash).send()
+        governance.using(baker1).new_proposal(kernel_root_hash).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -78,9 +78,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        preimage_hash = '010101010101010101010101010101010101010101010101010101010101010101'
+        kernel_root_hash = '010101010101010101010101010101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 3
-        governance.using(baker).new_proposal(preimage_hash).send()
+        governance.using(baker).new_proposal(kernel_root_hash).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -113,9 +113,9 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 0
         
-        preimage_hash = '010101010101010101010101010101010101010101010101010101010101010101'
+        kernel_root_hash = '010101010101010101010101010101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 5
-        governance.using(baker1).new_proposal(preimage_hash).send()
+        governance.using(baker1).new_proposal(kernel_root_hash).send()
         self.bake_block()
         # Period index: 0. Block: 3 of 5
         self.bake_block()
@@ -125,7 +125,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': pack_preimage_hash(preimage_hash),
+            'payload': pack_kernel_root_hash(kernel_root_hash),
             'votes': {},
             'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
         }
@@ -137,7 +137,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': pack_preimage_hash(preimage_hash),
+            'payload': pack_kernel_root_hash(kernel_root_hash),
             'votes': {
                 pkh(baker1): {
                     'vote': YAY_VOTE,
@@ -154,7 +154,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': pack_preimage_hash(preimage_hash),
+            'payload': pack_kernel_root_hash(kernel_root_hash),
             'votes': {
                 pkh(baker1): {
                     'vote': YAY_VOTE,
@@ -175,7 +175,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': pack_preimage_hash(preimage_hash),
+            'payload': pack_kernel_root_hash(kernel_root_hash),
             'votes': {
                 pkh(baker1): {
                     'vote': YAY_VOTE,
@@ -200,7 +200,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 1
         assert state['voting_context']['promotion_period'] == {
-            'payload': pack_preimage_hash(preimage_hash),
+            'payload': pack_kernel_root_hash(kernel_root_hash),
             'votes': {
                 pkh(baker1): {
                     'vote': YAY_VOTE,

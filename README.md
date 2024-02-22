@@ -42,7 +42,7 @@ Creates and upvotes a new proposal.
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%PREIMAGE_HASH%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%KERNEL_ROOT_HASH%"
 ```
 
 #### Example
@@ -58,7 +58,7 @@ Upvotes an existing proposal.
 #### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%PREIMAGE_HASH%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%KERNEL_ROOT_HASH%"
 ```
 
 #### Example
@@ -91,7 +91,7 @@ octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718f
 
 ### trigger_kernel_upgrade
 
-Calls a smart rollup's upgrade entrypoint and passes the latest voting winner payload (kernel hash). It can be called any number of times.
+Calls a smart rollup's upgrade entrypoint and passes the latest voting winner payload (kernel root hash). It can be called any number of times.
 
 #### Client command
 
