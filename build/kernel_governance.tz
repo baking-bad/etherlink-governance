@@ -1862,7 +1862,7 @@
              ISNAT ;
              IF_NONE { PUSH string "option is None" ; FAILWITH } {} } } ;
   view "get_upgrade_payload"
-       (pair (bytes %payload) (timestamp %activation_time))
+       (pair (bytes %preimage_hash) (timestamp %activation_timestamp))
        bytes
        { CAR ;
          UNPAIR ;

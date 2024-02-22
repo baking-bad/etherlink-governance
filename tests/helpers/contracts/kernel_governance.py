@@ -53,3 +53,6 @@ class KernelGovernance(GovernanceBase):
         return self.contract.vote(
             {'sender_key_hash': sender_key_hash, 'vote': vote}
         )
+
+    def get_upgrade_payload(self, preimage_hash : bytes, activation_timestamp : int):
+        return self.contract.get_upgrade_payload(preimage_hash, activation_timestamp).run_view()

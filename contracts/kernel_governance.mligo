@@ -82,8 +82,8 @@ module KernelGovernance = struct
         Voting.get_current_period_remaining_blocks storage.config
 
     type upgrade_payload_params_t = {
-        payload : payload_t;
-        activation_time : timestamp;
+        preimage_hash : payload_t;
+        activation_timestamp : timestamp;
     }
 
     [@view] 
@@ -91,6 +91,6 @@ module KernelGovernance = struct
             (params: upgrade_payload_params_t) 
             (_ : storage_t) 
             : bytes = 
-        let { payload; activation_time } = params in
-        Rollup.get_upgrade_payload payload activation_time
+        let { preimage_hash; activation_timestamp } = params in
+        Rollup.get_upgrade_payload preimage_hash activation_timestamp
 end
