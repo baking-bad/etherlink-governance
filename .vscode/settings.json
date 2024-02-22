@@ -6,6 +6,7 @@
         "ediv",
         "Etherlink",
         "failwith",
+        "preimage",
         "pytezos",
         "rollup",
         "Sandboxed",

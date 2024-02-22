@@ -50,7 +50,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        kernel_hash = '0101010101010101010101010101010101010101'
+        kernel_hash = '010101010101010101010101010101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 3
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()
@@ -86,7 +86,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        kernel_hash = '0101010101010101010101010101010101010101'
+        kernel_hash = '010101010101010101010101010101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 3
         governance.using(baker).new_proposal(pkh(baker), kernel_hash).send()
         self.bake_block()
@@ -121,7 +121,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         state = governance.get_voting_state()
         assert len(state['voting_context']['proposal_period']['proposals']) == 0
         
-        kernel_hash = '0101010101010101010101010101010101010101'
+        kernel_hash = '010101010101010101010101010101010101010101010101010101010101010101'
         # Period index: 0. Block: 2 of 5
         governance.using(baker1).new_proposal(pkh(baker1), kernel_hash).send()
         self.bake_block()

@@ -22,7 +22,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert self.get_current_level() == governance_started_at_level
 
         # Period index: 0. Block: 2 of 3
-        kernel_hash = bytes.fromhex('0101010101010101010101010101010101010101')
+        kernel_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
         governance.using(proposer).new_proposal(pkh(proposer), kernel_hash).send()
         self.bake_block()
 
@@ -57,7 +57,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'finished_at_period_index': 2, 
             'proposal_period': {
                 'proposals': {
-                    b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
+                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
@@ -125,7 +125,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'finished_at_period_index': 2, 
             'proposal_period': {
                 'proposals': {
-                    b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
+                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
@@ -182,7 +182,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'finished_at_period_index': 2, 
             'proposal_period': {
                 'proposals': {
-                    b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
+                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
@@ -242,7 +242,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'finished_at_period_index': 2, 
             'proposal_period': {
                 'proposals': {
-                    b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
+                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {
@@ -290,7 +290,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
             'finished_at_period_index': 2, 
             'proposal_period': {
                 'proposals': {
-                    b'\xfa\xa8X\xa1UbF>3\xd0\xd7\xd4x\xb5J*\xe9\xcc\xfe\xa0g\x8cy#zs\xfce\x96\x90\xe6I': {
+                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
                         'payload': pack_kernel_hash(kernel_hash), 
                         'proposer': pkh(proposer), 
                         'votes': {

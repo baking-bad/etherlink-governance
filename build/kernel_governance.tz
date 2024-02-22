@@ -1168,7 +1168,16 @@
                      UPDATE 5 ;
                      SOME ;
                      UPDATE 3 }
-                   { UNPAIR ;
+                   { DUP ;
+                     CDR ;
+                     PUSH nat 33 ;
+                     DUP 2 ;
+                     SIZE ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "INCORRECT_PREIMAGE_HASH_SIZE" ; FAILWITH } ;
+                     SWAP ;
+                     CAR ;
                      DUP ;
                      VOTING_POWER ;
                      DUP 4 ;

@@ -21,7 +21,9 @@ module KernelGovernance = struct
             (params : new_proposal_params_t)
             (storage : storage_t) 
             : return_t = 
-        Entrypoints.new_proposal params.sender_key_hash params.hash storage
+        let preimage_hash = params.hash in
+        let _ = Utils.assert_preimage_hash_has_correct_size preimage_hash in
+        Entrypoints.new_proposal params.sender_key_hash preimage_hash storage
   
 
     type upvote_proposal_params_t = {
