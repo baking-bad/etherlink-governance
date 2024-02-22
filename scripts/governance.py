@@ -17,6 +17,11 @@ from scripts.environment import load_or_ask
     help='The period life-time (in blocks), default: 75',
 )
 @click.option(
+    '--cooldown_period_sec',
+    default=600,
+    help='The duration of the l2 cooldown period counted in seconds, default: 600',
+)
+@click.option(
     '--upvoting_limit',
     default=20,
     help='The max number of new active proposals for each account, default: 20',
@@ -52,12 +57,13 @@ from scripts.environment import load_or_ask
 def deploy_kernel_governance(
     started_at_level: int,
     period_length: int,
+    cooldown_period_sec: int,
     upvoting_limit: int,
     proposal_quorum: int,
     promotion_quorum: int,
     promotion_supermajority: int,
-    scale : int,
-    allowed_proposer : list[str],
+    scale: int,
+    allowed_proposer: list[str],
     private_key: Optional[str],
     rpc_url: Optional[str],
 ) -> KernelGovernance:
@@ -69,6 +75,7 @@ def deploy_kernel_governance(
     config = {
         'started_at_level': int(started_at_level),
         'period_length': int(period_length),
+        'cooldown_period_sec' : int(cooldown_period_sec),
         'upvoting_limit': int(upvoting_limit),
         'scale': int(scale),
         'allowed_proposers': list(allowed_proposer),
