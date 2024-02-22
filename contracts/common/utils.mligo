@@ -33,3 +33,45 @@ let assert_payload_not_last_winner
         | Some last_winner_payload ->
             assert_with_error (Bytes.pack payload <> Bytes.pack last_winner_payload) Errors.payload_same_as_last_winner
         | None -> unit
+
+// let get_sender_key_hash
+//         (_ : unit)
+//         : key_hash =
+//     let address_packed = Bytes.pack (Tezos.get_sender ()) in
+//     let key_hash_packed = Bytes.concats [(Bytes.sub 0n 5n address_packed); 0x15; (Bytes.sub 7n 21n address_packed)] in
+//     Option.unopt (Bytes.unpack key_hash_packed)
+
+let timestamp_to_nat
+        (value : timestamp)
+        : nat =
+    let packed_timestamp : bytes = Bytes.pack value in
+    Option.unopt (Bytes.unpack packed_timestamp)
+
+let nat_to_big_endian_bytes 
+        (value : nat) 
+        : bytes =
+    [%Michelson ({| { BYTES } |} : nat -> bytes)] value
+
+let nat_to_little_endian_bytes
+        (value : nat)
+        : bytes = 
+    let bytes = nat_to_big_endian_bytes value in
+    let mut res : bytes = 0x in
+    let bytes_length = Bytes.length bytes in
+    let _ = for i = 0 upto bytes_length - 1 do
+        let index : nat = Option.unopt (is_nat i) in
+        res := Bytes.concat (Bytes.sub index 1n bytes) res
+    done in
+    res
+
+let pad_end
+        (source : bytes)
+        (target_length : nat)
+        (pad_value : bytes)
+        : bytes =
+    let mut res = source in
+    let source_length = int (Bytes.length source) in
+    let _ = for _i = source_length upto target_length - 1 do
+        res := Bytes.concat res pad_value
+    done in
+    res

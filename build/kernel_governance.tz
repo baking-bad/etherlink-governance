@@ -7,6 +7,7 @@
     (pair (pair %config
              (nat %started_at_level)
              (nat %period_length)
+             (int %cooldown_period_sec)
              (nat %upvoting_limit)
              (set %allowed_proposers address)
              (nat %scale)
@@ -29,8 +30,6 @@
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
          PUSH string "UPVOTING_LIMIT_EXCEEDED" ;
-         PUSH string "yay" ;
-         PUSH string "nay" ;
          LAMBDA
            unit
            unit
@@ -60,8 +59,10 @@
              COMPARE ;
              GT ;
              IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
+         PUSH string "yay" ;
+         PUSH string "nay" ;
          LAMBDA
-           (pair nat nat nat (set address) nat nat nat nat)
+           (pair nat nat int nat (set address) nat nat nat nat)
            nat
            { DUP ;
              CAR ;
@@ -105,8 +106,8 @@
              SWAP ;
              DIG 2 ;
              DROP 2 } ;
-         DUP 8 ;
-         DUP 8 ;
+         DUP 5 ;
+         DUP 5 ;
          PAIR ;
          APPLY ;
          DIG 10 ;
@@ -114,8 +115,8 @@
          IF_LEFT
            { DIG 5 ;
              DIG 6 ;
+             DIG 7 ;
              DIG 8 ;
-             DIG 9 ;
              DIG 10 ;
              DIG 11 ;
              DROP 6 ;
@@ -201,12 +202,12 @@
                           DROP ;
                           UNPAIR ;
                           DUP 4 ;
-                          GET 11 ;
+                          GET 13 ;
                           DIG 3 ;
                           CDR ;
                           MUL ;
                           DIG 3 ;
-                          GET 9 ;
+                          GET 11 ;
                           DIG 3 ;
                           MUL ;
                           COMPARE ;
@@ -325,10 +326,10 @@
                           EXEC ;
                           UNPAIR 3 ;
                           DUP 7 ;
-                          GET 13 ;
+                          GET 15 ;
                           DIG 5 ;
                           DUP 8 ;
-                          GET 9 ;
+                          GET 11 ;
                           DIG 5 ;
                           DUP 6 ;
                           DUP 6 ;
@@ -348,10 +349,10 @@
                           COMPARE ;
                           GT ;
                           IF { DUP 6 ;
-                               GET 14 ;
+                               GET 16 ;
                                SWAP ;
                                DIG 6 ;
-                               GET 9 ;
+                               GET 11 ;
                                DIG 4 ;
                                MUL ;
                                EDIV ;
@@ -381,7 +382,79 @@
              DIG 3 ;
              CONTRACT (or (or (pair %d bytes (ticket (pair nat (option bytes)))) (bytes %a)) (bytes %u)) ;
              IF_NONE { PUSH string "ROLLUP_ENTRYPOINT_NOT_FOUND" ; FAILWITH } {} ;
+             DUP 5 ;
+             CAR ;
+             GET 5 ;
+             NOW ;
+             ADD ;
+             PACK ;
+             UNPACK nat ;
+             IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+             BYTES ;
+             PUSH bytes 0x ;
+             PUSH int 1 ;
+             PUSH int 1 ;
+             DUP 4 ;
+             SIZE ;
+             SUB ;
+             PUSH int 0 ;
+             DUP 2 ;
+             DUP 2 ;
+             COMPARE ;
+             LE ;
+             LOOP { DUP ;
+                    DUG 3 ;
+                    DIP 3
+                        { ISNAT ;
+                          IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+                          SWAP ;
+                          DUP 3 ;
+                          PUSH nat 1 ;
+                          DIG 3 ;
+                          SLICE ;
+                          IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
+                          CONCAT } ;
+                    DUP 3 ;
+                    ADD ;
+                    DUP 2 ;
+                    DUP 2 ;
+                    COMPARE ;
+                    LE } ;
+             DROP 3 ;
              SWAP ;
+             DROP ;
+             DUP ;
+             SIZE ;
+             INT ;
+             PUSH int 1 ;
+             PUSH int 1 ;
+             PUSH nat 8 ;
+             SUB ;
+             DIG 2 ;
+             DUP 2 ;
+             DUP 2 ;
+             COMPARE ;
+             LE ;
+             LOOP { DUP ;
+                    DUG 3 ;
+                    DIP 3 { DROP ; PUSH bytes 0x00 ; SWAP ; CONCAT } ;
+                    DUP 3 ;
+                    ADD ;
+                    DUP 2 ;
+                    DUP 2 ;
+                    COMPARE ;
+                    LE } ;
+             DROP 3 ;
+             NIL bytes ;
+             SWAP ;
+             CONS ;
+             PUSH bytes 0x88 ;
+             CONS ;
+             DIG 2 ;
+             CONS ;
+             PUSH bytes 0xeba1 ;
+             CONS ;
+             CONCAT ;
              RIGHT (or (pair bytes (ticket (pair nat (option bytes)))) bytes) ;
              SWAP ;
              PUSH mutez 0 ;
@@ -496,12 +569,12 @@
                               DROP ;
                               UNPAIR ;
                               DUP 4 ;
-                              GET 11 ;
+                              GET 13 ;
                               DIG 3 ;
                               CDR ;
                               MUL ;
                               DIG 3 ;
-                              GET 9 ;
+                              GET 11 ;
                               DIG 3 ;
                               MUL ;
                               COMPARE ;
@@ -620,10 +693,10 @@
                               EXEC ;
                               UNPAIR 3 ;
                               DUP 7 ;
-                              GET 13 ;
+                              GET 15 ;
                               DIG 5 ;
                               DUP 8 ;
-                              GET 9 ;
+                              GET 11 ;
                               DIG 5 ;
                               DUP 6 ;
                               DUP 6 ;
@@ -643,10 +716,10 @@
                               COMPARE ;
                               GT ;
                               IF { DUP 6 ;
-                                   GET 14 ;
+                                   GET 16 ;
                                    SWAP ;
                                    DIG 6 ;
-                                   GET 9 ;
+                                   GET 11 ;
                                    DIG 4 ;
                                    MUL ;
                                    EDIV ;
@@ -671,17 +744,17 @@
                               SWAP ;
                               IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
                  UNIT ;
-                 DIG 9 ;
+                 DIG 11 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
                  DIG 3 ;
-                 DIG 7 ;
+                 DIG 9 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
                  DUP 3 ;
-                 DIG 6 ;
+                 DIG 8 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -749,8 +822,8 @@
                  UPDATE 7 ;
                  SOME ;
                  UPDATE 3 }
-               { DIG 8 ;
-                 DIG 9 ;
+               { DIG 5 ;
+                 DIG 6 ;
                  DROP 2 ;
                  IF_LEFT
                    { DUP ;
@@ -834,12 +907,12 @@
                                   DROP ;
                                   UNPAIR ;
                                   DUP 4 ;
-                                  GET 11 ;
+                                  GET 13 ;
                                   DIG 3 ;
                                   CDR ;
                                   MUL ;
                                   DIG 3 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 3 ;
                                   MUL ;
                                   COMPARE ;
@@ -958,10 +1031,10 @@
                                   EXEC ;
                                   UNPAIR 3 ;
                                   DUP 7 ;
-                                  GET 13 ;
+                                  GET 15 ;
                                   DIG 5 ;
                                   DUP 8 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 5 ;
                                   DUP 6 ;
                                   DUP 6 ;
@@ -981,10 +1054,10 @@
                                   COMPARE ;
                                   GT ;
                                   IF { DUP 6 ;
-                                       GET 14 ;
+                                       GET 16 ;
                                        SWAP ;
                                        DIG 6 ;
-                                       GET 9 ;
+                                       GET 11 ;
                                        DIG 4 ;
                                        MUL ;
                                        EDIV ;
@@ -1035,7 +1108,7 @@
                      ITER { CDR ; GET 4 ; DUP 4 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
                      DUP 8 ;
                      CAR ;
-                     GET 5 ;
+                     GET 7 ;
                      SWAP ;
                      COMPARE ;
                      LT ;
@@ -1175,12 +1248,12 @@
                                   DROP ;
                                   UNPAIR ;
                                   DUP 4 ;
-                                  GET 11 ;
+                                  GET 13 ;
                                   DIG 3 ;
                                   CDR ;
                                   MUL ;
                                   DIG 3 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 3 ;
                                   MUL ;
                                   COMPARE ;
@@ -1299,10 +1372,10 @@
                                   EXEC ;
                                   UNPAIR 3 ;
                                   DUP 7 ;
-                                  GET 13 ;
+                                  GET 15 ;
                                   DIG 5 ;
                                   DUP 8 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 5 ;
                                   DUP 6 ;
                                   DUP 6 ;
@@ -1322,10 +1395,10 @@
                                   COMPARE ;
                                   GT ;
                                   IF { DUP 6 ;
-                                       GET 14 ;
+                                       GET 16 ;
                                        SWAP ;
                                        DIG 6 ;
-                                       GET 9 ;
+                                       GET 11 ;
                                        DIG 4 ;
                                        MUL ;
                                        EDIV ;
@@ -1362,7 +1435,7 @@
                      DROP ;
                      DUP 6 ;
                      CAR ;
-                     GET 7 ;
+                     GET 9 ;
                      PUSH nat 0 ;
                      DUP 2 ;
                      SIZE ;
@@ -1396,7 +1469,7 @@
                      ITER { CDR ; GET 4 ; DUP 3 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
                      DUP 7 ;
                      CAR ;
-                     GET 5 ;
+                     GET 7 ;
                      SWAP ;
                      COMPARE ;
                      LT ;
@@ -1566,12 +1639,12 @@
                              PAIR } ;
                       UNPAIR ;
                       DUP 4 ;
-                      GET 11 ;
+                      GET 13 ;
                       DIG 3 ;
                       CDR ;
                       MUL ;
                       DIG 3 ;
-                      GET 9 ;
+                      GET 11 ;
                       DIG 3 ;
                       MUL ;
                       COMPARE ;
@@ -1704,10 +1777,10 @@
                                      { DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 4 ; ADD ; UPDATE 4 } } } ;
                       UNPAIR 3 ;
                       DUP 7 ;
-                      GET 13 ;
+                      GET 15 ;
                       DIG 5 ;
                       DUP 8 ;
-                      GET 9 ;
+                      GET 11 ;
                       DIG 5 ;
                       DUP 6 ;
                       DUP 6 ;
@@ -1727,10 +1800,10 @@
                       COMPARE ;
                       GT ;
                       IF { DUP 6 ;
-                           GET 14 ;
+                           GET 16 ;
                            SWAP ;
                            DIG 6 ;
-                           GET 9 ;
+                           GET 11 ;
                            DIG 4 ;
                            MUL ;
                            EDIV ;
@@ -1778,5 +1851,79 @@
              SWAP ;
              SUB ;
              ISNAT ;
-             IF_NONE { PUSH string "option is None" ; FAILWITH } {} } } }
+             IF_NONE { PUSH string "option is None" ; FAILWITH } {} } } ;
+  view "get_upgrade_payload"
+       (pair (bytes %payload) (timestamp %activation_time))
+       bytes
+       { CAR ;
+         UNPAIR ;
+         SWAP ;
+         PACK ;
+         UNPACK nat ;
+         IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+         BYTES ;
+         PUSH bytes 0x ;
+         PUSH int 1 ;
+         PUSH int 1 ;
+         DUP 4 ;
+         SIZE ;
+         SUB ;
+         PUSH int 0 ;
+         DUP 2 ;
+         DUP 2 ;
+         COMPARE ;
+         LE ;
+         LOOP { DUP ;
+                DUG 3 ;
+                DIP 3
+                    { ISNAT ;
+                      IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+                      SWAP ;
+                      DUP 3 ;
+                      PUSH nat 1 ;
+                      DIG 3 ;
+                      SLICE ;
+                      IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
+                      CONCAT } ;
+                DUP 3 ;
+                ADD ;
+                DUP 2 ;
+                DUP 2 ;
+                COMPARE ;
+                LE } ;
+         DROP 3 ;
+         SWAP ;
+         DROP ;
+         DUP ;
+         SIZE ;
+         INT ;
+         PUSH int 1 ;
+         PUSH int 1 ;
+         PUSH nat 8 ;
+         SUB ;
+         DIG 2 ;
+         DUP 2 ;
+         DUP 2 ;
+         COMPARE ;
+         LE ;
+         LOOP { DUP ;
+                DUG 3 ;
+                DIP 3 { DROP ; PUSH bytes 0x00 ; SWAP ; CONCAT } ;
+                DUP 3 ;
+                ADD ;
+                DUP 2 ;
+                DUP 2 ;
+                COMPARE ;
+                LE } ;
+         DROP 3 ;
+         NIL bytes ;
+         SWAP ;
+         CONS ;
+         PUSH bytes 0x88 ;
+         CONS ;
+         SWAP ;
+         CONS ;
+         PUSH bytes 0xeba1 ;
+         CONS ;
+         CONCAT } }
 

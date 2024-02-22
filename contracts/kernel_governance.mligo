@@ -56,7 +56,12 @@ module KernelGovernance = struct
             (rollup_address : address)
             (storage : storage_t) 
             : return_t =
-        Entrypoints.trigger_rollup_upgrade rollup_address storage (fun kernel_hash -> kernel_hash)
+        let pack_payload = fun 
+                (payload : payload_t) 
+                : bytes -> 
+            let activation_time = Tezos.get_now () + storage.config.cooldown_period_sec in
+            Rollup.get_upgrade_payload payload activation_time in
+        Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
 
     [@view] 
@@ -73,4 +78,17 @@ module KernelGovernance = struct
             (storage : storage_t) 
             : nat = 
         Voting.get_current_period_remaining_blocks storage.config
+
+    type upgrade_payload_params_t = {
+        payload : payload_t;
+        activation_time : timestamp;
+    }
+
+    [@view] 
+    let get_upgrade_payload
+            (params: upgrade_payload_params_t) 
+            (_ : storage_t) 
+            : bytes = 
+        let { payload; activation_time } = params in
+        Rollup.get_upgrade_payload payload activation_time
 end

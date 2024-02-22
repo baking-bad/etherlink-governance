@@ -1,4 +1,5 @@
 #import "errors.mligo" "Errors"
+#import "utils.mligo" "Utils"
 
 type content_t = nat * bytes option
 type ticket_t = content_t ticket
@@ -28,4 +29,18 @@ let get_entry   // NOTE: the entrypoint is used to upgrade kernel and sequencer 
 let get_upgrade_params 
         (payload : bytes)
         : t =
-    M_right payload 
+    M_right payload
+
+let timestamp_to_padded_little_endian_bytes
+        (value : timestamp)
+        : bytes =
+    let timestamp_number : nat = Utils.timestamp_to_nat value in
+    let timestamp_bytes = Utils.nat_to_little_endian_bytes timestamp_number in
+    Utils.pad_end timestamp_bytes 8n 0x00
+
+let get_upgrade_payload
+        (root_hash : bytes)
+        (activation_time : timestamp)
+        : bytes =
+    let timestamp = timestamp_to_padded_little_endian_bytes activation_time in
+    Bytes.concats [0xEBA1; root_hash; 0x88; timestamp]

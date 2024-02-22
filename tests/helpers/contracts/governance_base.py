@@ -16,6 +16,7 @@ class GovernanceBase(ContractHelper):
         config = {
             'started_at_level': 0,
             'period_length': 10,
+            'cooldown_period_sec' : 60,
             'upvoting_limit': 20,
             'allowed_proposers': [],
             'scale': 100,

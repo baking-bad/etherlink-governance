@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
+        "concat",
+        "concats",
+        "cooldown",
+        "ediv",
         "Etherlink",
         "failwith",
         "pytezos",
@@ -7,6 +11,7 @@
         "Sandboxed",
         "struct",
         "supermajority",
+        "upto",
         "upvote",
         "upvoted",
         "upvotes",

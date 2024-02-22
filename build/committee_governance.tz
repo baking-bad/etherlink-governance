@@ -7,6 +7,7 @@
     (pair (pair %config
              (nat %started_at_level)
              (nat %period_length)
+             (int %cooldown_period_sec)
              (nat %upvoting_limit)
              (set %allowed_proposers address)
              (nat %scale)
@@ -29,8 +30,6 @@
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
          PUSH string "UPVOTING_LIMIT_EXCEEDED" ;
-         PUSH string "yay" ;
-         PUSH string "nay" ;
          LAMBDA
            unit
            unit
@@ -60,8 +59,10 @@
              COMPARE ;
              GT ;
              IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
+         PUSH string "yay" ;
+         PUSH string "nay" ;
          LAMBDA
-           (pair nat nat nat (set address) nat nat nat nat)
+           (pair nat nat int nat (set address) nat nat nat nat)
            nat
            { DUP ;
              CAR ;
@@ -105,8 +106,8 @@
              SWAP ;
              DIG 2 ;
              DROP 2 } ;
-         DUP 8 ;
-         DUP 8 ;
+         DUP 5 ;
+         DUP 5 ;
          PAIR ;
          APPLY ;
          DIG 10 ;
@@ -114,8 +115,8 @@
          IF_LEFT
            { DIG 5 ;
              DIG 6 ;
+             DIG 7 ;
              DIG 8 ;
-             DIG 9 ;
              DIG 10 ;
              DIG 11 ;
              DROP 6 ;
@@ -201,12 +202,12 @@
                           DROP ;
                           UNPAIR ;
                           DUP 4 ;
-                          GET 11 ;
+                          GET 13 ;
                           DIG 3 ;
                           CDR ;
                           MUL ;
                           DIG 3 ;
-                          GET 9 ;
+                          GET 11 ;
                           DIG 3 ;
                           MUL ;
                           COMPARE ;
@@ -325,10 +326,10 @@
                           EXEC ;
                           UNPAIR 3 ;
                           DUP 7 ;
-                          GET 13 ;
+                          GET 15 ;
                           DIG 5 ;
                           DUP 8 ;
-                          GET 9 ;
+                          GET 11 ;
                           DIG 5 ;
                           DUP 6 ;
                           DUP 6 ;
@@ -348,10 +349,10 @@
                           COMPARE ;
                           GT ;
                           IF { DUP 6 ;
-                               GET 14 ;
+                               GET 16 ;
                                SWAP ;
                                DIG 6 ;
-                               GET 9 ;
+                               GET 11 ;
                                DIG 4 ;
                                MUL ;
                                EDIV ;
@@ -497,12 +498,12 @@
                               DROP ;
                               UNPAIR ;
                               DUP 4 ;
-                              GET 11 ;
+                              GET 13 ;
                               DIG 3 ;
                               CDR ;
                               MUL ;
                               DIG 3 ;
-                              GET 9 ;
+                              GET 11 ;
                               DIG 3 ;
                               MUL ;
                               COMPARE ;
@@ -621,10 +622,10 @@
                               EXEC ;
                               UNPAIR 3 ;
                               DUP 7 ;
-                              GET 13 ;
+                              GET 15 ;
                               DIG 5 ;
                               DUP 8 ;
-                              GET 9 ;
+                              GET 11 ;
                               DIG 5 ;
                               DUP 6 ;
                               DUP 6 ;
@@ -644,10 +645,10 @@
                               COMPARE ;
                               GT ;
                               IF { DUP 6 ;
-                                   GET 14 ;
+                                   GET 16 ;
                                    SWAP ;
                                    DIG 6 ;
-                                   GET 9 ;
+                                   GET 11 ;
                                    DIG 4 ;
                                    MUL ;
                                    EDIV ;
@@ -672,17 +673,17 @@
                               SWAP ;
                               IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
                  UNIT ;
-                 DIG 9 ;
+                 DIG 11 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
                  DIG 3 ;
-                 DIG 7 ;
+                 DIG 9 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
                  DUP 3 ;
-                 DIG 6 ;
+                 DIG 8 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -750,8 +751,8 @@
                  UPDATE 7 ;
                  SOME ;
                  UPDATE 3 }
-               { DIG 8 ;
-                 DIG 9 ;
+               { DIG 5 ;
+                 DIG 6 ;
                  DROP 2 ;
                  IF_LEFT
                    { DUP ;
@@ -835,12 +836,12 @@
                                   DROP ;
                                   UNPAIR ;
                                   DUP 4 ;
-                                  GET 11 ;
+                                  GET 13 ;
                                   DIG 3 ;
                                   CDR ;
                                   MUL ;
                                   DIG 3 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 3 ;
                                   MUL ;
                                   COMPARE ;
@@ -959,10 +960,10 @@
                                   EXEC ;
                                   UNPAIR 3 ;
                                   DUP 7 ;
-                                  GET 13 ;
+                                  GET 15 ;
                                   DIG 5 ;
                                   DUP 8 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 5 ;
                                   DUP 6 ;
                                   DUP 6 ;
@@ -982,10 +983,10 @@
                                   COMPARE ;
                                   GT ;
                                   IF { DUP 6 ;
-                                       GET 14 ;
+                                       GET 16 ;
                                        SWAP ;
                                        DIG 6 ;
-                                       GET 9 ;
+                                       GET 11 ;
                                        DIG 4 ;
                                        MUL ;
                                        EDIV ;
@@ -1036,7 +1037,7 @@
                      ITER { CDR ; GET 4 ; DUP 4 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
                      DUP 8 ;
                      CAR ;
-                     GET 5 ;
+                     GET 7 ;
                      SWAP ;
                      COMPARE ;
                      LT ;
@@ -1176,12 +1177,12 @@
                                   DROP ;
                                   UNPAIR ;
                                   DUP 4 ;
-                                  GET 11 ;
+                                  GET 13 ;
                                   DIG 3 ;
                                   CDR ;
                                   MUL ;
                                   DIG 3 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 3 ;
                                   MUL ;
                                   COMPARE ;
@@ -1300,10 +1301,10 @@
                                   EXEC ;
                                   UNPAIR 3 ;
                                   DUP 7 ;
-                                  GET 13 ;
+                                  GET 15 ;
                                   DIG 5 ;
                                   DUP 8 ;
-                                  GET 9 ;
+                                  GET 11 ;
                                   DIG 5 ;
                                   DUP 6 ;
                                   DUP 6 ;
@@ -1323,10 +1324,10 @@
                                   COMPARE ;
                                   GT ;
                                   IF { DUP 6 ;
-                                       GET 14 ;
+                                       GET 16 ;
                                        SWAP ;
                                        DIG 6 ;
-                                       GET 9 ;
+                                       GET 11 ;
                                        DIG 4 ;
                                        MUL ;
                                        EDIV ;
@@ -1363,7 +1364,7 @@
                      DROP ;
                      DUP 6 ;
                      CAR ;
-                     GET 7 ;
+                     GET 9 ;
                      PUSH nat 0 ;
                      DUP 2 ;
                      SIZE ;
@@ -1397,7 +1398,7 @@
                      ITER { CDR ; GET 4 ; DUP 3 ; MEM ; IF { PUSH nat 1 ; ADD } {} } ;
                      DUP 7 ;
                      CAR ;
-                     GET 5 ;
+                     GET 7 ;
                      SWAP ;
                      COMPARE ;
                      LT ;
@@ -1567,12 +1568,12 @@
                              PAIR } ;
                       UNPAIR ;
                       DUP 4 ;
-                      GET 11 ;
+                      GET 13 ;
                       DIG 3 ;
                       CDR ;
                       MUL ;
                       DIG 3 ;
-                      GET 9 ;
+                      GET 11 ;
                       DIG 3 ;
                       MUL ;
                       COMPARE ;
@@ -1705,10 +1706,10 @@
                                      { DUP 2 ; SWAP ; CDR ; DIG 2 ; GET 4 ; ADD ; UPDATE 4 } } } ;
                       UNPAIR 3 ;
                       DUP 7 ;
-                      GET 13 ;
+                      GET 15 ;
                       DIG 5 ;
                       DUP 8 ;
-                      GET 9 ;
+                      GET 11 ;
                       DIG 5 ;
                       DUP 6 ;
                       DUP 6 ;
@@ -1728,10 +1729,10 @@
                       COMPARE ;
                       GT ;
                       IF { DUP 6 ;
-                           GET 14 ;
+                           GET 16 ;
                            SWAP ;
                            DIG 6 ;
-                           GET 9 ;
+                           GET 11 ;
                            DIG 4 ;
                            MUL ;
                            EDIV ;
