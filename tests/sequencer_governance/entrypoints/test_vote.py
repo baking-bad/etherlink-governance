@@ -9,21 +9,21 @@ from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POW
 class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
-        governance = self.deploy_committee_governance()
+        governance = self.deploy_sequencer_governance()
 
         with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).vote(YAY_VOTE).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:
         no_baker = self.bootstrap_no_baker()
-        governance = self.deploy_committee_governance()
+        governance = self.deploy_sequencer_governance()
 
         with self.raisesMichelsonError(NO_VOTING_POWER):
             governance.using(no_baker).vote(YAY_VOTE).send()
 
     def test_should_fail_if_current_period_is_not_promotion(self) -> None:
         baker = self.bootstrap_baker()
-        governance = self.deploy_committee_governance()
+        governance = self.deploy_sequencer_governance()
 
         with self.raisesMichelsonError(NOT_PROMOTION_PERIOD):
             governance.using(baker).vote(YAY_VOTE).send()
@@ -35,7 +35,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
             'proposal_quorum': 20 # 1 baker out of 5 will vote
@@ -71,7 +71,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 3
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
             'proposal_quorum': 20 # 1 baker out of 5 will vote
@@ -102,7 +102,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
             'upvoting_limit': 2,

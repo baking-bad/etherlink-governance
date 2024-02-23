@@ -10,10 +10,10 @@ from os.path import join
 from tests.helpers.metadata import Metadata
 
 
-class CommitteeGovernance(GovernanceBase):
+class SequencerGovernance(GovernanceBase):
     @classmethod
     def originate(self, client: PyTezosClient, custom_config=None) -> OperationGroup:
-        """Deploys Committee Governance"""
+        """Deploys Sequencer Governance"""
 
         metadata = Metadata.make_default(
             name='Sequencer Committee Governance',
@@ -21,7 +21,7 @@ class CommitteeGovernance(GovernanceBase):
         )
 
         storage = self.make_storage(metadata, custom_config)
-        filename = join(get_build_dir(), 'committee_governance.tz')
+        filename = join(get_build_dir(), 'sequencer_governance.tz')
 
         return originate_from_file(filename, client, storage)
     

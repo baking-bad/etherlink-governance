@@ -6,7 +6,7 @@ from tests.helpers.contracts import (
 from typing import Optional
 from pytezos.rpc import RpcError
 from contextlib import contextmanager
-from tests.helpers.contracts.committee_governance import CommitteeGovernance
+from tests.helpers.contracts.committee_governance import SequencerGovernance
 from tests.helpers.utility import pkh
 from pytezos.contract.result import ContractCallResult
 from pytezos.operation.group import OperationGroup
@@ -48,12 +48,12 @@ class BaseTestCase(SandboxedNodeTestCase):
         self.bake_block()
         return KernelGovernance.from_opg(self.manager, opg)
     
-    def deploy_committee_governance(self, custom_config=None) -> CommitteeGovernance:
+    def deploy_sequencer_governance(self, custom_config=None) -> SequencerGovernance:
         """Deploys Committee Governance contract"""
 
-        opg = CommitteeGovernance.originate(self.manager, custom_config=custom_config).send()
+        opg = SequencerGovernance.originate(self.manager, custom_config=custom_config).send()
         self.bake_block()
-        return CommitteeGovernance.from_opg(self.manager, opg)
+        return SequencerGovernance.from_opg(self.manager, opg)
 
     @contextmanager
     def raisesMichelsonError(self, error_message):

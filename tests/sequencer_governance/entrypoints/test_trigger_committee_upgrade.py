@@ -8,7 +8,7 @@ from tests.helpers.utility import DEFAULT_ADDRESS
 class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
-        governance = self.deploy_committee_governance()
+        governance = self.deploy_sequencer_governance()
 
         with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).trigger_committee_upgrade(DEFAULT_ADDRESS).with_amount(1).send()

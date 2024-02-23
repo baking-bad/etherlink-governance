@@ -9,7 +9,7 @@ from tests.helpers.utility import DEFAULT_VOTING_POWER, pkh
 class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
-        governance = self.deploy_committee_governance()
+        governance = self.deploy_sequencer_governance()
 
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
@@ -17,7 +17,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:
         no_baker = self.bootstrap_no_baker()
-        governance = self.deploy_committee_governance()
+        governance = self.deploy_sequencer_governance()
 
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         with self.raisesMichelsonError(NO_VOTING_POWER):
@@ -28,7 +28,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 2
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 2,
             'proposal_quorum': 20 # 1 bakers out of 5 voted
@@ -56,7 +56,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 7
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 7,
             'upvoting_limit': 2
@@ -90,7 +90,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
             'upvoting_limit': 5
@@ -128,7 +128,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
             'upvoting_limit': 2
@@ -152,7 +152,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
         # Period index: 0. Block: 1 of 5
-        governance = self.deploy_committee_governance(custom_config={
+        governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 5,
             'upvoting_limit': 2
