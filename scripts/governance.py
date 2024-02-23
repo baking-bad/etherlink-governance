@@ -1,11 +1,24 @@
 from pytezos import pytezos
+from tests.helpers.contracts.committee_governance import SequencerGovernance
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from typing import Optional
 import click
 from scripts.environment import load_or_ask
 
+def originate_contract(contract_type, manager, config):
+    if contract_type == 'kernel_governance':
+        return KernelGovernance.originate(manager, config).send()
+    elif contract_type == 'sequencer_governance':
+        return SequencerGovernance.originate(manager, config).send()
+    else:
+        raise ValueError("Incorrect contract_type")
 
 @click.command()
+@click.option(
+    '--contract',
+    required=True,
+    help='"kernel_governance" or "sequencer_governance"',
+)
 @click.option(
     '--started_at_level',
     required=True,
@@ -54,7 +67,8 @@ from scripts.environment import load_or_ask
 )
 @click.option('--private-key', default=None, help='Use the provided private key.')
 @click.option('--rpc-url', default=None, help='Tezos RPC URL.')
-def deploy_kernel_governance(
+def deploy_contract(
+    contract: str,
     started_at_level: int,
     period_length: int,
     cooldown_period_sec: int,
@@ -85,7 +99,7 @@ def deploy_kernel_governance(
     }
     
     manager = pytezos.using(shell=rpc_url, key=private_key)
-    opg = KernelGovernance.originate(manager, config).send()
+    opg = originate_contract(contract, manager, config)
     manager.wait(opg)
     kernelGovernance = KernelGovernance.from_opg(manager, opg)
     return kernelGovernance

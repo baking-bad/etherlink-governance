@@ -16,7 +16,12 @@ poetry run pytest
 
 ### Deploy Kernel Governance contract
 ```
-poetry run deploy_kernel_governance --started_at_level 5370247 --scale 10000 --proposal_quorum 2 --promotion_quorum 2 --promotion_supermajority 5000 --rpc-url https://rpc.tzkt.io/ghostnet
+poetry run deploy_contract --contract kernel_governance  --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
+```
+
+### Deploy Sequencer Committee Governance contract
+```
+poetry run deploy_contract --contract sequencer_governance  --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
 ```
 
 ## Deployed contracts
@@ -25,7 +30,13 @@ poetry run deploy_kernel_governance --started_at_level 5370247 --scale 10000 --p
 
 | Network    | Contract address                       |
 |------------|:--------------------------------------:|
-| ghostnet   |  KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL  |
+| ghostnet   |  KT1JxAykfcToEV1G4aTgcJJoxjHPLb6tBL5v  |
+
+### Sequencer Committee Governance
+
+| Network    | Contract address                       |
+|------------|:--------------------------------------:|
+| ghostnet   |  KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j  |
 
 # Kernel governance contract
 
