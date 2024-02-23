@@ -112,6 +112,79 @@ octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718f
 ```
 
 
+## Sequencer committee governance contract
+
+The contract allows bakers to make proposals and vote for sequencer committee upgrade as well as trigger sequencer committee upgrade with the latest voting winner payload stored in the smart contract and updated through the voting process
+
+### Entrypoints
+
+#### new_proposal
+
+Creates and upvotes a new proposal.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%COMMITTEE_ADDRESSES_SET%"
+```
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "new_proposal" --arg "{ \"tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN\" }"
+```
+
+#### upvote_proposal
+
+Upvotes an existing proposal.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%COMMITTEE_ADDRESSES_SET%"
+```
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "upvote_proposal" --arg "{ \"tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN\" }"
+```
+
+#### vote
+
+Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the promotion period.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
+```
+
+where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "vote" --arg "\"yay\""
+```
+
+
+#### trigger_committee_upgrade
+
+Calls a smart rollup's upgrade entrypoint and passes the latest voting winner payload (committee addresses). It can be called any number of times.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "trigger_committee_upgrade" --arg "\"%SMART_ROLLUP_ADDRESS%\""
+```
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "trigger_committee_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
+```
+
 ## The get_voting_state on-chain view and voting_finished events
 
 **Note: Don't use the storage to get the actual state**
