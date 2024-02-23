@@ -13,7 +13,7 @@ class Metadata:
     template = {
         'version': '0.1.0',
         'name': 'Etherlink Governance',
-        'description': 'The Etherlink Governance consists of contracts designed for upgrading Etherlink kernel by voting.',
+        'description': 'The Etherlink Governance consists of contracts designed for upgrading Etherlink kernel and Sequencer committee by voting.',
         'interfaces': ['TZIP-016'],
         'license': {'name': 'MIT'},
         'homepage': 'TODO',

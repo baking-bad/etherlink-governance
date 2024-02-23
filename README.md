@@ -1,13 +1,13 @@
 # Etherlink governance smart contracts
 
-todo
-
+The repository contains contracts designed to upgrade the Etherlink kernel and sequencer by voting.
 ## Commands
 
 ### Build
 ```
 make compile
 ```
+
 ### Test
 The testing stack for the contracts is based on Python and requires [poetry](https://python-poetry.org/), [pytezos](https://pytezos.org/), and [pytest](https://docs.pytest.org/en/7.4.x/) to be installed.
 ```
@@ -16,12 +16,12 @@ poetry run pytest
 
 ### Deploy Kernel Governance contract
 ```
-poetry run deploy_contract --contract kernel_governance  --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
+poetry run deploy_contract --contract kernel_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
 ```
 
 ### Deploy Sequencer Committee Governance contract
 ```
-poetry run deploy_contract --contract sequencer_governance  --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
+poetry run deploy_contract --contract sequencer_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
 ```
 
 ## Deployed contracts
@@ -38,53 +38,49 @@ poetry run deploy_contract --contract sequencer_governance  --rpc-url https://rp
 |------------|:--------------------------------------:|
 | ghostnet   |  KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j  |
 
-# Kernel governance contract
+## Kernel governance contract
 
 The contract allows bakers to make proposals and vote for kernel upgrade as well as trigger kernel upgrade with the latest voting winner payload stored in the smart contract and updated through the voting process
 
-# Entrypoints
+### Entrypoints
 
-## Proposal period
-
-### new_proposal
+#### new_proposal
 
 Creates and upvotes a new proposal.
 
-#### Client command
+##### Client command
 
 ```bash
 octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%KERNEL_ROOT_HASH%"
 ```
 
-#### Example
+##### Example
 
 ```bash
 octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "new_proposal" --arg "0x009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abc"
 ```
 
-### upvote_proposal
+#### upvote_proposal
 
 Upvotes an existing proposal.
 
-#### Client command
+##### Client command
 
 ```bash
 octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%KERNEL_ROOT_HASH%"
 ```
 
-#### Example
+##### Example
 
 ```bash
 octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "upvote_proposal" --arg "0x009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abc"
 ```
 
-## Promotion period
-
-### vote
+#### vote
 
 Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the promotion period.
 
-#### Client command
+##### Client command
 
 ```bash
 octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
@@ -92,32 +88,31 @@ octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint 
 
 where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
 
-#### Example
+##### Example
 
 ```bash
 octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "vote" --arg "\"yay\""
 ```
 
-## Send upgrade to kernel
 
-### trigger_kernel_upgrade
+#### trigger_kernel_upgrade
 
 Calls a smart rollup's upgrade entrypoint and passes the latest voting winner payload (kernel root hash). It can be called any number of times.
 
-#### Client command
+##### Client command
 
 ```bash
 octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "trigger_kernel_upgrade" --arg "\"%SMART_ROLLUP_ADDRESS%\""
 ```
 
-#### Example
+##### Example
 
 ```bash
 octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "trigger_kernel_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
 ```
 
 
-# The get_voting_state on-chain view and voting_finished events
+## The get_voting_state on-chain view and voting_finished events
 
 **Note: Don't use the storage to get the actual state**
 
@@ -127,7 +122,7 @@ Use the [get_voting_state](https://better-call.dev/ghostnet/KT1JA6kdnWJqXRpKKHU5
 Use the [contract events](https://better-call.dev/ghostnet/KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL/events) to see the history of voting epochs 
 
 
-# Config
+## Config
 
 How to read values stored in the smart contract storage config
 ```ocaml
