@@ -208,7 +208,7 @@ let get_payload_key
         (type pt)
         (payload : pt)
         : Storage.payload_key_t =
-    Crypto.sha256 (Bytes.pack payload) //TODO: omit sha256, big_map does hashing by itself
+    Bytes.pack payload
 
 
 let update_upvoters

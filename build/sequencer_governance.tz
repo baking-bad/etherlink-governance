@@ -906,7 +906,6 @@
                      IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
                      DUP 5 ;
                      PACK ;
-                     SHA256 ;
                      DUP 4 ;
                      GET 5 ;
                      GET 3 ;
@@ -1240,7 +1239,6 @@
                      IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
                      DUP 5 ;
                      PACK ;
-                     SHA256 ;
                      DUP 4 ;
                      GET 5 ;
                      GET 3 ;
