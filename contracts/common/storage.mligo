@@ -63,24 +63,29 @@ type config_t = {
 type 'pt proposal_t = {
     payload : 'pt;
     proposer : address;
-    votes : (address, nat) map;
+    upvotes_voting_power : nat;
 }
 
-type 'pt proposals_t = (bytes, ('pt proposal_t)) map
+type 'pt proposals_t = (bytes, ('pt proposal_t)) big_map
+
+type payload_key_t = bytes
+
+type upvoters_t = (address, payload_key_t set) big_map
 
 type 'pt proposal_period_t = {
+    upvoters : upvoters_t;
     proposals : 'pt proposals_t;
+    max_upvotes_voting_power : nat option;
+    winner_candidate : 'pt option;
     total_voting_power : nat;
 }
 
-type promotion_vote_params_t = {
-    vote: string;
-    voting_power: nat;
-}
-
 type 'pt promotion_period_t = {
-    payload : 'pt;
-    votes : (address, promotion_vote_params_t) map;
+    payload : 'pt; //TODO: redundant. We can use proposal.winner_candidate
+    voters : (address, unit) big_map;
+    yay_voting_power : nat;
+    nay_voting_power : nat;
+    pass_voting_power : nat;
     total_voting_power : nat;
 }
 

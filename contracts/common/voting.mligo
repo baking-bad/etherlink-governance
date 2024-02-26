@@ -24,50 +24,19 @@ let get_current_period_remaining_blocks
         | None -> failwith Errors.current_level_less_than_start_level
 
 
-let get_upvotes_power
-        (votes: (address, nat) map)
-        : nat =
-    let get_voting_power_sum = fun ((sum, (_, voting_power)) : (nat * (address * nat)) ) ->
-        sum + voting_power in
-    Map.fold get_voting_power_sum votes 0n
-
-
 let get_proposal_winner
         (type pt)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt option =
-        let get_winners = fun ((winner, max_power), (_, proposal) : (pt option * nat) * (bytes * pt Storage.proposal_t)) -> 
-            let upvotes_power = get_upvotes_power proposal.votes in
-            if upvotes_power > max_power
-                then (Some(proposal.payload), upvotes_power)
-                else if upvotes_power = max_power
-                    then (None, max_power)
-                    else (winner, max_power) in
-        let (winner_payload, winner_upvotes_power) = Map.fold get_winners proposal_period.proposals (None, 0n) in
+        let winner_payload = proposal_period.winner_candidate in
+        let winner_upvotes_power = match proposal_period.max_upvotes_voting_power with 
+            | Some value -> value
+            | None -> 0n in
         let proposal_quorum_reached = winner_upvotes_power * config.scale >= proposal_period.total_voting_power * config.proposal_quorum in
         if proposal_quorum_reached
             then winner_payload
             else None
-
-
-type aggregated_promotion_voting_power_t = {
-    yay_votes_power : nat;
-    nay_votes_power : nat;
-    pass_votes_power : nat;
-}
-
-let get_aggregated_promotion_voting_power
-        (votes: (address, Storage.promotion_vote_params_t) map)
-        : aggregated_promotion_voting_power_t =
-    let get_values = fun ((values), (_, vote_params) : (aggregated_promotion_voting_power_t * (address * Storage.promotion_vote_params_t) )) ->
-        if vote_params.vote = Constants.yay
-            then { values with yay_votes_power = values.yay_votes_power + vote_params.voting_power }
-            else if vote_params.vote = Constants.nay 
-                then { values with nay_votes_power = values.nay_votes_power + vote_params.voting_power }
-                else { values with pass_votes_power = values.pass_votes_power + vote_params.voting_power } in
-    let result = { yay_votes_power = 0n; nay_votes_power = 0n; pass_votes_power = 0n } in
-    Map.fold get_values votes result
 
 
 let get_promotion_winner
@@ -75,12 +44,11 @@ let get_promotion_winner
         (promotion_period : pt Storage.promotion_period_t)
         (config : Storage.config_t)
         : pt option =
-    let { total_voting_power; votes; payload; } = promotion_period in 
-    let { yay_votes_power; nay_votes_power; pass_votes_power; } = get_aggregated_promotion_voting_power votes in 
-    let quorum_reached = (yay_votes_power + nay_votes_power + pass_votes_power) * config.scale / total_voting_power >= config.promotion_quorum in
-    let yay_nay_votes_sum = yay_votes_power + nay_votes_power in
-    let super_majority_reached = if yay_nay_votes_sum > 0n
-        then yay_votes_power * config.scale / yay_nay_votes_sum >= config.promotion_supermajority
+    let { total_voting_power; payload; yay_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
+    let quorum_reached = (yay_voting_power + nay_voting_power + pass_voting_power) * config.scale / total_voting_power >= config.promotion_quorum in
+    let yay_nay_voting_sum = yay_voting_power + nay_voting_power in
+    let super_majority_reached = if yay_nay_voting_sum > 0n
+        then yay_voting_power * config.scale / yay_nay_voting_sum >= config.promotion_supermajority
         else false in
     if quorum_reached && super_majority_reached 
         then Some payload
@@ -96,7 +64,10 @@ let init_new_proposal_voting_period
         period_index = period_index;
         period_type = Proposal;
         proposal_period = {
-            proposals = Map.empty;
+            proposals = Big_map.empty;
+            upvoters = Big_map.empty;
+            max_upvotes_voting_power = None; 
+            winner_candidate = None;
             total_voting_power = Tezos.get_total_voting_power ();
         };
         promotion_period = None;
@@ -116,7 +87,10 @@ let init_new_promotion_voting_period
         period_type = Promotion;
         promotion_period = Some {
             payload = proposal_winner;
-            votes = Map.empty;
+            voters = Big_map.empty;
+            yay_voting_power = 0n;
+            nay_voting_power = 0n; 
+            pass_voting_power = 0n;
             total_voting_power = Tezos.get_total_voting_power ();
         }
     }   
@@ -151,7 +125,8 @@ let init_new_voting_state
                                 finished_voting = Some (Events.create_voting_finished_event voting_context_with_promotion_phase None);
                             })
                 | None ->
-                    let finished_voting = if Map.size voting_context.proposal_period.proposals > 0n 
+                    let at_least_one_proposal_was_submitted = Option.is_some voting_context.proposal_period.max_upvotes_voting_power in
+                    let finished_voting = if at_least_one_proposal_was_submitted
                         then Some (Events.create_voting_finished_event voting_context None)
                         else None in
                     {
@@ -213,15 +188,13 @@ let assert_current_period_promotion
 
 let assert_upvoting_allowed
         (type pt)
-        (proposals : pt Storage.proposals_t)
+        (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         (voter : address)
         : unit =
-    let get_upvotes_count = fun (acc, (_, proposal) : nat * (bytes * pt Storage.proposal_t)) ->
-        if Map.mem voter proposal.votes
-            then acc + 1n
-            else acc in
-    let upvotes_count = Map.fold get_upvotes_count proposals 0n in
+    let upvotes_count = match Big_map.find_opt voter proposal_period.upvoters with
+        | Some upvoted_payloads -> Set.size upvoted_payloads
+        | None -> 0n in
     assert_with_error (upvotes_count < config.upvoting_limit) Errors.upvoting_limit_exceeded
 
 
@@ -235,8 +208,51 @@ let assert_vote_value_correct
 let get_payload_key
         (type pt)
         (payload : pt)
-        : bytes =
-    Crypto.sha256 (Bytes.pack payload)
+        : Storage.payload_key_t =
+    Crypto.sha256 (Bytes.pack payload) //TODO: omit sha256, big_map does hashing by itself
+
+
+let update_upvoters
+        (upvoter : address)
+        (payload_key : Storage.payload_key_t)
+        (upvoters : Storage.upvoters_t)
+        : Storage.upvoters_t =
+    match Big_map.find_opt upvoter upvoters with
+        | Some upvoted_payloads ->
+            let updated_payloads = Set.add payload_key upvoted_payloads in
+            Big_map.update upvoter (Some updated_payloads) upvoters
+        | None -> Big_map.add upvoter (Set.literal [payload_key]) upvoters
+
+
+let update_winner_candidate
+        (type pt)
+        (upvotes_voting_power : nat)
+        (payload : pt)
+        (proposal_period : pt Storage.proposal_period_t)
+        : pt Storage.proposal_period_t =
+    match proposal_period.max_upvotes_voting_power with
+        | Some max_upvotes_voting_power -> 
+            if upvotes_voting_power > max_upvotes_voting_power
+            then
+                {
+                    proposal_period with
+                    max_upvotes_voting_power = Some upvotes_voting_power;
+                    winner_candidate = Some payload 
+                }
+            else if upvotes_voting_power = max_upvotes_voting_power
+                then 
+                {
+                    proposal_period with
+                    winner_candidate = None 
+                }
+                else
+                    proposal_period
+        | None -> 
+                {
+                    proposal_period with
+                    max_upvotes_voting_power = Some upvotes_voting_power;
+                    winner_candidate = Some payload 
+                }
 
 
 let add_new_proposal_and_upvote
@@ -247,41 +263,58 @@ let add_new_proposal_and_upvote
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt Storage.proposal_period_t =
-    let _ = assert_upvoting_allowed proposal_period.proposals config proposer in
+    let _ = assert_upvoting_allowed proposal_period config proposer in
     let key = get_payload_key payload in
-    let _ = assert_with_error (not Map.mem key proposal_period.proposals) Errors.proposal_already_created in
+    let _ = assert_with_error (not Big_map.mem key proposal_period.proposals) Errors.proposal_already_created in
     let value = {
         payload = payload;
         proposer = proposer;
-        votes = Map.literal [(proposer, voting_power)];
+        upvotes_voting_power = voting_power;
     } in
-    {
+    let updated_proposal_period = {
         proposal_period with
-        proposals = Map.add key value proposal_period.proposals
-    }
+        upvoters = update_upvoters proposer key proposal_period.upvoters;
+        proposals = Big_map.add key value proposal_period.proposals
+    } in
+    update_winner_candidate voting_power payload updated_proposal_period
+
+
+let assert_proposal_not_already_upvoted
+        (upvoter : address)
+        (payload_key : Storage.payload_key_t)
+        (upvoters : Storage.upvoters_t)
+        : unit =
+    match Big_map.find_opt upvoter upvoters with
+        | Some payloads -> assert_with_error (not Set.mem payload_key payloads) Errors.proposal_already_upvoted
+        | None -> unit
 
 
 let upvote_proposal
         (type pt)
         (payload : pt)
-        (voter : address)
+        (upvoter : address)
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt Storage.proposal_period_t =
-    let _ = assert_upvoting_allowed proposal_period.proposals config voter in
+    let _ = assert_upvoting_allowed proposal_period config upvoter in
     let key = get_payload_key payload in
-    let proposal_opt = Map.find_opt key proposal_period.proposals in
-    let proposal = Option.unopt_with_error proposal_opt Errors.proposal_not_found in
-    let _ = assert_with_error (not Map.mem voter proposal.votes) Errors.proposal_already_upvoted in
+    let proposal = match Big_map.find_opt key proposal_period.proposals with 
+        | Some value -> value 
+        | None -> failwith Errors.proposal_not_found in
+    let upvoters = proposal_period.upvoters in
+    let _ = assert_proposal_not_already_upvoted upvoter key upvoters in
+    let upvotes_voting_power = proposal.upvotes_voting_power + voting_power in
     let updated_proposal = { 
         proposal with
-        votes = Map.add voter voting_power proposal.votes;
+        upvotes_voting_power = upvotes_voting_power
     } in
-    {
+    let updated_proposal_period = {
         proposal_period with
-        proposals = Map.update key (Some updated_proposal) proposal_period.proposals
-    }
+        upvoters = update_upvoters upvoter key upvoters;
+        proposals = Big_map.update key (Some updated_proposal) proposal_period.proposals;
+    } in
+    update_winner_candidate upvotes_voting_power payload updated_proposal_period
 
 
 let vote_promotion
@@ -291,7 +324,14 @@ let vote_promotion
         (voting_power : nat)
         (promotion_period : pt Storage.promotion_period_t)
         : pt Storage.promotion_period_t =
-    let _ = assert_with_error (not Map.mem voter promotion_period.votes) Errors.promotion_already_voted in
+    let _ = assert_with_error (not Big_map.mem voter promotion_period.voters) Errors.promotion_already_voted in
     let _ = assert_vote_value_correct vote in
-    let updated_votes = Map.add voter { vote = vote; voting_power = voting_power; } promotion_period.votes in
-    { promotion_period with votes = updated_votes }
+    let updated_promotion_period = if vote = Constants.yay
+        then { promotion_period with yay_voting_power = promotion_period.yay_voting_power + voting_power }
+        else if vote = Constants.nay 
+            then { promotion_period with nay_voting_power = promotion_period.nay_voting_power + voting_power }
+            else { promotion_period with pass_voting_power = promotion_period.pass_voting_power + voting_power } in
+    { 
+        updated_promotion_period with 
+        voters = Big_map.add voter unit promotion_period.voters
+    }

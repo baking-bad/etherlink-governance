@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
 from tests.helpers.contracts.kernel_governance import KernelGovernance
-from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_kernel_root_hash, pkh
+from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER
 from pytezos.client import PyTezosClient
 
 class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
@@ -29,17 +29,26 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         self.bake_blocks(2)
 
         # Period index: 1. Block: 1 of 3
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROMOTION_PERIOD
-        assert state['voting_context']['period_index'] == 1
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert state['voting_context']['promotion_period'] == {
-            'payload': kernel_root_hash,
-            'votes': {},
-            'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': kernel_root_hash,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                   'payload': kernel_root_hash,
+                   'yay_voting_power': 0,
+                   'nay_voting_power': 0,
+                   'pass_voting_power': 0,
+                   'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
+            },
+            'finished_voting': None
         }
-        assert state['voting_context']['last_winner_payload'] == None
-        assert state['finished_voting'] == None
 
         return {
             'governance': governance,
@@ -50,52 +59,50 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_if_promotion_period_is_skipped(self) -> None:
         test = self.prepare_promotion_period()
         governance: KernelGovernance = test['governance']
-        kernel_root_hash = test['kernel_root_hash']
-        proposer: PyTezosClient = test['proposer']
-
-        expected_finished_voting = {
-            'finished_at_period_index': 2, 
-            'proposal_period': {
-                'proposals': {
-                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_root_hash(kernel_root_hash), 
-                        'proposer': pkh(proposer), 
-                        'votes': {
-                            pkh(proposer): DEFAULT_VOTING_POWER
-                        },
-                    },
-                },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            },
-            'promotion_period': {
-                'payload': pack_kernel_root_hash(kernel_root_hash),
-                'votes': {},
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            }, 
-            'winner_payload': None
-        }
 
         # Wait to skip the whole promotion period
         self.bake_blocks(3)
         # Period index: 2. Block: 1 of 3
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 2
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == None
-        assert state['finished_voting'] == expected_finished_voting
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 2,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': None
+            }
+        }
 
         # Wait to skip one more period
         self.bake_blocks(3)
         # Period index: 3. Block: 1 of 3
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 3
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == None
-        assert state['finished_voting'] == expected_finished_voting
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 3,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': None
+            }
+        }
 
     def test_should_reset_to_proposal_period_if_promotion_quorum_is_not_reached(self) -> None:
         test = self.prepare_promotion_period({
@@ -111,45 +118,47 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         governance.using(proposer).vote(YAY_VOTE).send()
         governance.using(baker1).vote(NAY_VOTE).send()
         self.bake_block()
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': kernel_root_hash,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                   'payload': kernel_root_hash,
+                   'yay_voting_power': DEFAULT_VOTING_POWER,
+                   'nay_voting_power': DEFAULT_VOTING_POWER,
+                   'pass_voting_power': 0,
+                   'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
         # Wait to skip one more period
         self.bake_blocks(2)
         # Period index: 2. Block: 1 of 3
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 2
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == None
-        assert state['finished_voting'] == {
-            'finished_at_period_index': 2, 
-            'proposal_period': {
-                'proposals': {
-                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_root_hash(kernel_root_hash), 
-                        'proposer': pkh(proposer), 
-                        'votes': {
-                            pkh(proposer): DEFAULT_VOTING_POWER
-                        },
-                    },
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 2,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                'promotion_period': None,
+                'last_winner_payload': None
             },
-            'promotion_period': {
-                'payload': pack_kernel_root_hash(kernel_root_hash),
-                'votes': {
-                    pkh(proposer): {
-                        'vote': YAY_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                    pkh(baker1): {
-                        'vote': NAY_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            }, 
-            'winner_payload': None
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': None
+            }
         }
 
     def test_should_reset_to_proposal_period_if_promotion_supermajority_is_not_reached(self) -> None:
@@ -168,49 +177,47 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         governance.using(baker1).vote(NAY_VOTE).send()
         governance.using(baker2).vote(PASS_VOTE).send()
         self.bake_block()
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': kernel_root_hash,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                   'payload': kernel_root_hash,
+                   'yay_voting_power': DEFAULT_VOTING_POWER,
+                   'nay_voting_power': DEFAULT_VOTING_POWER,
+                   'pass_voting_power': DEFAULT_VOTING_POWER,
+                   'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
         # Wait to skip one more period
         self.bake_blocks(2)
         # Period index: 2. Block: 1 of 3
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 2
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == None
-        assert state['finished_voting'] == {
-            'finished_at_period_index': 2, 
-            'proposal_period': {
-                'proposals': {
-                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_root_hash(kernel_root_hash), 
-                        'proposer': pkh(proposer), 
-                        'votes': {
-                            pkh(proposer): DEFAULT_VOTING_POWER
-                        },
-                    },
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 2,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                'promotion_period': None,
+                'last_winner_payload': None
             },
-            'promotion_period': {
-                'payload': pack_kernel_root_hash(kernel_root_hash),
-                'votes': {
-                    pkh(proposer): {
-                        'vote': YAY_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                    pkh(baker1): {
-                        'vote': NAY_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                    pkh(baker2): {
-                        'vote': PASS_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            }, 
-            'winner_payload': None
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': None
+            }
         }
 
     def test_should_reset_to_proposal_period_if_promotion_phase_has_only_pass_votes(self) -> None:
@@ -224,45 +231,49 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
 
         # Period index: 1. Block: 1 of 3
-        # governance.using(proposer).vote(YAY_VOTE).send()
-        # governance.using(baker1).vote(NAY_VOTE).send()
         governance.using(baker2).vote(PASS_VOTE).send()
         self.bake_block()
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': kernel_root_hash,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                   'payload': kernel_root_hash,
+                   'yay_voting_power': 0,
+                   'nay_voting_power': 0,
+                   'pass_voting_power': DEFAULT_VOTING_POWER,
+                   'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
         # Wait to skip one more period
         self.bake_blocks(2)
         # Period index: 2. Block: 1 of 3
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 2
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == None
-        assert state['finished_voting'] == {
-            'finished_at_period_index': 2, 
-            'proposal_period': {
-                'proposals': {
-                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_root_hash(kernel_root_hash), 
-                        'proposer': pkh(proposer), 
-                        'votes': {
-                            pkh(proposer): DEFAULT_VOTING_POWER
-                        },
-                    },
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 2,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                'promotion_period': None,
+                'last_winner_payload': None
             },
-            'promotion_period': {
-                'payload': pack_kernel_root_hash(kernel_root_hash),
-                'votes': {
-                    pkh(baker2): {
-                        'vote': PASS_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            }, 
-            'winner_payload': None
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': None
+            }
         }
 
     def test_should_reset_to_proposal_period_with_a_new_winner_and_event_if_promotion_period_passed_successfully(self) -> None:
@@ -281,59 +292,66 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         governance.using(baker1).vote(NAY_VOTE).send()
         governance.using(baker2).vote(PASS_VOTE).send()
         self.bake_block()
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': kernel_root_hash,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                   'payload': kernel_root_hash,
+                   'yay_voting_power': DEFAULT_VOTING_POWER,
+                   'nay_voting_power': DEFAULT_VOTING_POWER,
+                   'pass_voting_power': DEFAULT_VOTING_POWER,
+                   'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
         # Wait to skip one more period
         self.bake_blocks(2)
         # Period index: 2. Block: 1 of 3
-        state = governance.get_voting_state()
-        expected_finished_voting = {
-            'finished_at_period_index': 2, 
-            'proposal_period': {
-                'proposals': {
-                    b'&\xbap\xbfs\xc4)l<K\x99\xba\xf6u\xb9\x99\x8f#!\x8f)\tR0o\xd4l\x17\xfc1\x1fW': {
-                        'payload': pack_kernel_root_hash(kernel_root_hash), 
-                        'proposer': pkh(proposer), 
-                        'votes': {
-                            pkh(proposer): DEFAULT_VOTING_POWER
-                        },
-                    }
-                }, 
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            }, 
-            'promotion_period': {
-                'payload': pack_kernel_root_hash(kernel_root_hash), 
-                'votes': {
-                    pkh(proposer): {
-                        'vote': YAY_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                    pkh(baker1): {
-                        'vote': NAY_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
-                    pkh(baker2): {
-                        'vote': PASS_VOTE,
-                        'voting_power' : DEFAULT_VOTING_POWER
-                    },
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 2,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-            }, 
-            'winner_payload': pack_kernel_root_hash(kernel_root_hash)
+                'promotion_period': None,
+                'last_winner_payload': kernel_root_hash
+            },
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': kernel_root_hash
+            }
         }
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 2
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == kernel_root_hash
-        assert state['finished_voting'] == expected_finished_voting
 
-        # Check that winner preserves in future periods
+        # Check that event preserves in future periods
         self.bake_blocks(6)
-        state = governance.get_voting_state()
-        assert state['voting_context']['period_type'] == PROPOSAL_PERIOD
-        assert state['voting_context']['period_index'] == 4
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
-        assert state['voting_context']['promotion_period'] == None
-        assert state['voting_context']['last_winner_payload'] == kernel_root_hash
-        assert state['finished_voting'] == expected_finished_voting
-
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 4,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': kernel_root_hash
+            },
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_payload': kernel_root_hash
+            }
+        }

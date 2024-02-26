@@ -4,6 +4,7 @@
 #import "common/voting.mligo" "Voting"
 #import "common/rollup.mligo" "Rollup"
 #import "common/entrypoints.mligo" "Entrypoints"
+#import "common/views.mligo" "Views"
 
 module SequencerCommitteeGovernance = struct
 
@@ -47,8 +48,8 @@ module SequencerCommitteeGovernance = struct
     let get_voting_state
             (_ : unit) 
             (storage : storage_t) 
-            : payload_t Voting.voting_state_t = 
-        Voting.get_voting_state storage
+            : payload_t Views.voting_state_t = 
+        Views.get_voting_state storage
 
 
     [@view] 

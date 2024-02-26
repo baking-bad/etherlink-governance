@@ -1,10 +1,10 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, YAY_VOTE
+from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
 from tests.helpers.errors import (
     NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PAYLOAD_SAME_AS_LAST_WINNER, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
     UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
 )
-from tests.helpers.utility import DEFAULT_VOTING_POWER, pkh
+from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pkh
 
 class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
@@ -148,40 +148,91 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
 
     def test_should_not_fail_if_allowed_proposers_list_is_empty(self) -> None:
         disallowed_baker = self.bootstrap_baker()
+        # deploying will take 1 block
+        governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_sequencer_governance(custom_config={
+            'started_at_level': governance_started_at_level,
             'allowed_proposers': []
         })
 
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
+        addresses.sort()
+
         governance.using(disallowed_baker).new_proposal(addresses).send()
         self.bake_block()
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
     def test_should_not_fail_if_proposer_is_in_the_allowed_proposers_list(self) -> None:
         allowed_baker = self.bootstrap_baker()
         another_allowed_baker = self.bootstrap_baker()
+        # deploying will take 1 block
+        governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_sequencer_governance(custom_config={
+            'started_at_level': governance_started_at_level,
             'allowed_proposers': [pkh(allowed_baker), pkh(another_allowed_baker)]
         })
 
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
+        addresses.sort()
+
         governance.using(allowed_baker).new_proposal(addresses).send()
         self.bake_block()
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
     def test_should_not_fail_if_no_baker_is_in_the_allowed_proposers_list(self) -> None:
         no_baker = self.bootstrap_no_baker()
+        # deploying will take 1 block
+        governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_sequencer_governance(custom_config={
+            'started_at_level': governance_started_at_level,
             'allowed_proposers': [pkh(no_baker)]
         })
 
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
+        addresses.sort()
+        
         governance.using(no_baker).new_proposal(addresses).send()
         self.bake_block()
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': 0,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
 
     def test_should_create_new_proposal_with_correct_parameters(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -195,8 +246,20 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'upvoting_limit': 2
         })
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
         
         addresses1 = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         addresses1.sort()
@@ -204,14 +267,19 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(addresses1).send()
         self.bake_block()
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
-            'payload': addresses1, 
-            'proposer': pkh(baker1), 
-            'votes': {
-                pkh(baker1): DEFAULT_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': addresses1,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
             },
+            'finished_voting': None
         }
 
         addresses2 = ['tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
@@ -219,19 +287,17 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker2).new_proposal(addresses2).send()
         self.bake_block()
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 2
-        assert list(state['voting_context']['proposal_period']['proposals'].values())[0] == {
-            'payload': addresses1, 
-            'proposer': pkh(baker1), 
-            'votes': {
-                pkh(baker1): DEFAULT_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
             },
-        }
-        assert list(state['voting_context']['proposal_period']['proposals'].values())[1] == {
-            'payload': addresses2, 
-            'proposer': pkh(baker2), 
-            'votes': {
-                pkh(baker2): DEFAULT_VOTING_POWER
-            },
+            'finished_voting': None
         }

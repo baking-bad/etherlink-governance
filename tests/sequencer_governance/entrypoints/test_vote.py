@@ -1,5 +1,5 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, YAY_VOTE
+from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
 from tests.helpers.errors import (
     INCORRECT_VOTE_VALUE, NO_VOTING_POWER, NOT_PROMOTION_PERIOD, PROMOTION_ALREADY_VOTED, 
     XTZ_IN_TRANSACTION_DISALLOWED
@@ -109,8 +109,20 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 0
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 0,
+                'proposal_period': {
+                    'winner_candidate': None,
+                    'max_upvotes_voting_power': None,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': None,
+                'last_winner_payload': None
+            },
+            'finished_voting': None
+        }
         
         addresses = ['tz1RoqRN77gGpeV96vEXzt62Sns2LViZiUCa', 'tz1NqA15BLrMFZNsGWBwrq8XkcXfGyCpapU1']
         addresses.sort()
@@ -122,102 +134,123 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         # Period index: 1. Block: 1 of 3
         self.bake_blocks(3)
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert state['voting_context']['promotion_period'] == {
-            'payload': addresses,
-            'votes': {},
-            'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                    'payload': addresses,
+                    'yay_voting_power': 0,
+                    'nay_voting_power': 0,
+                    'pass_voting_power': 0,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
+            },
+            'finished_voting': None
         }
 
         # Period index: 1. Block: 2 of 5
         governance.using(baker1).vote(YAY_VOTE).send()
         self.bake_block()
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert state['voting_context']['promotion_period'] == {
-            'payload': addresses,
-            'votes': {
-                pkh(baker1): {
-                    'vote': YAY_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
-                }
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'promotion_period': {
+                    'payload': addresses,
+                    'yay_voting_power': DEFAULT_VOTING_POWER,
+                    'nay_voting_power': 0,
+                    'pass_voting_power': 0,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
             },
-            'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+            'finished_voting': None
         }
 
         # Period index: 1. Block: 3 of 5
         governance.using(baker2).vote(NAY_VOTE).send()
         self.bake_block()
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert state['voting_context']['promotion_period'] == {
-            'payload': addresses,
-            'votes': {
-                pkh(baker1): {
-                    'vote': YAY_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                pkh(baker2): {
-                    'vote': NAY_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
-                }
+                'promotion_period': {
+                    'payload': addresses,
+                    'yay_voting_power': DEFAULT_VOTING_POWER,
+                    'nay_voting_power': DEFAULT_VOTING_POWER,
+                    'pass_voting_power': 0,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+                },
+                'last_winner_payload': None
             },
-            'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+            'finished_voting': None
         }
 
         # Period index: 1. Block: 4 of 5
         governance.using(baker3).vote(PASS_VOTE).send()
         self.bake_block()
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert state['voting_context']['promotion_period'] == {
-            'payload': addresses,
-            'votes': {
-                pkh(baker1): {
-                    'vote' : YAY_VOTE,
-                    'voting_power' : DEFAULT_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                pkh(baker2): {
-                    'vote': NAY_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
+                'promotion_period': {
+                    'payload': addresses,
+                    'yay_voting_power': DEFAULT_VOTING_POWER,
+                    'nay_voting_power': DEFAULT_VOTING_POWER,
+                    'pass_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                pkh(baker3): {
-                    'vote': PASS_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
-                }
+                'last_winner_payload': None
             },
-            'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+            'finished_voting': None
         }
 
         # Period index: 1. Block: 5 of 5
         governance.using(baker4).vote(YAY_VOTE).send()
         self.bake_block()
 
-        state = governance.get_voting_state()
-        assert len(state['voting_context']['proposal_period']['proposals']) == 1
-        assert state['voting_context']['promotion_period'] == {
-            'payload': addresses,
-            'votes': {
-                pkh(baker1): {
-                    'vote' : YAY_VOTE,
-                    'voting_power' : DEFAULT_VOTING_POWER
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'proposal_period': {
+                    'winner_candidate': addresses,
+                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                pkh(baker2): {
-                    'vote': NAY_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
+                'promotion_period': {
+                    'payload': addresses,
+                    'yay_voting_power': DEFAULT_VOTING_POWER * 2,
+                    'nay_voting_power': DEFAULT_VOTING_POWER,
+                    'pass_voting_power': DEFAULT_VOTING_POWER,
+                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
-                pkh(baker3): {
-                    'vote': PASS_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
-                },
-                pkh(baker4): {
-                    'vote': YAY_VOTE,
-                    'voting_power': DEFAULT_VOTING_POWER
-                },
+                'last_winner_payload': None
             },
-            'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
+            'finished_voting': None
         }
