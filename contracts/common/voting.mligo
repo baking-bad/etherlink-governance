@@ -41,17 +41,18 @@ let get_proposal_winner
 
 let get_promotion_winner
         (type pt)
-        (promotion_period : pt Storage.promotion_period_t)
+        (winner_candidate : pt option)
+        (promotion_period : Storage.promotion_period_t)
         (config : Storage.config_t)
         : pt option =
-    let { total_voting_power; payload; yay_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
+    let { total_voting_power; yay_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
     let quorum_reached = (yay_voting_power + nay_voting_power + pass_voting_power) * config.scale / total_voting_power >= config.promotion_quorum in
     let yay_nay_voting_sum = yay_voting_power + nay_voting_power in
     let super_majority_reached = if yay_nay_voting_sum > 0n
         then yay_voting_power * config.scale / yay_nay_voting_sum >= config.promotion_supermajority
         else false in
     if quorum_reached && super_majority_reached 
-        then Some payload
+        then winner_candidate
         else None
 
 
@@ -79,14 +80,12 @@ let init_new_promotion_voting_period
         (type pt)
         (voting_context : pt Storage.voting_context_t)
         (period_index : nat)
-        (proposal_winner : pt)
         : pt Storage.voting_context_t =
     { 
         voting_context with 
         period_index = period_index;
         period_type = Promotion;
         promotion_period = Some {
-            payload = proposal_winner;
             voters = Big_map.empty;
             yay_voting_power = 0n;
             nay_voting_power = 0n; 
@@ -110,16 +109,16 @@ let init_new_voting_state
     match voting_context.period_type with
         | Proposal -> 
             (match get_proposal_winner voting_context.proposal_period config with
-                | Some proposal_winner -> 
+                | Some _proposal_winner -> 
                     let next_period_index = voting_context.period_index + 1n in
                     (if period_index = next_period_index
                         then 
                             {
-                                voting_context = init_new_promotion_voting_period voting_context period_index proposal_winner;
+                                voting_context = init_new_promotion_voting_period voting_context period_index;
                                 finished_voting = None;
                             }
                         else 
-                            let voting_context_with_promotion_phase = init_new_promotion_voting_period voting_context next_period_index proposal_winner in
+                            let voting_context_with_promotion_phase = init_new_promotion_voting_period voting_context next_period_index in
                             {
                                 voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
                                 finished_voting = Some (Events.create_voting_finished_event voting_context_with_promotion_phase None);
@@ -136,7 +135,7 @@ let init_new_voting_state
         | Promotion ->
             let new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload in
             let promotion_period = Option.unopt voting_context.promotion_period in
-            let promotion_winner = get_promotion_winner promotion_period config in
+            let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
             let finished_voting = Some (Events.create_voting_finished_event voting_context promotion_winner) in
             let updated_voting_context = (match promotion_winner with
                 | Some promotion_winner -> 
@@ -318,12 +317,11 @@ let upvote_proposal
 
 
 let vote_promotion
-        (type pt)
         (vote : string)
         (voter : address)
         (voting_power : nat)
-        (promotion_period : pt Storage.promotion_period_t)
-        : pt Storage.promotion_period_t =
+        (promotion_period :Storage.promotion_period_t)
+        : Storage.promotion_period_t =
     let _ = assert_with_error (not Big_map.mem voter promotion_period.voters) Errors.promotion_already_voted in
     let _ = assert_vote_value_correct vote in
     let updated_promotion_period = if vote = Constants.yay

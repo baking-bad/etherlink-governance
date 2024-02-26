@@ -8,8 +8,7 @@ type 'pt proposal_period_t = {
     total_voting_power : nat;
 }
 
-type 'pt promotion_period_t = {
-    payload : 'pt;
+type promotion_period_t = {
     yay_voting_power : nat;
     nay_voting_power : nat;
     pass_voting_power : nat;
@@ -20,7 +19,7 @@ type 'pt voting_context_t = {
     period_index : nat;
     period_type : Storage.period_type_t;
     proposal_period : 'pt proposal_period_t;
-    promotion_period : 'pt promotion_period_t option;
+    promotion_period : promotion_period_t option;
     last_winner_payload : 'pt option;
 }
 
@@ -40,7 +39,6 @@ let get_voting_state
     let promotion_period = match voting_context.promotion_period with
         | Some promotion_period -> 
             Some {
-                payload = promotion_period.payload;
                 yay_voting_power = promotion_period.yay_voting_power;
                 nay_voting_power = promotion_period.nay_voting_power;
                 pass_voting_power = promotion_period.pass_voting_power;

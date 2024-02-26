@@ -144,7 +144,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
                     'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
                 'promotion_period': {
-                    'payload': kernel_root_hash,
                     'yay_voting_power': 0,
                     'nay_voting_power': 0,
                     'pass_voting_power': 0,
@@ -169,7 +168,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
                     'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
                 'promotion_period': {
-                    'payload': kernel_root_hash,
                     'yay_voting_power': DEFAULT_VOTING_POWER,
                     'nay_voting_power': 0,
                     'pass_voting_power': 0,
@@ -194,7 +192,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
                     'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
                 'promotion_period': {
-                    'payload': kernel_root_hash,
                     'yay_voting_power': DEFAULT_VOTING_POWER,
                     'nay_voting_power': DEFAULT_VOTING_POWER,
                     'pass_voting_power': 0,
@@ -219,7 +216,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
                     'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
                 'promotion_period': {
-                    'payload': kernel_root_hash,
                     'yay_voting_power': DEFAULT_VOTING_POWER,
                     'nay_voting_power': DEFAULT_VOTING_POWER,
                     'pass_voting_power': DEFAULT_VOTING_POWER,
@@ -244,7 +240,6 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
                     'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
                 },
                 'promotion_period': {
-                    'payload': kernel_root_hash,
                     'yay_voting_power': DEFAULT_VOTING_POWER * 2,
                     'nay_voting_power': DEFAULT_VOTING_POWER,
                     'pass_voting_power': DEFAULT_VOTING_POWER,

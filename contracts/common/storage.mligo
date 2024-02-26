@@ -80,8 +80,7 @@ type 'pt proposal_period_t = {
     total_voting_power : nat;
 }
 
-type 'pt promotion_period_t = {
-    payload : 'pt; //TODO: redundant. We can use proposal.winner_candidate
+type promotion_period_t = {
     voters : (address, unit) big_map;
     yay_voting_power : nat;
     nay_voting_power : nat;
@@ -95,7 +94,7 @@ type 'pt voting_context_t = {
     period_index : nat;
     period_type : period_type_t;
     proposal_period : 'pt proposal_period_t;
-    promotion_period : 'pt promotion_period_t option;
+    promotion_period : promotion_period_t option;
     last_winner_payload : 'pt option;
 }
 
