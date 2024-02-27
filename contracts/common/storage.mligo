@@ -70,10 +70,12 @@ type 'pt proposals_t = (bytes, ('pt proposal_t)) big_map
 
 type payload_key_t = bytes
 
-type upvoters_t = (address, payload_key_t set) big_map
+type upvoters_upvotes_count_t = (address, nat) big_map
+type upvoters_proposals_t = (address * payload_key_t, unit) big_map
 
 type 'pt proposal_period_t = {
-    upvoters : upvoters_t;
+    upvoters_upvotes_count : upvoters_upvotes_count_t;
+    upvoters_proposals : upvoters_proposals_t;
     proposals : 'pt proposals_t;
     max_upvotes_voting_power : nat option;
     winner_candidate : 'pt option;

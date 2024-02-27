@@ -66,7 +66,8 @@ let init_new_proposal_voting_period
         period_type = Proposal;
         proposal_period = {
             proposals = Big_map.empty;
-            upvoters = Big_map.empty;
+            upvoters_upvotes_count = Big_map.empty;
+            upvoters_proposals = Big_map.empty;
             max_upvotes_voting_power = None; 
             winner_candidate = None;
             total_voting_power = Tezos.get_total_voting_power ();
@@ -186,13 +187,12 @@ let assert_current_period_promotion
 
 
 let assert_upvoting_allowed
-        (type pt)
-        (proposal_period : pt Storage.proposal_period_t)
+        (upvoters_upvotes_count : Storage.upvoters_upvotes_count_t)
         (config : Storage.config_t)
         (voter : address)
         : unit =
-    let upvotes_count = match Big_map.find_opt voter proposal_period.upvoters with
-        | Some upvoted_payloads -> Set.size upvoted_payloads
+    let upvotes_count = match Big_map.find_opt voter upvoters_upvotes_count with
+        | Some count -> count
         | None -> 0n in
     assert_with_error (upvotes_count < config.upvoting_limit) Errors.upvoting_limit_exceeded
 
@@ -211,16 +211,20 @@ let get_payload_key
     Bytes.pack payload
 
 
-let update_upvoters
+let update_upvoters_proposals
         (upvoter : address)
         (payload_key : Storage.payload_key_t)
-        (upvoters : Storage.upvoters_t)
-        : Storage.upvoters_t =
-    match Big_map.find_opt upvoter upvoters with
-        | Some upvoted_payloads ->
-            let updated_payloads = Set.add payload_key upvoted_payloads in
-            Big_map.update upvoter (Some updated_payloads) upvoters
-        | None -> Big_map.add upvoter (Set.literal [payload_key]) upvoters
+        (upvoters_proposals : Storage.upvoters_proposals_t)
+        : Storage.upvoters_proposals_t =
+    Big_map.add (upvoter, payload_key ) unit upvoters_proposals
+
+let update_upvoters_upvotes_count
+        (upvoter : address)
+        (upvoters_upvotes_count : Storage.upvoters_upvotes_count_t)
+        : Storage.upvoters_upvotes_count_t =
+    match Big_map.find_opt upvoter upvoters_upvotes_count with
+        | Some count -> Big_map.update upvoter (Some (count + 1n)) upvoters_upvotes_count
+        | None -> Big_map.add upvoter 1n upvoters_upvotes_count
 
 
 let update_winner_candidate
@@ -262,7 +266,8 @@ let add_new_proposal_and_upvote
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt Storage.proposal_period_t =
-    let _ = assert_upvoting_allowed proposal_period config proposer in
+    let upvoters_upvotes_count = proposal_period.upvoters_upvotes_count in
+    let _ = assert_upvoting_allowed upvoters_upvotes_count config proposer in
     let key = get_payload_key payload in
     let _ = assert_with_error (not Big_map.mem key proposal_period.proposals) Errors.proposal_already_created in
     let value = {
@@ -272,7 +277,8 @@ let add_new_proposal_and_upvote
     } in
     let updated_proposal_period = {
         proposal_period with
-        upvoters = update_upvoters proposer key proposal_period.upvoters;
+        upvoters_upvotes_count = update_upvoters_upvotes_count proposer upvoters_upvotes_count;
+        upvoters_proposals = update_upvoters_proposals proposer key proposal_period.upvoters_proposals;
         proposals = Big_map.add key value proposal_period.proposals
     } in
     update_winner_candidate voting_power payload updated_proposal_period
@@ -281,11 +287,9 @@ let add_new_proposal_and_upvote
 let assert_proposal_not_already_upvoted
         (upvoter : address)
         (payload_key : Storage.payload_key_t)
-        (upvoters : Storage.upvoters_t)
+        (upvoters_proposals : Storage.upvoters_proposals_t)
         : unit =
-    match Big_map.find_opt upvoter upvoters with
-        | Some payloads -> assert_with_error (not Set.mem payload_key payloads) Errors.proposal_already_upvoted
-        | None -> unit
+    assert_with_error (not Big_map.mem (upvoter, payload_key) upvoters_proposals) Errors.proposal_already_upvoted
 
 
 let upvote_proposal
@@ -296,13 +300,14 @@ let upvote_proposal
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
         : pt Storage.proposal_period_t =
-    let _ = assert_upvoting_allowed proposal_period config upvoter in
+    let upvoters_upvotes_count = proposal_period.upvoters_upvotes_count in
+    let _ = assert_upvoting_allowed upvoters_upvotes_count config upvoter in
     let key = get_payload_key payload in
     let proposal = match Big_map.find_opt key proposal_period.proposals with 
         | Some value -> value 
         | None -> failwith Errors.proposal_not_found in
-    let upvoters = proposal_period.upvoters in
-    let _ = assert_proposal_not_already_upvoted upvoter key upvoters in
+    let upvoters_proposals = proposal_period.upvoters_proposals in
+    let _ = assert_proposal_not_already_upvoted upvoter key upvoters_proposals in
     let upvotes_voting_power = proposal.upvotes_voting_power + voting_power in
     let updated_proposal = { 
         proposal with
@@ -310,7 +315,8 @@ let upvote_proposal
     } in
     let updated_proposal_period = {
         proposal_period with
-        upvoters = update_upvoters upvoter key upvoters;
+        upvoters_upvotes_count = update_upvoters_upvotes_count upvoter upvoters_upvotes_count;
+        upvoters_proposals = update_upvoters_proposals upvoter key upvoters_proposals;
         proposals = Big_map.update key (Some updated_proposal) proposal_period.proposals;
     } in
     update_winner_candidate upvotes_voting_power payload updated_proposal_period

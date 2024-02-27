@@ -16,7 +16,8 @@
              (pair (nat %period_index)
                    (or %period_type (unit %proposal) (unit %promotion))
                    (pair %proposal_period
-                      (big_map %upvoters address (set bytes))
+                      (big_map %upvoters_upvotes_count address nat)
+                      (big_map %upvoters_proposals (pair address bytes) unit)
                       (big_map %proposals
                          bytes
                          (pair (bytes %payload) (address %proposer) (nat %upvotes_voting_power)))
@@ -32,7 +33,6 @@
                    (option %last_winner_payload bytes)))
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
-         PUSH string "UPVOTING_LIMIT_EXCEEDED" ;
          LAMBDA
            unit
            unit
@@ -93,44 +93,55 @@
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR } } ;
          LAMBDA
-           (pair address bytes (big_map address (set bytes)))
-           (big_map address (set bytes))
+           (pair (big_map address nat)
+                 (pair nat nat int nat (set address) nat nat nat nat)
+                 address)
+           unit
            { UNPAIR 3 ;
-             DUP 3 ;
+             SWAP ;
+             GET 7 ;
+             SWAP ;
+             DIG 2 ;
+             GET ;
+             IF_NONE { PUSH nat 0 } {} ;
+             COMPARE ;
+             LT ;
+             IF { UNIT } { PUSH string "UPVOTING_LIMIT_EXCEEDED" ; FAILWITH } } ;
+         LAMBDA
+           (pair address bytes (big_map (pair address bytes) unit))
+           (big_map (pair address bytes) unit)
+           { UNPAIR 3 ;
+             DIG 2 ;
+             UNIT ;
+             DIG 3 ;
+             DIG 3 ;
+             PAIR ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE } ;
+         LAMBDA
+           (pair address (big_map address nat))
+           (big_map address nat)
+           { UNPAIR ;
+             DUP 2 ;
              DUP 2 ;
              GET ;
              IF_NONE
-               { DIG 2 ;
-                 EMPTY_SET bytes ;
-                 DIG 3 ;
-                 PUSH bool True ;
-                 SWAP ;
-                 UPDATE ;
-                 DIG 2 ;
-                 SWAP ;
-                 SOME ;
-                 SWAP ;
-                 UPDATE }
-               { DIG 3 ;
-                 SWAP ;
-                 DIG 3 ;
-                 PUSH bool True ;
-                 SWAP ;
-                 UPDATE ;
-                 SOME ;
-                 DIG 2 ;
-                 UPDATE } } ;
-         DIG 9 ;
+               { SWAP ; PUSH nat 1 ; DIG 2 ; SWAP ; SOME ; SWAP ; UPDATE }
+               { DIG 2 ; PUSH nat 1 ; DIG 2 ; ADD ; SOME ; DIG 2 ; UPDATE } } ;
+         DIG 10 ;
          UNPAIR ;
          IF_LEFT
            { DIG 2 ;
+             DIG 3 ;
              DIG 4 ;
-             DIG 5 ;
              DIG 6 ;
              DIG 7 ;
+             DIG 8 ;
              DIG 9 ;
-             DIG 10 ;
-             DROP 7 ;
+             DIG 11 ;
+             DROP 8 ;
              UNIT ;
              DIG 4 ;
              SWAP ;
@@ -151,8 +162,9 @@
                  NONE bytes ;
                  NONE nat ;
                  EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                 EMPTY_BIG_MAP address (set bytes) ;
-                 PAIR 5 ;
+                 EMPTY_BIG_MAP (pair address bytes) unit ;
+                 EMPTY_BIG_MAP address nat ;
+                 PAIR 6 ;
                  UNIT ;
                  LEFT unit ;
                  DIG 5 ;
@@ -174,21 +186,21 @@
                           DUP 2 ;
                           GET 13 ;
                           DUP 2 ;
-                          GET 8 ;
+                          GET 10 ;
                           MUL ;
                           DIG 2 ;
                           GET 11 ;
                           DUP 3 ;
-                          GET 5 ;
+                          GET 7 ;
                           IF_NONE { PUSH nat 0 } {} ;
                           MUL ;
                           COMPARE ;
                           GE ;
-                          IF { GET 7 } { DROP ; NONE bytes } ;
+                          IF { GET 9 } { DROP ; NONE bytes } ;
                           IF_NONE
                             { DUP ;
                               GET 5 ;
-                              GET 5 ;
+                              GET 7 ;
                               IF_NONE { PUSH bool False } { DROP ; PUSH bool True } ;
                               IF { NONE bytes ;
                                    DUP 2 ;
@@ -207,8 +219,9 @@
                               NONE bytes ;
                               NONE nat ;
                               EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                              EMPTY_BIG_MAP address (set bytes) ;
-                              PAIR 5 ;
+                              EMPTY_BIG_MAP (pair address bytes) unit ;
+                              EMPTY_BIG_MAP address nat ;
+                              PAIR 6 ;
                               UNIT ;
                               LEFT unit ;
                               DIG 5 ;
@@ -268,8 +281,9 @@
                                    NONE bytes ;
                                    NONE nat ;
                                    EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                   EMPTY_BIG_MAP address (set bytes) ;
-                                   PAIR 5 ;
+                                   EMPTY_BIG_MAP (pair address bytes) unit ;
+                                   EMPTY_BIG_MAP address nat ;
+                                   PAIR 6 ;
                                    UNIT ;
                                    LEFT unit ;
                                    DIG 5 ;
@@ -282,8 +296,9 @@
                           NONE bytes ;
                           NONE nat ;
                           EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                          EMPTY_BIG_MAP address (set bytes) ;
-                          PAIR 5 ;
+                          EMPTY_BIG_MAP (pair address bytes) unit ;
+                          EMPTY_BIG_MAP address nat ;
+                          PAIR 6 ;
                           UNIT ;
                           LEFT unit ;
                           DIG 6 ;
@@ -330,7 +345,7 @@
                                GE }
                              { DIG 2 ; DIG 4 ; DROP 3 ; PUSH bool False } ;
                           AND ;
-                          IF { DUP 2 ; GET 5 ; GET 7 } { NONE bytes } ;
+                          IF { DUP 2 ; GET 5 ; GET 9 } { NONE bytes } ;
                           DUP ;
                           DUP 4 ;
                           GET 3 ;
@@ -445,9 +460,10 @@
              CONS }
            { IF_LEFT
                { DIG 2 ;
-                 DIG 9 ;
-                 DIG 10 ;
-                 DROP 3 ;
+                 DIG 3 ;
+                 DIG 4 ;
+                 DIG 11 ;
+                 DROP 4 ;
                  DUP 2 ;
                  CAR ;
                  DIG 3 ;
@@ -463,8 +479,9 @@
                      NONE bytes ;
                      NONE nat ;
                      EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                     EMPTY_BIG_MAP address (set bytes) ;
-                     PAIR 5 ;
+                     EMPTY_BIG_MAP (pair address bytes) unit ;
+                     EMPTY_BIG_MAP address nat ;
+                     PAIR 6 ;
                      UNIT ;
                      LEFT unit ;
                      DIG 5 ;
@@ -486,21 +503,21 @@
                               DUP 2 ;
                               GET 13 ;
                               DUP 2 ;
-                              GET 8 ;
+                              GET 10 ;
                               MUL ;
                               DIG 2 ;
                               GET 11 ;
                               DUP 3 ;
-                              GET 5 ;
+                              GET 7 ;
                               IF_NONE { PUSH nat 0 } {} ;
                               MUL ;
                               COMPARE ;
                               GE ;
-                              IF { GET 7 } { DROP ; NONE bytes } ;
+                              IF { GET 9 } { DROP ; NONE bytes } ;
                               IF_NONE
                                 { DUP ;
                                   GET 5 ;
-                                  GET 5 ;
+                                  GET 7 ;
                                   IF_NONE { PUSH bool False } { DROP ; PUSH bool True } ;
                                   IF { NONE bytes ;
                                        DUP 2 ;
@@ -519,8 +536,9 @@
                                   NONE bytes ;
                                   NONE nat ;
                                   EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                  EMPTY_BIG_MAP address (set bytes) ;
-                                  PAIR 5 ;
+                                  EMPTY_BIG_MAP (pair address bytes) unit ;
+                                  EMPTY_BIG_MAP address nat ;
+                                  PAIR 6 ;
                                   UNIT ;
                                   LEFT unit ;
                                   DIG 5 ;
@@ -580,8 +598,9 @@
                                        NONE bytes ;
                                        NONE nat ;
                                        EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                       EMPTY_BIG_MAP address (set bytes) ;
-                                       PAIR 5 ;
+                                       EMPTY_BIG_MAP (pair address bytes) unit ;
+                                       EMPTY_BIG_MAP address nat ;
+                                       PAIR 6 ;
                                        UNIT ;
                                        LEFT unit ;
                                        DIG 5 ;
@@ -594,8 +613,9 @@
                               NONE bytes ;
                               NONE nat ;
                               EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                              EMPTY_BIG_MAP address (set bytes) ;
-                              PAIR 5 ;
+                              EMPTY_BIG_MAP (pair address bytes) unit ;
+                              EMPTY_BIG_MAP address nat ;
+                              PAIR 6 ;
                               UNIT ;
                               LEFT unit ;
                               DIG 6 ;
@@ -642,7 +662,7 @@
                                    GE }
                                  { DIG 2 ; DIG 4 ; DROP 3 ; PUSH bool False } ;
                               AND ;
-                              IF { DUP 2 ; GET 5 ; GET 7 } { NONE bytes } ;
+                              IF { DUP 2 ; GET 5 ; GET 9 } { NONE bytes } ;
                               DUP ;
                               DUP 4 ;
                               GET 3 ;
@@ -734,13 +754,13 @@
                  UPDATE 7 ;
                  SOME ;
                  UPDATE 3 }
-               { DIG 4 ;
-                 DIG 5 ;
+               { DIG 6 ;
+                 DIG 7 ;
                  DROP 2 ;
                  IF_LEFT
                    { DUP 2 ;
                      CAR ;
-                     DIG 4 ;
+                     DIG 6 ;
                      SWAP ;
                      EXEC ;
                      DUP 3 ;
@@ -753,8 +773,9 @@
                          NONE bytes ;
                          NONE nat ;
                          EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                         EMPTY_BIG_MAP address (set bytes) ;
-                         PAIR 5 ;
+                         EMPTY_BIG_MAP (pair address bytes) unit ;
+                         EMPTY_BIG_MAP address nat ;
+                         PAIR 6 ;
                          UNIT ;
                          LEFT unit ;
                          DIG 5 ;
@@ -776,21 +797,21 @@
                                   DUP 2 ;
                                   GET 13 ;
                                   DUP 2 ;
-                                  GET 8 ;
+                                  GET 10 ;
                                   MUL ;
                                   DIG 2 ;
                                   GET 11 ;
                                   DUP 3 ;
-                                  GET 5 ;
+                                  GET 7 ;
                                   IF_NONE { PUSH nat 0 } {} ;
                                   MUL ;
                                   COMPARE ;
                                   GE ;
-                                  IF { GET 7 } { DROP ; NONE bytes } ;
+                                  IF { GET 9 } { DROP ; NONE bytes } ;
                                   IF_NONE
                                     { DUP ;
                                       GET 5 ;
-                                      GET 5 ;
+                                      GET 7 ;
                                       IF_NONE { PUSH bool False } { DROP ; PUSH bool True } ;
                                       IF { NONE bytes ;
                                            DUP 2 ;
@@ -809,8 +830,9 @@
                                       NONE bytes ;
                                       NONE nat ;
                                       EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                      EMPTY_BIG_MAP address (set bytes) ;
-                                      PAIR 5 ;
+                                      EMPTY_BIG_MAP (pair address bytes) unit ;
+                                      EMPTY_BIG_MAP address nat ;
+                                      PAIR 6 ;
                                       UNIT ;
                                       LEFT unit ;
                                       DIG 5 ;
@@ -870,8 +892,9 @@
                                            NONE bytes ;
                                            NONE nat ;
                                            EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                           EMPTY_BIG_MAP address (set bytes) ;
-                                           PAIR 5 ;
+                                           EMPTY_BIG_MAP (pair address bytes) unit ;
+                                           EMPTY_BIG_MAP address nat ;
+                                           PAIR 6 ;
                                            UNIT ;
                                            LEFT unit ;
                                            DIG 5 ;
@@ -884,8 +907,9 @@
                                   NONE bytes ;
                                   NONE nat ;
                                   EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                  EMPTY_BIG_MAP address (set bytes) ;
-                                  PAIR 5 ;
+                                  EMPTY_BIG_MAP (pair address bytes) unit ;
+                                  EMPTY_BIG_MAP address nat ;
+                                  PAIR 6 ;
                                   UNIT ;
                                   LEFT unit ;
                                   DIG 6 ;
@@ -932,7 +956,7 @@
                                        GE }
                                      { DIG 2 ; DIG 4 ; DROP 3 ; PUSH bool False } ;
                                   AND ;
-                                  IF { DUP 2 ; GET 5 ; GET 7 } { NONE bytes } ;
+                                  IF { DUP 2 ; GET 5 ; GET 9 } { NONE bytes } ;
                                   DUP ;
                                   DUP 4 ;
                                   GET 3 ;
@@ -946,61 +970,66 @@
                                   IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
                      SENDER ;
                      DUP ;
-                     DIG 7 ;
+                     DIG 9 ;
                      SWAP ;
                      EXEC ;
                      VOTING_POWER ;
                      UNIT ;
-                     DIG 9 ;
+                     DIG 11 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
                      DUP ;
-                     DIG 8 ;
+                     DIG 10 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
                      DUP 3 ;
                      GET 3 ;
-                     IF_LEFT { DIG 9 ; DROP 2 } { DROP ; DIG 8 ; FAILWITH } ;
+                     IF_LEFT { DIG 10 ; DROP 2 } { DROP ; DIG 9 ; FAILWITH } ;
+                     DUP 3 ;
+                     GET 5 ;
+                     CAR ;
+                     DUP 3 ;
+                     DUP 8 ;
+                     CAR ;
+                     DUP 3 ;
+                     PAIR 3 ;
+                     DIG 10 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
                      DUP 6 ;
-                     CAR ;
-                     GET 7 ;
-                     DUP 4 ;
-                     GET 5 ;
-                     CAR ;
-                     DUP 4 ;
-                     GET ;
-                     IF_NONE { PUSH nat 0 } { SIZE } ;
-                     COMPARE ;
-                     LT ;
-                     IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
-                     DUP 5 ;
                      PACK ;
-                     DUP 4 ;
+                     DUP 5 ;
                      GET 5 ;
-                     GET 3 ;
+                     GET 5 ;
                      DUP 2 ;
                      GET ;
                      IF_NONE { PUSH string "PROPOSAL_NOT_FOUND" ; FAILWITH } {} ;
-                     DUP 5 ;
-                     GET 5 ;
-                     CAR ;
-                     DUP ;
                      DUP 6 ;
-                     GET ;
-                     IF_NONE
-                       {}
-                       { DUP 4 ;
-                         MEM ;
-                         NOT ;
-                         IF {} { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } } ;
-                     DIG 3 ;
+                     GET 5 ;
+                     GET 3 ;
+                     DUP ;
+                     DUP 4 ;
+                     DUP 8 ;
+                     PAIR ;
+                     MEM ;
+                     NOT ;
+                     IF {} { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } ;
+                     DIG 4 ;
                      DUP 3 ;
                      GET 4 ;
                      ADD ;
-                     DUP 6 ;
+                     DUP 7 ;
                      GET 5 ;
+                     DIG 5 ;
+                     DUP 7 ;
+                     PAIR ;
+                     DIG 11 ;
+                     SWAP ;
+                     EXEC ;
+                     UPDATE 1 ;
                      DIG 2 ;
                      DUP 5 ;
                      DIG 6 ;
@@ -1008,8 +1037,18 @@
                      DIG 9 ;
                      SWAP ;
                      EXEC ;
-                     UPDATE 1 ;
-                     DIG 5 ;
+                     UPDATE 3 ;
+                     DUP 5 ;
+                     GET 5 ;
+                     GET 5 ;
+                     DIG 3 ;
+                     DUP 4 ;
+                     UPDATE 4 ;
+                     SOME ;
+                     DIG 4 ;
+                     UPDATE ;
+                     UPDATE 5 ;
+                     DIG 3 ;
                      IF_NONE
                        { NIL operation }
                        { NIL operation ;
@@ -1019,34 +1058,23 @@
                                  (or %finished_at_period_type (unit %proposal) (unit %promotion))
                                  (option %winner_proposal_payload bytes)) ;
                          CONS } ;
-                     DIG 7 ;
-                     DUP 7 ;
-                     DIG 3 ;
-                     DIG 7 ;
-                     GET 5 ;
-                     GET 3 ;
-                     DIG 6 ;
-                     DUP 7 ;
-                     UPDATE 4 ;
-                     SOME ;
-                     DIG 7 ;
-                     UPDATE ;
-                     UPDATE 3 ;
-                     DUP ;
-                     GET 5 ;
+                     DIG 5 ;
+                     DIG 4 ;
+                     DUP 4 ;
+                     GET 7 ;
                      IF_NONE
-                       { DIG 4 ; SOME ; UPDATE 5 ; DIG 4 ; SOME ; UPDATE 7 }
+                       { DIG 3 ; DIG 4 ; SOME ; UPDATE 7 ; DIG 4 ; SOME ; UPDATE 9 }
                        { DUP ;
                          DUP 7 ;
                          COMPARE ;
                          GT ;
-                         IF { DROP ; DIG 4 ; SOME ; UPDATE 5 ; DIG 4 ; SOME ; UPDATE 7 }
+                         IF { DROP ; DIG 3 ; DIG 4 ; SOME ; UPDATE 7 ; DIG 4 ; SOME ; UPDATE 9 }
                             { DIG 6 ;
                               DROP ;
                               DIG 5 ;
                               COMPARE ;
                               EQ ;
-                              IF { NONE bytes ; UPDATE 7 } {} } } ;
+                              IF { DIG 3 ; NONE bytes ; UPDATE 9 } { DIG 3 } } } ;
                      UPDATE 5 ;
                      SOME ;
                      UPDATE 3 }
@@ -1058,7 +1086,7 @@
                      IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_SIZE" ; FAILWITH } ;
                      DUP 2 ;
                      CAR ;
-                     DIG 4 ;
+                     DIG 6 ;
                      SWAP ;
                      EXEC ;
                      DUP 3 ;
@@ -1071,8 +1099,9 @@
                          NONE bytes ;
                          NONE nat ;
                          EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                         EMPTY_BIG_MAP address (set bytes) ;
-                         PAIR 5 ;
+                         EMPTY_BIG_MAP (pair address bytes) unit ;
+                         EMPTY_BIG_MAP address nat ;
+                         PAIR 6 ;
                          UNIT ;
                          LEFT unit ;
                          DIG 5 ;
@@ -1094,21 +1123,21 @@
                                   DUP 2 ;
                                   GET 13 ;
                                   DUP 2 ;
-                                  GET 8 ;
+                                  GET 10 ;
                                   MUL ;
                                   DIG 2 ;
                                   GET 11 ;
                                   DUP 3 ;
-                                  GET 5 ;
+                                  GET 7 ;
                                   IF_NONE { PUSH nat 0 } {} ;
                                   MUL ;
                                   COMPARE ;
                                   GE ;
-                                  IF { GET 7 } { DROP ; NONE bytes } ;
+                                  IF { GET 9 } { DROP ; NONE bytes } ;
                                   IF_NONE
                                     { DUP ;
                                       GET 5 ;
-                                      GET 5 ;
+                                      GET 7 ;
                                       IF_NONE { PUSH bool False } { DROP ; PUSH bool True } ;
                                       IF { NONE bytes ;
                                            DUP 2 ;
@@ -1127,8 +1156,9 @@
                                       NONE bytes ;
                                       NONE nat ;
                                       EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                      EMPTY_BIG_MAP address (set bytes) ;
-                                      PAIR 5 ;
+                                      EMPTY_BIG_MAP (pair address bytes) unit ;
+                                      EMPTY_BIG_MAP address nat ;
+                                      PAIR 6 ;
                                       UNIT ;
                                       LEFT unit ;
                                       DIG 5 ;
@@ -1188,8 +1218,9 @@
                                            NONE bytes ;
                                            NONE nat ;
                                            EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                           EMPTY_BIG_MAP address (set bytes) ;
-                                           PAIR 5 ;
+                                           EMPTY_BIG_MAP (pair address bytes) unit ;
+                                           EMPTY_BIG_MAP address nat ;
+                                           PAIR 6 ;
                                            UNIT ;
                                            LEFT unit ;
                                            DIG 5 ;
@@ -1202,8 +1233,9 @@
                                   NONE bytes ;
                                   NONE nat ;
                                   EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                                  EMPTY_BIG_MAP address (set bytes) ;
-                                  PAIR 5 ;
+                                  EMPTY_BIG_MAP (pair address bytes) unit ;
+                                  EMPTY_BIG_MAP address nat ;
+                                  PAIR 6 ;
                                   UNIT ;
                                   LEFT unit ;
                                   DIG 6 ;
@@ -1250,7 +1282,7 @@
                                        GE }
                                      { DIG 2 ; DIG 4 ; DROP 3 ; PUSH bool False } ;
                                   AND ;
-                                  IF { DUP 2 ; GET 5 ; GET 7 } { NONE bytes } ;
+                                  IF { DUP 2 ; GET 5 ; GET 9 } { NONE bytes } ;
                                   DUP ;
                                   DUP 4 ;
                                   GET 3 ;
@@ -1264,12 +1296,12 @@
                                   IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
                      SENDER ;
                      DUP ;
-                     DIG 7 ;
+                     DIG 9 ;
                      SWAP ;
                      EXEC ;
                      VOTING_POWER ;
                      UNIT ;
-                     DIG 9 ;
+                     DIG 11 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
@@ -1281,8 +1313,8 @@
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF { DROP ; DUP ; DIG 8 ; SWAP ; EXEC ; DROP }
-                        { DIG 8 ;
+                     IF { DROP ; DUP ; DIG 10 ; SWAP ; EXEC ; DROP }
+                        { DIG 10 ;
                           DROP ;
                           DUP 3 ;
                           MEM ;
@@ -1301,36 +1333,33 @@
                          IF { DROP } { FAILWITH } } ;
                      DUP 3 ;
                      GET 3 ;
-                     IF_LEFT { DIG 9 ; DROP 2 } { DROP ; DIG 8 ; FAILWITH } ;
+                     IF_LEFT { DIG 10 ; DROP 2 } { DROP ; DIG 9 ; FAILWITH } ;
+                     DUP 3 ;
+                     GET 5 ;
+                     CAR ;
+                     DUP 3 ;
+                     DUP 8 ;
+                     CAR ;
+                     DUP 3 ;
+                     PAIR 3 ;
+                     DIG 10 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
                      DUP 6 ;
-                     CAR ;
-                     GET 7 ;
-                     DUP 4 ;
-                     GET 5 ;
-                     CAR ;
-                     DUP 4 ;
-                     GET ;
-                     IF_NONE { PUSH nat 0 } { SIZE } ;
-                     COMPARE ;
-                     LT ;
-                     IF { DIG 7 ; DROP } { DIG 7 ; FAILWITH } ;
-                     DUP 5 ;
                      PACK ;
-                     DUP 4 ;
+                     DUP 5 ;
                      GET 5 ;
-                     GET 3 ;
+                     GET 5 ;
                      DUP 2 ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_CREATED" ; FAILWITH } ;
-                     DUP 4 ;
-                     GET 5 ;
                      DUP 5 ;
                      GET 5 ;
-                     CAR ;
-                     DUP 3 ;
-                     DUP 6 ;
-                     PAIR 3 ;
+                     DIG 2 ;
+                     DUP 5 ;
+                     PAIR ;
                      DIG 9 ;
                      SWAP ;
                      EXEC ;
@@ -1338,6 +1367,16 @@
                      DUP 5 ;
                      GET 5 ;
                      GET 3 ;
+                     DUP 3 ;
+                     DUP 6 ;
+                     PAIR 3 ;
+                     DIG 9 ;
+                     SWAP ;
+                     EXEC ;
+                     UPDATE 3 ;
+                     DUP 5 ;
+                     GET 5 ;
+                     GET 5 ;
                      DUP 4 ;
                      DIG 5 ;
                      DUP 9 ;
@@ -1347,7 +1386,7 @@
                      SOME ;
                      SWAP ;
                      UPDATE ;
-                     UPDATE 3 ;
+                     UPDATE 5 ;
                      DIG 3 ;
                      IF_NONE
                        { NIL operation }
@@ -1361,20 +1400,20 @@
                      DIG 5 ;
                      DIG 4 ;
                      DUP 4 ;
-                     GET 5 ;
+                     GET 7 ;
                      IF_NONE
-                       { DIG 3 ; DIG 4 ; SOME ; UPDATE 5 ; DIG 4 ; SOME ; UPDATE 7 }
+                       { DIG 3 ; DIG 4 ; SOME ; UPDATE 7 ; DIG 4 ; SOME ; UPDATE 9 }
                        { DUP ;
                          DUP 7 ;
                          COMPARE ;
                          GT ;
-                         IF { DROP ; DIG 3 ; DIG 4 ; SOME ; UPDATE 5 ; DIG 4 ; SOME ; UPDATE 7 }
+                         IF { DROP ; DIG 3 ; DIG 4 ; SOME ; UPDATE 7 ; DIG 4 ; SOME ; UPDATE 9 }
                             { DIG 6 ;
                               DROP ;
                               DIG 5 ;
                               COMPARE ;
                               EQ ;
-                              IF { DIG 3 ; NONE bytes ; UPDATE 7 } { DIG 3 } } } ;
+                              IF { DIG 3 ; NONE bytes ; UPDATE 9 } { DIG 3 } } } ;
                      UPDATE 5 ;
                      SOME ;
                      UPDATE 3 } } ;
@@ -1418,8 +1457,9 @@
              NONE bytes ;
              NONE nat ;
              EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-             EMPTY_BIG_MAP address (set bytes) ;
-             PAIR 5 ;
+             EMPTY_BIG_MAP (pair address bytes) unit ;
+             EMPTY_BIG_MAP address nat ;
+             PAIR 6 ;
              UNIT ;
              LEFT unit ;
              DIG 5 ;
@@ -1441,21 +1481,21 @@
                       DUP 2 ;
                       GET 13 ;
                       DUP 2 ;
-                      GET 8 ;
+                      GET 10 ;
                       MUL ;
                       DIG 2 ;
                       GET 11 ;
                       DUP 3 ;
-                      GET 5 ;
+                      GET 7 ;
                       IF_NONE { PUSH nat 0 } {} ;
                       MUL ;
                       COMPARE ;
                       GE ;
-                      IF { GET 7 } { DROP ; NONE bytes } ;
+                      IF { GET 9 } { DROP ; NONE bytes } ;
                       IF_NONE
                         { DUP ;
                           GET 5 ;
-                          GET 5 ;
+                          GET 7 ;
                           IF_NONE { PUSH bool False } { DROP ; PUSH bool True } ;
                           IF { NONE bytes ;
                                DUP 2 ;
@@ -1474,8 +1514,9 @@
                           NONE bytes ;
                           NONE nat ;
                           EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                          EMPTY_BIG_MAP address (set bytes) ;
-                          PAIR 5 ;
+                          EMPTY_BIG_MAP (pair address bytes) unit ;
+                          EMPTY_BIG_MAP address nat ;
+                          PAIR 6 ;
                           UNIT ;
                           LEFT unit ;
                           DIG 5 ;
@@ -1535,8 +1576,9 @@
                                NONE bytes ;
                                NONE nat ;
                                EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                               EMPTY_BIG_MAP address (set bytes) ;
-                               PAIR 5 ;
+                               EMPTY_BIG_MAP (pair address bytes) unit ;
+                               EMPTY_BIG_MAP address nat ;
+                               PAIR 6 ;
                                UNIT ;
                                LEFT unit ;
                                DIG 5 ;
@@ -1549,8 +1591,9 @@
                       NONE bytes ;
                       NONE nat ;
                       EMPTY_BIG_MAP bytes (pair bytes address nat) ;
-                      EMPTY_BIG_MAP address (set bytes) ;
-                      PAIR 5 ;
+                      EMPTY_BIG_MAP (pair address bytes) unit ;
+                      EMPTY_BIG_MAP address nat ;
+                      PAIR 6 ;
                       UNIT ;
                       LEFT unit ;
                       DIG 6 ;
@@ -1597,7 +1640,7 @@
                            GE }
                          { DIG 2 ; DIG 4 ; DROP 3 ; PUSH bool False } ;
                       AND ;
-                      IF { DUP 2 ; GET 5 ; GET 7 } { NONE bytes } ;
+                      IF { DUP 2 ; GET 5 ; GET 9 } { NONE bytes } ;
                       DUP ;
                       DUP 4 ;
                       GET 3 ;
