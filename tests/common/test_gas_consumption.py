@@ -13,7 +13,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
         self.recorder.write_to_file(join(get_tests_dir(), 'gas_consumption.json'))
         super().tearDownClass()
 
-    def test_new_proposal(self) -> None:
+    def test_new_proposal_same_baker(self) -> None:
         baker = self.bootstrap_baker()
         governance_started_at_level = self.get_current_level() + 1
         governance = self.deploy_kernel_governance(custom_config={
@@ -28,7 +28,26 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
             self.bake_block()
             if i < 10 or i % 10 == 0:
                 op = find_op_by_hash(self.manager, opg)
-                self.recorder.add_element(f'new_proposal_nth_{i + 1}', op)
+                self.recorder.add_element(f'new_proposal_same_baker_nth_{i + 1}', op)
+
+    def test_new_proposal_different_baker(self) -> None:
+        baker1 = self.bootstrap_baker()
+        baker2 = self.bootstrap_baker()
+        baker3 = self.bootstrap_baker()
+        baker4 = self.bootstrap_baker()
+        governance_started_at_level = self.get_current_level() + 1
+        governance = self.deploy_kernel_governance(custom_config={
+            'started_at_level': governance_started_at_level,
+            'period_length': 500,
+            'upvoting_limit': 500,
+        })
+
+        for i, baker in enumerate([baker1, baker2, baker3, baker4]):
+            random_bytes = secrets.token_bytes(33)
+            opg = governance.using(baker).new_proposal(random_bytes).send()
+            self.bake_block()
+            op = find_op_by_hash(self.manager, opg)
+            self.recorder.add_element(f'new_proposal_different_baker_nth_{i + 1}', op)
 
     def test_new_proposal_with_event(self) -> None:
         baker1 = self.bootstrap_baker()
