@@ -1,27 +1,9 @@
 import secrets
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import YAY_VOTE
+from tests.helpers.operation_result_recorder import OperationResultRecorder
 from tests.helpers.utility import find_op_by_hash, get_tests_dir
-from pytezos.operation.result import OperationResult
-from pytezos.operation.group import OperationGroup
 from os.path import join
-import json
-
-class OperationResultRecorder:
-    def __init__(self):
-        self.data = {}
-
-    def add_element(self, key, op):
-        value = {
-            'consumed_gas': OperationResult.consumed_gas(op),
-            'paid_storage_size_diff': OperationResult.paid_storage_size_diff(op),
-            'burned': OperationResult.burned(op),
-        }
-        self.data[key] = value
-
-    def write_to_file(self, filename):
-        with open(filename, 'w') as f:
-            json.dump(self.data, f, indent=4)
 
 class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
     recorder = OperationResultRecorder()

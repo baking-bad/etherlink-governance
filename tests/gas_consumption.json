@@ -1,137 +1,110 @@
 {
     "new_proposal_nth_1": {
         "consumed_gas": 5489,
-        "paid_storage_size_diff": 180,
-        "burned": 0
+        "paid_storage_size_diff": 180
     },
     "new_proposal_nth_2": {
         "consumed_gas": 631,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_3": {
         "consumed_gas": 638,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_4": {
         "consumed_gas": 645,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_5": {
         "consumed_gas": 652,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_6": {
         "consumed_gas": 659,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_7": {
         "consumed_gas": 666,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_8": {
         "consumed_gas": 673,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_9": {
         "consumed_gas": 681,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_10": {
         "consumed_gas": 688,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_11": {
         "consumed_gas": 695,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_21": {
         "consumed_gas": 765,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_31": {
         "consumed_gas": 835,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_41": {
         "consumed_gas": 905,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_51": {
         "consumed_gas": 976,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_61": {
         "consumed_gas": 1046,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_71": {
         "consumed_gas": 1116,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_81": {
         "consumed_gas": 1187,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_91": {
         "consumed_gas": 1257,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "new_proposal_nth_101": {
         "consumed_gas": 1327,
-        "paid_storage_size_diff": 150,
-        "burned": 0
+        "paid_storage_size_diff": 150
     },
     "test_new_proposal_with_event": {
         "consumed_gas": 949,
-        "paid_storage_size_diff": 0,
-        "burned": 0
+        "paid_storage_size_diff": 0
     },
     "upvote_nth_1": {
         "consumed_gas": 626,
-        "paid_storage_size_diff": 37,
-        "burned": 0
+        "paid_storage_size_diff": 37
     },
     "upvote_nth_2": {
         "consumed_gas": 628,
-        "paid_storage_size_diff": 37,
-        "burned": 0
+        "paid_storage_size_diff": 37
     },
     "upvote_nth_3": {
         "consumed_gas": 630,
-        "paid_storage_size_diff": 37,
-        "burned": 0
+        "paid_storage_size_diff": 37
     },
     "vote_nth_1": {
         "consumed_gas": 838,
-        "paid_storage_size_diff": 102,
-        "burned": 0
+        "paid_storage_size_diff": 102
     },
     "vote_nth_2": {
         "consumed_gas": 629,
-        "paid_storage_size_diff": 47,
-        "burned": 0
+        "paid_storage_size_diff": 47
     },
     "vote_nth_3": {
         "consumed_gas": 632,
-        "paid_storage_size_diff": 47,
-        "burned": 0
+        "paid_storage_size_diff": 47
     }
 }
