@@ -59,14 +59,6 @@ module KernelGovernance = struct
         Views.get_voting_state storage
 
 
-    [@view] 
-    let get_period_remaining_blocks
-            (_ : unit) 
-            (storage : storage_t) 
-            : nat = 
-        Voting.get_current_period_remaining_blocks storage.config
-
-
     type upgrade_payload_params_t = {
         kernel_root_hash : payload_t;
         activation_timestamp : timestamp;

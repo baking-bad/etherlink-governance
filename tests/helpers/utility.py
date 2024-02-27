@@ -83,9 +83,6 @@ def pack(object: Any, type_expression: str) -> bytes:
 
     return to_michelson_type(object, type_expression).pack()
 
-def pack_kernel_root_hash(kernel_root_hash: str) -> bytes:
-    return pack(kernel_root_hash, 'bytes')[6:]
-
 
 def originate_from_file(
     filename: str, client: PyTezosClient, storage: Any

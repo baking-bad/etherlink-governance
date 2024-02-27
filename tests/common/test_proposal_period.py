@@ -13,17 +13,13 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         })
         assert self.get_current_level() == governance_started_at_level
 
+        storage = governance.contract.storage()
+        assert storage['voting_context'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': None
         }
@@ -34,13 +30,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
@@ -51,13 +41,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
@@ -68,13 +52,7 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': None
         }
@@ -85,30 +63,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
 
         self.bake_blocks(10)
-        # Period index: 4. Block: 2 of 3
+        # Period index: 4. Block: 3 of 3
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 4,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
@@ -130,39 +96,41 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker).new_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
 
         self.bake_block()
         # Period index: 1. Block: 1 of 2
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': {
                 'finished_at_period_index': 1, 
                 'finished_at_period_type': PROPOSAL_PERIOD,
-                'winner_payload': None
+                'winner_proposal_payload': None
             }
         }
     
@@ -184,17 +152,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
@@ -203,17 +172,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker2).upvote_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER * 2
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER * 2,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
@@ -221,22 +191,23 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         self.bake_block()
 
         # Period index: 1. Block: 1 of 3
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER * 2
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': {
                 'finished_at_period_index': 1, 
                 'finished_at_period_type': PROPOSAL_PERIOD,
-                'winner_payload': None
+                'winner_proposal_payload': None
             }
         }
 
@@ -258,17 +229,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(kernel_root_hash1).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash1
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash1,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
@@ -278,17 +250,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker2).new_proposal(kernel_root_hash2).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == None
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
@@ -296,22 +269,23 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         self.bake_block()
 
         # Period index: 1. Block: 1 of 3
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == None
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': {
                 'finished_at_period_index': 1, 
                 'finished_at_period_type': PROPOSAL_PERIOD,
-                'winner_payload': None
+                'winner_proposal_payload': None
             }
         }
 
@@ -333,17 +307,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
@@ -352,17 +327,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker2).upvote_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER * 2
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER * 2,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
@@ -370,22 +346,23 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         self.bake_blocks(4)
 
         # Period index: 2. Block: 1 of 3
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER * 2
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 2,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': {
                 'finished_at_period_index': 2, 
                 'finished_at_period_type': PROMOTION_PERIOD,
-                'winner_payload': None
+                'winner_proposal_payload': None
             }
         }
 
@@ -407,17 +384,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
@@ -426,17 +404,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         governance.using(baker2).upvote_proposal(kernel_root_hash).send()
         self.bake_block()
         
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER * 2
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER * 2,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
@@ -444,22 +423,18 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         self.bake_block()
 
         # Period index: 1. Block: 1 of 3
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER * 2
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROMOTION_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': kernel_root_hash,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER * 2,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': {
-                   'yay_voting_power': 0,
-                   'nay_voting_power': 0,
-                   'pass_voting_power': 0,
-                   'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': None
         }

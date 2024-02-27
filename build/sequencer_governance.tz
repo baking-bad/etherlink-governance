@@ -363,7 +363,7 @@
                  EMIT %voting_finished
                    (pair (nat %finished_at_period_index)
                          (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                         (option %winner_payload (set address))) ;
+                         (option %winner_proposal_payload (set address))) ;
                  CONS } ;
              DIG 3 ;
              DIG 3 ;
@@ -645,7 +645,7 @@
                      EMIT %voting_finished
                        (pair (nat %finished_at_period_index)
                              (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                             (option %winner_payload (set address))) ;
+                             (option %winner_proposal_payload (set address))) ;
                      CONS } ;
                  DIG 5 ;
                  DIG 5 ;
@@ -946,7 +946,7 @@
                          EMIT %voting_finished
                            (pair (nat %finished_at_period_index)
                                  (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                                 (option %winner_payload (set address))) ;
+                                 (option %winner_proposal_payload (set address))) ;
                          CONS } ;
                      DIG 7 ;
                      DUP 7 ;
@@ -1279,7 +1279,7 @@
                          EMIT %voting_finished
                            (pair (nat %finished_at_period_index)
                                  (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                                 (option %winner_payload (set address))) ;
+                                 (option %winner_proposal_payload (set address))) ;
                          CONS } ;
                      DIG 5 ;
                      DIG 4 ;
@@ -1308,21 +1308,14 @@
        (pair (pair %voting_context
                 (nat %period_index)
                 (or %period_type (unit %proposal) (unit %promotion))
-                (pair %proposal_period
-                   (option %max_upvotes_voting_power nat)
-                   (option %winner_candidate (set address))
-                   (nat %total_voting_power))
-                (option %promotion_period
-                   (pair (nat %yay_voting_power)
-                         (nat %nay_voting_power)
-                         (nat %pass_voting_power)
-                         (nat %total_voting_power)))
-                (option %last_winner_payload (set address)))
+                (nat %remaining_blocks))
              (option %finished_voting
                 (pair (nat %finished_at_period_index)
                       (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                      (option %winner_payload (set address)))))
-       { CDR ;
+                      (option %winner_proposal_payload (set address)))))
+       { PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ;
+         SWAP ;
+         CDR ;
          DUP ;
          CAR ;
          DUP ;
@@ -1331,7 +1324,7 @@
          SUB ;
          ISNAT ;
          IF_NONE
-           { DROP ; PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ; FAILWITH }
+           { DROP ; DUP 2 ; FAILWITH }
            { SWAP ;
              GET 3 ;
              SWAP ;
@@ -1341,9 +1334,7 @@
          DUP 2 ;
          GET 3 ;
          IF_NONE
-           { SWAP ;
-             DROP ;
-             NONE (pair nat (or unit unit) (option (set address))) ;
+           { NONE (pair nat (or unit unit) (option (set address))) ;
              NONE (set address) ;
              NONE (pair (big_map address unit) nat nat nat nat) ;
              TOTAL_VOTING_POWER ;
@@ -1361,12 +1352,8 @@
              DUP 3 ;
              COMPARE ;
              EQ ;
-             IF { SWAP ;
-                  DIG 2 ;
-                  DROP 2 ;
-                  NONE (pair nat (or unit unit) (option (set address))) ;
-                  SWAP }
-                { DIG 2 ;
+             IF { SWAP ; DROP ; NONE (pair nat (or unit unit) (option (set address))) ; SWAP }
+                { DUP 3 ;
                   CAR ;
                   DUP 2 ;
                   GET 3 ;
@@ -1545,46 +1532,8 @@
                       SOME ;
                       SWAP ;
                       IF_NONE { SWAP } { DIG 2 ; SWAP ; SOME ; UPDATE 8 } } } } ;
-         PAIR ;
-         DUP ;
-         CAR ;
-         DUP ;
-         GET 5 ;
+         SWAP ;
          DIG 2 ;
-         CDR ;
-         DUP 3 ;
-         GET 8 ;
-         DUP 4 ;
-         GET 7 ;
-         IF_NONE
-           { NONE (pair nat nat nat nat) }
-           { DUP ;
-             GET 8 ;
-             DUP 2 ;
-             GET 7 ;
-             DUP 3 ;
-             GET 5 ;
-             DIG 3 ;
-             GET 3 ;
-             PAIR 4 ;
-             SOME } ;
-         DUP 4 ;
-         GET 8 ;
-         DUP 5 ;
-         GET 7 ;
-         DIG 5 ;
-         GET 5 ;
-         PAIR 3 ;
-         DUP 5 ;
-         GET 3 ;
-         DIG 5 ;
-         CAR ;
-         PAIR 5 ;
-         PAIR } ;
-  view "get_period_remaining_blocks"
-       unit
-       nat
-       { CDR ;
          CAR ;
          DUP ;
          CAR ;
@@ -1595,8 +1544,10 @@
          SWAP ;
          ISNAT ;
          IF_NONE
-           { DROP ; PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ; FAILWITH }
-           { DUP 2 ;
+           { DROP ; DIG 2 ; FAILWITH }
+           { DIG 4 ;
+             DROP ;
+             DUP 2 ;
              SWAP ;
              EDIV ;
              IF_NONE { PUSH string "MOD by 0" ; FAILWITH } {} ;
@@ -1604,5 +1555,11 @@
              SWAP ;
              SUB ;
              ISNAT ;
-             IF_NONE { PUSH string "option is None" ; FAILWITH } {} } } }
+             IF_NONE { PUSH string "option is None" ; FAILWITH } {} } ;
+         DUP 3 ;
+         GET 3 ;
+         DIG 3 ;
+         CAR ;
+         PAIR 3 ;
+         PAIR } }
 

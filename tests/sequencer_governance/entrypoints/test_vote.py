@@ -113,13 +113,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'voting_context': {
                 'period_type': PROPOSAL_PERIOD,
                 'period_index': 0,
-                'proposal_period': {
-                    'winner_candidate': None,
-                    'max_upvotes_voting_power': None,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': None,
-                'last_winner_payload': None
+                'remaining_blocks': 5
             },
             'finished_voting': None
         }
@@ -129,27 +123,21 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         # Period index: 0. Block: 2 of 5
         governance.using(baker1).new_proposal(addresses).send()
         self.bake_block()
-        # Period index: 0. Block: 3 of 5
-        self.bake_block()
-        # Period index: 1. Block: 1 of 3
-        self.bake_blocks(3)
+        # Period index: 1. Block: 1 of 5
+        self.bake_blocks(4)
 
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
+        assert storage['voting_context']['period_index'] == 0
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == addresses
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROMOTION_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': addresses,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': {
-                    'yay_voting_power': 0,
-                    'nay_voting_power': 0,
-                    'pass_voting_power': 0,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'last_winner_payload': None
+                'remaining_blocks': 5
             },
             'finished_voting': None
         }
@@ -158,46 +146,45 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker1).vote(YAY_VOTE).send()
         self.bake_block()
 
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
+        assert storage['voting_context']['period_index'] == 1
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == addresses
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0
+        assert storage['voting_context']['promotion_period']['pass_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROMOTION_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': addresses,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': {
-                    'yay_voting_power': DEFAULT_VOTING_POWER,
-                    'nay_voting_power': 0,
-                    'pass_voting_power': 0,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'last_winner_payload': None
+                'remaining_blocks': 4
             },
             'finished_voting': None
         }
+
 
         # Period index: 1. Block: 3 of 5
         governance.using(baker2).vote(NAY_VOTE).send()
         self.bake_block()
 
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
+        assert storage['voting_context']['period_index'] == 1
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == addresses
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['pass_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROMOTION_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': addresses,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': {
-                    'yay_voting_power': DEFAULT_VOTING_POWER,
-                    'nay_voting_power': DEFAULT_VOTING_POWER,
-                    'pass_voting_power': 0,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'last_winner_payload': None
+                'remaining_blocks': 3
             },
             'finished_voting': None
         }
@@ -206,22 +193,21 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker3).vote(PASS_VOTE).send()
         self.bake_block()
 
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
+        assert storage['voting_context']['period_index'] == 1
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == addresses
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROMOTION_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': addresses,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': {
-                    'yay_voting_power': DEFAULT_VOTING_POWER,
-                    'nay_voting_power': DEFAULT_VOTING_POWER,
-                    'pass_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'last_winner_payload': None
+                'remaining_blocks': 2
             },
             'finished_voting': None
         }
@@ -230,22 +216,21 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker4).vote(YAY_VOTE).send()
         self.bake_block()
 
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
+        assert storage['voting_context']['period_index'] == 1
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == addresses
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER  * 2
+        assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
         assert governance.get_voting_state() == {
             'voting_context': {
                 'period_type': PROMOTION_PERIOD,
                 'period_index': 1,
-                'proposal_period': {
-                    'winner_candidate': addresses,
-                    'max_upvotes_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'promotion_period': {
-                    'yay_voting_power': DEFAULT_VOTING_POWER * 2,
-                    'nay_voting_power': DEFAULT_VOTING_POWER,
-                    'pass_voting_power': DEFAULT_VOTING_POWER,
-                    'total_voting_power': DEFAULT_TOTAL_VOTING_POWER
-                },
-                'last_winner_payload': None
+                'remaining_blocks': 1
             },
             'finished_voting': None
         }
