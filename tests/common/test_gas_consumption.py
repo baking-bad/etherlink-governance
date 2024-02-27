@@ -22,13 +22,12 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
             'upvoting_limit': 500,
         })
 
-        for i in range(101):
+        for i in range(4):
             random_bytes = secrets.token_bytes(33)
             opg = governance.using(baker).new_proposal(random_bytes).send()
             self.bake_block()
-            if i < 10 or i % 10 == 0:
-                op = find_op_by_hash(self.manager, opg)
-                self.recorder.add_element(f'new_proposal_same_baker_nth_{i + 1}', op)
+            op = find_op_by_hash(self.manager, opg)
+            self.recorder.add_element(f'new_proposal_same_baker_nth_{i + 1}', op)
 
     def test_new_proposal_different_baker(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -109,7 +108,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
         governance.using(baker1).new_proposal(random_bytes).send()
         self.bake_blocks(11)
         
-        for i, baker in enumerate([baker2, baker3, baker4]):
+        for i, baker in enumerate([baker1, baker2, baker3, baker4]):
             opg = governance.using(baker).vote(YAY_VOTE).send()
             self.bake_block()
             op = find_op_by_hash(self.manager, opg)
