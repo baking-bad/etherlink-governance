@@ -45,6 +45,11 @@ def get_build_dir() -> str:
 
     return join(dirname(__file__), '..', '..', 'build')
 
+def get_tests_dir() -> str:
+    """Returns path to the test directory"""
+
+    return join(dirname(__file__), '..')
+
 
 def load_contract_from_address(
     client: PyTezosClient, contract_address: str
