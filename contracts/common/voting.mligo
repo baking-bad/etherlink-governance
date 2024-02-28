@@ -60,6 +60,7 @@ let get_promotion_winner
         else None
 
 
+[@inline]
 let init_new_proposal_voting_period
         (type pt)
         (period_index : nat)
@@ -81,6 +82,7 @@ let init_new_proposal_voting_period
     }   
 
 
+[@inline]
 let init_new_promotion_voting_period
         (type pt)
         (voting_context : pt Storage.voting_context_t)

@@ -2,17 +2,21 @@
 #import "events.mligo" "Events"
 #import "voting.mligo" "Voting"
 
-type 'pt voting_context_t = {
+
+type voting_context_t = {
     period_index : nat;
     period_type : Storage.period_type_t;
     remaining_blocks : nat;
 }
 
+
 type 'pt voting_state_t = {
-    voting_context : 'pt voting_context_t;
+    voting_context : voting_context_t;
     finished_voting : 'pt Events.voting_finished_event_payload_t option;
 }
 
+
+[@inline]
 let get_voting_state
         (type pt)
         (storage : pt Storage.t)
