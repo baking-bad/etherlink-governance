@@ -31,6 +31,18 @@
         "consumed_gas": 2498,
         "paid_storage_size_diff": 209
     },
+    "test_new_proposal_with_10_proposals_on_previous_voting_period": {
+        "consumed_gas": 1668,
+        "paid_storage_size_diff": 0
+    },
+    "test_new_proposal_with_50_proposals_on_previous_voting_period": {
+        "consumed_gas": 1668,
+        "paid_storage_size_diff": 0
+    },
+    "test_new_proposal_with_100_proposals_on_previous_voting_period": {
+        "consumed_gas": 1668,
+        "paid_storage_size_diff": 0
+    },
     "test_new_proposal_with_event": {
         "consumed_gas": 1668,
         "paid_storage_size_diff": 0
