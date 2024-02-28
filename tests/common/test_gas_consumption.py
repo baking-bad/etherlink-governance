@@ -144,7 +144,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
             opg = governance.using(baker1).new_proposal(secrets.token_bytes(33)).send()
             self.bake_block()
             op = find_op_by_hash(self.manager, opg)
-            self.recorder.add_element(f'test_new_proposal_with_{prev_voting_proposal_count}_proposals_on_previous_voting_period', op)
+            self.recorder.add_element(f'new_proposal_with_{prev_voting_proposal_count}_proposals_on_previous_voting_period', op)
 
         for i, prev_voting_proposal_count in enumerate([10, 50, 100]):
             run_test(prev_voting_proposal_count)

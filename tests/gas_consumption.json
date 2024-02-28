@@ -31,15 +31,15 @@
         "consumed_gas": 2497,
         "paid_storage_size_diff": 209
     },
-    "test_new_proposal_with_10_proposals_on_previous_voting_period": {
+    "new_proposal_with_10_proposals_on_previous_voting_period": {
         "consumed_gas": 1667,
         "paid_storage_size_diff": 0
     },
-    "test_new_proposal_with_50_proposals_on_previous_voting_period": {
+    "new_proposal_with_50_proposals_on_previous_voting_period": {
         "consumed_gas": 1667,
         "paid_storage_size_diff": 0
     },
-    "test_new_proposal_with_100_proposals_on_previous_voting_period": {
+    "new_proposal_with_100_proposals_on_previous_voting_period": {
         "consumed_gas": 1667,
         "paid_storage_size_diff": 0
     },
