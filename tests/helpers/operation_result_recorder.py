@@ -1,6 +1,5 @@
 import json
 from pytezos.operation.result import OperationResult
-from pytezos.operation.group import OperationGroup
 
 class OperationResultRecorder:
     def __init__(self):
