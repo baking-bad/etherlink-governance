@@ -3,6 +3,7 @@
 #import "events.mligo" "Events"
 #import "constants.mligo" "Constants"
 
+
 let get_period_index
         (config : Storage.config_t)
         : nat =
@@ -12,6 +13,7 @@ let get_period_index
         | None -> failwith Errors.current_level_less_than_start_level
 
 
+[@inline]
 let get_current_period_remaining_blocks
         (config : Storage.config_t)
         : nat =
@@ -24,6 +26,7 @@ let get_current_period_remaining_blocks
         | None -> failwith Errors.current_level_less_than_start_level
 
 
+[@inline]
 let get_proposal_winner
         (type pt)
         (proposal_period : pt Storage.proposal_period_t)
@@ -39,6 +42,7 @@ let get_proposal_winner
             else None
 
 
+[@inline]
 let get_promotion_winner
         (type pt)
         (winner_candidate : pt option)
@@ -168,6 +172,7 @@ let get_voting_state
                 else init_new_voting_state voting_context storage.config period_index
 
 
+[@inline]
 let assert_current_period_proposal 
         (type pt)
         (voting_context : pt Storage.voting_context_t)
@@ -177,6 +182,7 @@ let assert_current_period_proposal
         | Promotion -> failwith Errors.not_proposal_period
 
 
+[@inline]
 let assert_current_period_promotion 
         (type pt)
         (voting_context : pt Storage.voting_context_t)
@@ -186,6 +192,7 @@ let assert_current_period_promotion
         | Proposal -> failwith Errors.not_promotion_period
 
 
+[@inline]
 let assert_upvoting_allowed
         (upvoters_upvotes_count : Storage.upvoters_upvotes_count_t)
         (config : Storage.config_t)
@@ -197,6 +204,7 @@ let assert_upvoting_allowed
     assert_with_error (upvotes_count < config.upvoting_limit) Errors.upvoting_limit_exceeded
 
 
+[@inline]
 let assert_vote_value_correct
         (vote : string)
         : unit =
@@ -204,6 +212,7 @@ let assert_vote_value_correct
     assert_with_error value_is_correct Errors.incorrect_vote_value
 
 
+[@inline]
 let get_payload_key
         (type pt)
         (payload : pt)
@@ -211,14 +220,17 @@ let get_payload_key
     Bytes.pack payload
 
 
-let update_upvoters_proposals
+[@inline]
+let add_proposal_to_upvoter
         (upvoter : address)
         (payload_key : Storage.payload_key_t)
         (upvoters_proposals : Storage.upvoters_proposals_t)
         : Storage.upvoters_proposals_t =
     Big_map.add (upvoter, payload_key ) unit upvoters_proposals
 
-let update_upvoters_upvotes_count
+
+[@inline]
+let increment_upvotes_count
         (upvoter : address)
         (upvoters_upvotes_count : Storage.upvoters_upvotes_count_t)
         : Storage.upvoters_upvotes_count_t =
@@ -227,6 +239,7 @@ let update_upvoters_upvotes_count
         | None -> Big_map.add upvoter 1n upvoters_upvotes_count
 
 
+[@inline]
 let update_winner_candidate
         (type pt)
         (upvotes_voting_power : nat)
@@ -258,6 +271,7 @@ let update_winner_candidate
                 }
 
 
+[@inline]
 let add_new_proposal_and_upvote
         (type pt)
         (payload : pt)
@@ -277,13 +291,14 @@ let add_new_proposal_and_upvote
     } in
     let updated_proposal_period = {
         proposal_period with
-        upvoters_upvotes_count = update_upvoters_upvotes_count proposer upvoters_upvotes_count;
-        upvoters_proposals = update_upvoters_proposals proposer key proposal_period.upvoters_proposals;
+        upvoters_upvotes_count = increment_upvotes_count proposer upvoters_upvotes_count;
+        upvoters_proposals = add_proposal_to_upvoter proposer key proposal_period.upvoters_proposals;
         proposals = Big_map.add key value proposal_period.proposals
     } in
     update_winner_candidate voting_power payload updated_proposal_period
 
 
+[@inline]
 let assert_proposal_not_already_upvoted
         (upvoter : address)
         (payload_key : Storage.payload_key_t)
@@ -292,6 +307,7 @@ let assert_proposal_not_already_upvoted
     assert_with_error (not Big_map.mem (upvoter, payload_key) upvoters_proposals) Errors.proposal_already_upvoted
 
 
+[@inline]
 let upvote_proposal
         (type pt)
         (payload : pt)
@@ -315,13 +331,14 @@ let upvote_proposal
     } in
     let updated_proposal_period = {
         proposal_period with
-        upvoters_upvotes_count = update_upvoters_upvotes_count upvoter upvoters_upvotes_count;
-        upvoters_proposals = update_upvoters_proposals upvoter key upvoters_proposals;
+        upvoters_upvotes_count = increment_upvotes_count upvoter upvoters_upvotes_count;
+        upvoters_proposals = add_proposal_to_upvoter upvoter key upvoters_proposals;
         proposals = Big_map.update key (Some updated_proposal) proposal_period.proposals;
     } in
     update_winner_candidate upvotes_voting_power payload updated_proposal_period
 
 
+[@inline]
 let vote_promotion
         (vote : string)
         (voter : address)
