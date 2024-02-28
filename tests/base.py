@@ -6,7 +6,8 @@ from tests.helpers.contracts import (
 from typing import Optional
 from pytezos.rpc import RpcError
 from contextlib import contextmanager
-from tests.helpers.contracts.committee_governance import SequencerGovernance
+from tests.helpers.contracts.rollup_mock import RollupMock
+from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.utility import pkh
 from pytezos.contract.result import ContractCallResult
 from pytezos.operation.group import OperationGroup
@@ -41,13 +42,20 @@ class BaseTestCase(SandboxedNodeTestCase):
             no_baker.reveal().autofill().sign().inject()
         return no_baker
 
+    def deploy_rollup_mock(self) -> KernelGovernance:
+        """Deploys Rollup Mock contract"""
+
+        opg = RollupMock.originate(self.manager).send()
+        self.bake_block()
+        return RollupMock.from_opg(self.manager, opg)
+
     def deploy_kernel_governance(self, custom_config=None) -> KernelGovernance:
         """Deploys Kernel Governance contract"""
 
         opg = KernelGovernance.originate(self.manager, custom_config=custom_config).send()
         self.bake_block()
         return KernelGovernance.from_opg(self.manager, opg)
-    
+
     def deploy_sequencer_governance(self, custom_config=None) -> SequencerGovernance:
         """Deploys Committee Governance contract"""
 

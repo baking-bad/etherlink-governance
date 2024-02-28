@@ -19,6 +19,7 @@ type t = (
     "u"
 ) michelson_or
 
+
 let get_entry   // NOTE: the entrypoint is used to upgrade kernel and sequencer committee as well
         (rollup : address) 
         : t contract =
@@ -26,10 +27,12 @@ let get_entry   // NOTE: the entrypoint is used to upgrade kernel and sequencer 
         | None -> failwith Errors.rollup_entrypoint_not_found
         | Some entry -> entry
 
+
 let get_upgrade_params 
         (payload : bytes)
         : t =
     M_right payload
+
 
 let timestamp_to_padded_little_endian_bytes
         (value : timestamp)
@@ -38,9 +41,18 @@ let timestamp_to_padded_little_endian_bytes
     let timestamp_bytes = Utils.nat_to_little_endian_bytes timestamp_number in
     Utils.pad_end timestamp_bytes 8n 0x00
 
+
 let get_upgrade_payload
         (kernel_root_hash : bytes)
         (activation_timestamp : timestamp)
         : bytes =
     let timestamp = timestamp_to_padded_little_endian_bytes activation_timestamp in
     Bytes.concats [0xEBA1; kernel_root_hash; 0x88; timestamp]
+
+
+let decode_upgrade_payload
+        (rollup_entry : t)
+        : bytes =
+     match rollup_entry with
+        | M_right bytes -> bytes
+        | M_left _ -> failwith Errors.wrong_rollup_entrypoint

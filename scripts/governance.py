@@ -1,5 +1,5 @@
 from pytezos import pytezos
-from tests.helpers.contracts.committee_governance import SequencerGovernance
+from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from typing import Optional
 import click
