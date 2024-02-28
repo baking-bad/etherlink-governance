@@ -115,23 +115,22 @@ let init_new_voting_state
         | Proposal -> 
             (match get_proposal_winner voting_context.proposal_period config with
                 | Some _proposal_winner -> 
-                    let next_period_index = voting_context.period_index + 1n in
-                    (if period_index = next_period_index
+                    let promotion_period_index = voting_context.period_index + 1n in
+                    (if period_index = promotion_period_index
                         then 
                             {
                                 voting_context = init_new_promotion_voting_period voting_context period_index;
                                 finished_voting = None;
                             }
                         else 
-                            let voting_context_with_promotion_phase = init_new_promotion_voting_period voting_context next_period_index in
                             {
                                 voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
-                                finished_voting = Some (Events.create_voting_finished_event voting_context_with_promotion_phase None);
+                                finished_voting = Some (Events.create_voting_finished_event promotion_period_index Promotion None);
                             })
                 | None ->
                     let at_least_one_proposal_was_submitted = Option.is_some voting_context.proposal_period.max_upvotes_voting_power in
                     let finished_voting = if at_least_one_proposal_was_submitted
-                        then Some (Events.create_voting_finished_event voting_context None)
+                        then Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type None)
                         else None in
                     {
                         voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
@@ -141,7 +140,7 @@ let init_new_voting_state
             let new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload in
             let promotion_period = Option.unopt voting_context.promotion_period in
             let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
-            let finished_voting = Some (Events.create_voting_finished_event voting_context promotion_winner) in
+            let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
             let updated_voting_context = (match promotion_winner with
                 | Some promotion_winner -> 
                     { 

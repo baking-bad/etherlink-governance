@@ -17,7 +17,6 @@ let get_voting_state
         (type pt)
         (storage : pt Storage.t)
         : pt voting_state_t = 
-    //TODO: implement optimization
     let voting_state = Voting.get_voting_state storage in
     let voting_context = voting_state.voting_context in
     {

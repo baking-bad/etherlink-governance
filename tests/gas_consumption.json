@@ -1,6 +1,6 @@
 {
     "new_proposal_different_baker_nth_1": {
-        "consumed_gas": 6151,
+        "consumed_gas": 6032,
         "paid_storage_size_diff": 459
     },
     "new_proposal_different_baker_nth_2": {
@@ -16,7 +16,7 @@
         "paid_storage_size_diff": 276
     },
     "new_proposal_same_baker_nth_1": {
-        "consumed_gas": 6151,
+        "consumed_gas": 6032,
         "paid_storage_size_diff": 459
     },
     "new_proposal_same_baker_nth_2": {
