@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
 from tests.helpers.errors import (
-    INCORRECT_KERNEL_ROOT_HASH_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PAYLOAD_SAME_AS_LAST_WINNER,
+    INCORRECT_KERNEL_ROOT_HASH_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, 
     PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, UPVOTING_LIMIT_EXCEEDED, 
     XTZ_IN_TRANSACTION_DISALLOWED
 )
@@ -17,6 +17,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         with self.raisesMichelsonError(INCORRECT_KERNEL_ROOT_HASH_SIZE):
             governance.using(baker).new_proposal(bytes.fromhex('009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abcde')).send()
         governance.using(baker).new_proposal(bytes.fromhex('009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abc')).send()
+        self.bake_block()
 
     def test_should_fail_if_xtz_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
@@ -34,7 +35,7 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         with self.raisesMichelsonError(NO_VOTING_POWER):
             governance.using(no_baker).new_proposal(kernel_root_hash).send()
 
-    def test_should_fail_payload_same_as_last_winner(self) -> None:
+    def test_should_not_fail_if_payload_same_as_last_winner(self) -> None:
         baker = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1
@@ -57,8 +58,8 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         self.bake_blocks(2)
 
         # Period index: 3. Block: 1 of 2
-        with self.raisesMichelsonError(PAYLOAD_SAME_AS_LAST_WINNER):
-            governance.using(baker).new_proposal(kernel_root_hash).send()
+        governance.using(baker).new_proposal(kernel_root_hash).send()
+        self.bake_block()
 
     def test_should_fail_if_current_period_is_not_proposal(self) -> None:
         baker = self.bootstrap_baker()

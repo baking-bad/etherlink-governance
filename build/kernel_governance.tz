@@ -1216,18 +1216,6 @@
                           MEM ;
                           IF {} { PUSH string "PROPOSER_NOT_ALLOWED" ; FAILWITH } } ;
                      DUP 3 ;
-                     GET 8 ;
-                     IF_NONE
-                       {}
-                       { PUSH string "PAYLOAD_SAME_AS_LAST_WINNER" ;
-                         SWAP ;
-                         PACK ;
-                         DUP 7 ;
-                         PACK ;
-                         COMPARE ;
-                         NEQ ;
-                         IF { DROP } { FAILWITH } } ;
-                     DUP 3 ;
                      GET 3 ;
                      IF_LEFT { DIG 7 ; DROP 2 } { DROP ; DIG 6 ; FAILWITH } ;
                      DUP 3 ;

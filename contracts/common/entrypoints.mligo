@@ -16,7 +16,6 @@ let new_proposal
     let voting_power = Tezos.voting_power (Utils.address_to_key_hash proposer) in
     let _ = Utils.assert_no_xtz_in_transaction () in
     let _ = Utils.assert_proposer_allowed proposer voting_power storage.config.allowed_proposers in
-    let _ = Utils.assert_payload_not_last_winner payload voting_context.last_winner_payload in
     let _ = Voting.assert_current_period_proposal voting_context in
     let updated_proposal_period = Voting.add_new_proposal_and_upvote payload proposer voting_power voting_context.proposal_period storage.config in
     let operations = match finished_voting with

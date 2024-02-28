@@ -24,14 +24,6 @@ let assert_kernel_root_hash_has_correct_size
         : unit =
     assert_with_error ((Bytes.length kernel_root_hash) = 33n) Errors.incorrect_kernel_root_hash_size
 
-let assert_payload_not_last_winner
-        (type pt)
-        (payload : pt)
-        (last_winner_payload_opt : pt option) =
-    match last_winner_payload_opt with
-        | Some last_winner_payload ->
-            assert_with_error (Bytes.pack payload <> Bytes.pack last_winner_payload) Errors.payload_same_as_last_winner
-        | None -> unit
 
 let address_to_key_hash
         (address : address)
