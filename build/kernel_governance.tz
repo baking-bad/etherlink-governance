@@ -317,9 +317,10 @@
              GET 5 ;
              NOW ;
              ADD ;
-             PACK ;
-             UNPACK nat ;
-             IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+             PUSH timestamp 0 ;
+             SWAP ;
+             SUB ;
+             ABS ;
              BYTES ;
              PUSH bytes 0x ;
              PUSH int 1 ;
@@ -1563,10 +1564,10 @@
          COMPARE ;
          EQ ;
          IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_SIZE" ; FAILWITH } ;
-         SWAP ;
-         PACK ;
-         UNPACK nat ;
-         IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+         PUSH timestamp 0 ;
+         DIG 2 ;
+         SUB ;
+         ABS ;
          BYTES ;
          PUSH bytes 0x ;
          PUSH int 1 ;

@@ -29,8 +29,7 @@ let address_to_key_hash
 let timestamp_to_nat
         (value : timestamp)
         : nat =
-    let packed_timestamp : bytes = Bytes.pack value in
-    Option.unopt (Bytes.unpack packed_timestamp)
+    abs (value - (0 : timestamp))
 
 let nat_to_big_endian_bytes 
         (value : nat) 
