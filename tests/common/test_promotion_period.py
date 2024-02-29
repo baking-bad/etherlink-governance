@@ -226,8 +226,66 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
 
     def test_should_reset_to_proposal_period_if_promotion_phase_has_only_pass_votes(self) -> None:
         test = self.prepare_promotion_period({
-            'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)
-            'promotion_supermajority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_quorum': 50, # 1 bakers out of 5 will vote (20%)
+            'promotion_supermajority': 51, # 1 baker will vote pass)
+        })
+        governance: KernelGovernance = test['governance']
+        kernel_root_hash = test['kernel_root_hash']
+        baker2 = self.bootstrap_baker()
+
+        # Period index: 1. Block: 2 of 3
+        governance.using(baker2).vote(PASS_VOTE).send()
+        self.bake_block()
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
+        assert storage['voting_context']['period_index'] == 1
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['yay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROMOTION_PERIOD,
+                'period_index': 1,
+                'remaining_blocks': 2
+            },
+            'finished_voting': None
+        }
+
+        # Wait to skip one more period
+        self.bake_blocks(2)
+        # Period index: 2. Block: 1 of 3
+
+        storage = governance.contract.storage()
+        assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
+        assert storage['voting_context']['period_index'] == 1
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
+        assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
+        assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
+        assert storage['voting_context']['promotion_period']['yay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
+        assert governance.get_voting_state() == {
+            'voting_context': {
+                'period_type': PROPOSAL_PERIOD,
+                'period_index': 2,
+                'remaining_blocks': 3
+            },
+            'finished_voting': {
+                'finished_at_period_index': 2, 
+                'finished_at_period_type': PROMOTION_PERIOD,
+                'winner_proposal_payload': None
+            }
+        }
+
+    def test_should_reset_to_proposal_period_if_promotion_phase_has_only_pass_votes_which_passes_only_promotion_quorum(self) -> None:
+        test = self.prepare_promotion_period({
+            'promotion_quorum': 20, # 1 bakers out of 5 will vote (20%)
+            'promotion_supermajority': 51, # 1 baker will vote pass
         })
         governance: KernelGovernance = test['governance']
         kernel_root_hash = test['kernel_root_hash']

@@ -50,10 +50,10 @@ let get_promotion_winner
         (config : Storage.config_t)
         : pt option =
     let { total_voting_power; yay_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
-    let quorum_reached = (yay_voting_power + nay_voting_power + pass_voting_power) * config.scale / total_voting_power >= config.promotion_quorum in
+    let quorum_reached = (yay_voting_power + nay_voting_power + pass_voting_power) * config.scale >= config.promotion_quorum * total_voting_power in
     let yay_nay_voting_sum = yay_voting_power + nay_voting_power in
     let super_majority_reached = if yay_nay_voting_sum > 0n
-        then yay_voting_power * config.scale / yay_nay_voting_sum >= config.promotion_supermajority
+        then yay_voting_power * config.scale >= config.promotion_supermajority * yay_nay_voting_sum
         else false in
     if quorum_reached && super_majority_reached 
         then winner_candidate
