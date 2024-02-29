@@ -18,7 +18,7 @@ module KernelGovernance = struct
             (kernel_root_hash : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = Utils.assert_kernel_root_hash_has_correct_size kernel_root_hash in
+        let _ = Rollup.assert_kernel_root_hash_has_correct_size kernel_root_hash in
         Entrypoints.new_proposal kernel_root_hash storage
   
 
@@ -47,7 +47,7 @@ module KernelGovernance = struct
                 (payload : payload_t) 
                 : bytes -> 
             let activation_timestamp = Tezos.get_now () + storage.config.cooldown_period_sec in
-            Rollup.get_upgrade_payload payload activation_timestamp in
+            Rollup.get_kernel_upgrade_payload payload activation_timestamp in
         Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
 
@@ -70,5 +70,6 @@ module KernelGovernance = struct
             (_ : storage_t) 
             : bytes = 
         let { kernel_root_hash; activation_timestamp } = params in
-        Rollup.get_upgrade_payload kernel_root_hash activation_timestamp
+        let _ = Rollup.assert_kernel_root_hash_has_correct_size kernel_root_hash in
+        Rollup.get_kernel_upgrade_payload kernel_root_hash activation_timestamp
 end

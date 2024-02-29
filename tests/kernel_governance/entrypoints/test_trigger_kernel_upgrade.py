@@ -1,5 +1,4 @@
 from pytezos.client import PyTezosClient
-from pytezos.michelson.types.big_map import BigMapType
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import YAY_VOTE
 from tests.helpers.contracts.kernel_governance import KernelGovernance

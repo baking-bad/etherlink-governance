@@ -8,24 +8,25 @@
 
 module SequencerCommitteeGovernance = struct
 
-    type payload_t = (address set) // TODO: think about l2 addresses as well (in the future); should we limit the size of the set?
+    type payload_t = bytes
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
     [@entry] 
     let new_proposal 
-            (addresses : payload_t)
+            (payload : payload_t)
             (storage : storage_t) 
             : return_t = 
-        Entrypoints.new_proposal addresses storage
+        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size payload in
+        Entrypoints.new_proposal payload storage
   
 
     [@entry]
     let upvote_proposal 
-            (addresses : payload_t)
+            (payload : payload_t)
             (storage : storage_t) 
             : return_t = 
-       Entrypoints.upvote_proposal addresses storage
+       Entrypoints.upvote_proposal payload storage
   
 
     [@entry]
@@ -41,7 +42,12 @@ module SequencerCommitteeGovernance = struct
             (rollup_address : address)
             (storage : storage_t) 
             : return_t =
-        Entrypoints.trigger_rollup_upgrade rollup_address storage (fun addresses -> Bytes.pack addresses)
+        let pack_payload = fun 
+                (payload : payload_t) 
+                : bytes -> 
+            let activation_timestamp = Tezos.get_now () + storage.config.cooldown_period_sec in
+            Rollup.get_sequencer_upgrade_payload payload activation_timestamp in
+        Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
 
     [@view] 
@@ -51,4 +57,18 @@ module SequencerCommitteeGovernance = struct
             : payload_t Views.voting_state_t = 
         Views.get_voting_state storage
 
+
+    type upgrade_payload_params_t = {
+        proposal_payload : payload_t;
+        activation_timestamp : timestamp;
+    }
+
+    [@view] 
+    let get_upgrade_payload
+            (params: upgrade_payload_params_t) 
+            (_ : storage_t) 
+            : bytes = 
+        let { proposal_payload; activation_timestamp } = params in
+        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size proposal_payload in
+        Rollup.get_sequencer_upgrade_payload proposal_payload activation_timestamp
 end

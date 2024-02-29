@@ -46,3 +46,5 @@ class SequencerGovernance(GovernanceBase):
 
         return self.contract.trigger_committee_upgrade(rollup_address)
     
+    def get_upgrade_payload(self, proposal_payload : bytes, activation_timestamp : int):
+        return self.contract.get_upgrade_payload(proposal_payload, activation_timestamp).run_view()

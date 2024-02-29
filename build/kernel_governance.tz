@@ -1622,6 +1622,12 @@
        bytes
        { CAR ;
          UNPAIR ;
+         PUSH nat 33 ;
+         DUP 2 ;
+         SIZE ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_SIZE" ; FAILWITH } ;
          SWAP ;
          PACK ;
          UNPACK nat ;
