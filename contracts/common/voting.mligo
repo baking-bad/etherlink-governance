@@ -61,24 +61,32 @@ let get_promotion_winner
 
 
 [@inline]
+let get_new_proposal_period_content
+        (type pt)
+        (_ : unit)
+        : pt Storage.proposal_period_t =
+    {
+        proposals = Big_map.empty;
+        upvoters_upvotes_count = Big_map.empty;
+        upvoters_proposals = Big_map.empty;
+        max_upvotes_voting_power = None; 
+        winner_candidate = None;
+        total_voting_power = Tezos.get_total_voting_power ();
+    }
+
+
+[@inline]
 let init_new_proposal_voting_period
         (type pt)
         (period_index : nat)
-        (last_winner_payload : pt option)
+        (voting_context : pt Storage.voting_context_t)
         : pt Storage.voting_context_t =
     { 
+        voting_context with
         period_index = period_index;
         period_type = Proposal;
-        proposal_period = {
-            proposals = Big_map.empty;
-            upvoters_upvotes_count = Big_map.empty;
-            upvoters_proposals = Big_map.empty;
-            max_upvotes_voting_power = None; 
-            winner_candidate = None;
-            total_voting_power = Tezos.get_total_voting_power ();
-        };
+        proposal_period = (get_new_proposal_period_content ());
         promotion_period = None;
-        last_winner_payload = last_winner_payload;
     }   
 
 
@@ -126,7 +134,7 @@ let init_new_voting_state
                             }
                         else 
                             {
-                                voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
+                                voting_context = init_new_proposal_voting_period period_index voting_context;
                                 finished_voting = Some (Events.create_voting_finished_event promotion_period_index Promotion None);
                             })
                 | None ->
@@ -135,25 +143,40 @@ let init_new_voting_state
                         then Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type None)
                         else None in
                     {
-                        voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload;
+                        voting_context = init_new_proposal_voting_period period_index voting_context;
                         finished_voting = finished_voting;
                     })
         | Promotion ->
-            let new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context.last_winner_payload in
             let promotion_period = Option.unopt voting_context.promotion_period in
             let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
             let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
+            let init_new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context in
             let updated_voting_context = (match promotion_winner with
                 | Some promotion_winner -> 
-                    { 
-                        new_proposal_voting_context with 
-                        last_winner_payload = Some promotion_winner
+                    {
+                        init_new_proposal_voting_context with
+                        last_winner_payload = (Some promotion_winner);
+                        last_winner_trigger_history = Big_map.empty;
                     }
-                | None -> new_proposal_voting_context) in
+                | None -> init_new_proposal_voting_context) in
             { 
                 voting_context = updated_voting_context;
                 finished_voting = finished_voting;
             }
+
+
+let init_voting_context
+        (type pt)
+        (period_index : nat)
+        : pt Storage.voting_context_t = 
+    {
+        period_index = period_index;
+        period_type = Proposal;
+        proposal_period = get_new_proposal_period_content ();
+        promotion_period = None;
+        last_winner_payload = None;
+        last_winner_trigger_history = Big_map.empty;
+    }
 
 
 let get_voting_state
@@ -164,7 +187,7 @@ let get_voting_state
     match storage.voting_context with
         | None ->  
             {
-                voting_context = init_new_proposal_voting_period period_index None;
+                voting_context = init_voting_context period_index;
                 finished_voting = None
             }
         | Some voting_context -> 

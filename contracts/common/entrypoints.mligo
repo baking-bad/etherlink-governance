@@ -70,8 +70,10 @@ let trigger_rollup_upgrade
         (storage : pt Storage.t)
         (pack_payload : pt -> bytes)
         : operation list * pt Storage.t =
-    let _ = Utils.assert_no_xtz_in_transaction () in
     let { voting_context; finished_voting } = Voting.get_voting_state storage in
+    let last_winner_trigger_history = voting_context.last_winner_trigger_history in
+    let _ = Utils.assert_no_xtz_in_transaction () in
+    let _ = assert_with_error (not Big_map.mem rollup_address last_winner_trigger_history) Errors.upgrade_for_address_already_triggered in
     let payload = Option.unopt_with_error voting_context.last_winner_payload Errors.last_winner_payload_not_found in
     let rollup_entry = Rollup.get_entry rollup_address in
     let upgrade_params = Rollup.get_upgrade_params (pack_payload payload) in
@@ -80,5 +82,9 @@ let trigger_rollup_upgrade
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
         | None -> [] in
     let operations = upgrade_operation :: operations in
-    let updated_storage = { storage with voting_context = Some voting_context } in 
+    let updated_voting_context = {
+        voting_context with
+        last_winner_trigger_history = Big_map.add rollup_address unit last_winner_trigger_history
+    } in
+    let updated_storage = { storage with voting_context = Some updated_voting_context } in 
     operations, updated_storage

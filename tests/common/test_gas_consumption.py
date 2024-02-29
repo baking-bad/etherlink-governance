@@ -148,6 +148,34 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
 
         for i, prev_voting_proposal_count in enumerate([10, 50, 100]):
             run_test(prev_voting_proposal_count)
+
+    def test_trigger_upgrade(self) -> None:
+        baker = self.bootstrap_baker()
+        rollup_mock1 = self.deploy_rollup_mock()
+        rollup_mock2 = self.deploy_rollup_mock()
+        rollup_mock3 = self.deploy_rollup_mock()
+        rollup_mock4 = self.deploy_rollup_mock()
+        rollup_mock5 = self.deploy_rollup_mock()
+        governance_started_at_level = self.get_current_level() + 1
+        governance = self.deploy_kernel_governance(custom_config={
+            'started_at_level': governance_started_at_level,
+            'period_length': 6,
+            'proposal_quorum': 20,
+            'promotion_quorum': 20,
+            'promotion_supermajority': 20,
+        })
+
+        kernel_root_hash = bytes.fromhex('020202020202020202020202020202020202020202020202020202020202020202')
+        governance.using(baker).new_proposal(kernel_root_hash).send()
+        self.bake_blocks(7)
+        governance.using(baker).vote(YAY_VOTE).send()
+        self.bake_blocks(7)
+        
+        for i, mock in enumerate([rollup_mock1, rollup_mock2, rollup_mock3, rollup_mock4, rollup_mock5]):
+            opg = governance.using(baker).trigger_kernel_upgrade(mock.contract.address).send()
+            self.bake_blocks(10)
+            op = find_op_by_hash(self.manager, opg)
+            self.recorder.add_element(f'trigger_upgrade_nth_{i + 1}', op)
         
     # def test_new_proposal_stress(self) -> None:
     #     baker = self.bootstrap_baker()
