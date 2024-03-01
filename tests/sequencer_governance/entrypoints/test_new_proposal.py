@@ -1,5 +1,5 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
+from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.errors import (
     INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
     UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
@@ -59,7 +59,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         self.bake_blocks(2)
 
         # Period index: 1. Block: 1 of 2
-        governance.using(baker).vote(YAY_VOTE).send()
+        governance.using(baker).vote(YEA_VOTE).send()
         self.bake_blocks(2)
 
         # Period index: 3. Block: 1 of 2

@@ -30,7 +30,7 @@
                       (nat %total_voting_power))
                    (option %promotion_period
                       (pair (big_map %voters address unit)
-                            (nat %yay_voting_power)
+                            (nat %yea_voting_power)
                             (nat %nay_voting_power)
                             (nat %pass_voting_power)
                             (nat %total_voting_power)))
@@ -81,7 +81,7 @@
              UNPACK key_hash ;
              IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          LAMBDA nat bytes { BYTES } ;
-         PUSH string "yay" ;
+         PUSH string "yea" ;
          PUSH string "nay" ;
          LAMBDA
            (pair nat nat int nat (set address) nat nat nat nat)

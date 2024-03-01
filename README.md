@@ -78,7 +78,7 @@ octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718f
 
 #### vote
 
-Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the promotion period.
+Votes with **yea**, **nay** or **pass** on the proposal that has advanced to the promotion period.
 
 ##### Client command
 
@@ -86,12 +86,12 @@ Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the
 octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
 ```
 
-where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
+where `%YOUR_VOTE%` is one of the values: `yea`, `nay` or `pass`
 
 ##### Example
 
 ```bash
-octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "vote" --arg "\"yay\""
+octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1HfJb718fGszcgYguA4bfTjAqe1BEmFHkv --entrypoint "vote" --arg "\"yea\""
 ```
 
 
@@ -152,7 +152,7 @@ octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzF
 
 #### vote
 
-Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the promotion period.
+Votes with **yea**, **nay** or **pass** on the proposal that has advanced to the promotion period.
 
 ##### Client command
 
@@ -160,12 +160,12 @@ Votes with **yay**, **nay** or **pass** on the proposal that has advanced to the
 octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
 ```
 
-where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
+where `%YOUR_VOTE%` is one of the values: `yea`, `nay` or `pass`
 
 ##### Example
 
 ```bash
-octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "vote" --arg "\"yay\""
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "vote" --arg "\"yea\""
 ```
 
 
@@ -246,14 +246,14 @@ type config_t = {
     proposal_quorum : nat;     
 
     (* 
-        Minimum ratio of all the cumulated stake of cast ballots (yay, nay, and pass ballots) 
+        Minimum ratio of all the cumulated stake of cast ballots (yea, nay, and pass ballots) 
         to the total stake to consider the proposal as a voting winner 
     *)
     promotion_quorum : nat;    
 
     (* 
-        Minimum ratio of cumulated stake of Yay ballots to the cumulated stake 
-        of Yay and Nay ballots to consider the proposal as a voting winner
+        Minimum ratio of cumulated stake of Yea ballots to the cumulated stake 
+        of Yea and Nay ballots to consider the proposal as a voting winner
     *)
     promotion_supermajority : nat;      
 }

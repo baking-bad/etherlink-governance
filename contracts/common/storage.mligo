@@ -45,14 +45,14 @@ type config_t = {
     proposal_quorum : nat;     
 
     (* 
-        Minimum ratio of all the cumulated stake of cast ballots (yay, nay, and pass ballots) 
+        Minimum ratio of all the cumulated stake of cast ballots (yea, nay, and pass ballots) 
         to the total stake to consider the proposal as a voting winner 
     *)
     promotion_quorum : nat;    
 
     (* 
-        Minimum ratio of cumulated stake of Yay ballots to the cumulated stake 
-        of Yay and Nay ballots to consider the proposal as a voting winner
+        Minimum ratio of cumulated stake of Yea ballots to the cumulated stake 
+        of Yea and Nay ballots to consider the proposal as a voting winner
     *)
     promotion_supermajority : nat;      
 }
@@ -84,7 +84,7 @@ type 'pt proposal_period_t = {
 
 type promotion_period_t = {
     voters : (address, unit) big_map;
-    yay_voting_power : nat;
+    yea_voting_power : nat;
     nay_voting_power : nat;
     pass_voting_power : nat;
     total_voting_power : nat;

@@ -1,6 +1,6 @@
 import secrets
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import YAY_VOTE
+from tests.helpers.contracts.governance_base import YEA_VOTE
 from tests.helpers.operation_result_recorder import OperationResultRecorder
 from tests.helpers.utility import find_op_by_hash, get_tests_dir
 from pytezos.operation.result import OperationResult
@@ -57,14 +57,14 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
             'period_length': 2,
             'proposal_quorum': 20, # 1 baker out of 5 will vote,
             'promotion_quorum': 20, # 1 bakers out of 5 will vote (20%)  
-            'promotion_supermajority': 50, # 1 baker will vote yay
+            'promotion_supermajority': 50, # 1 baker will vote yea
         })
 
         random_bytes = secrets.token_bytes(33)
         governance.using(baker1).new_proposal(random_bytes).send()
         self.bake_blocks(2)
         
-        governance.using(baker1).vote(YAY_VOTE).send()
+        governance.using(baker1).vote(YEA_VOTE).send()
         self.bake_blocks(2)
         
         opg = governance.using(baker1).new_proposal(secrets.token_bytes(33)).send()
@@ -110,7 +110,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
         self.bake_blocks(11)
         
         for i, baker in enumerate([baker1, baker2, baker3, baker4]):
-            opg = governance.using(baker).vote(YAY_VOTE).send()
+            opg = governance.using(baker).vote(YEA_VOTE).send()
             self.bake_block()
             op = find_op_by_hash(self.manager, opg)
             self.recorder.add_element(f'vote_nth_{i + 1}', op)
@@ -126,7 +126,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
                 'upvoting_limit': 500,
                 'proposal_quorum': 20, # 1 baker out of 5 will vote,
                 'promotion_quorum': 20, # 1 bakers out of 5 will vote (20%)  
-                'promotion_supermajority': 50, # 1 baker will vote yay
+                'promotion_supermajority': 50, # 1 baker will vote yea
             })
 
             random_bytes = secrets.token_bytes(33)
@@ -138,7 +138,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
                 governance.using(baker1).new_proposal(secrets.token_bytes(33)).send()
                 self.bake_block()
             
-            governance.using(baker1).vote(YAY_VOTE).send()
+            governance.using(baker1).vote(YEA_VOTE).send()
             self.bake_blocks(prev_voting_proposal_count + 2)
             
             opg = governance.using(baker1).new_proposal(secrets.token_bytes(33)).send()
@@ -168,7 +168,7 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
         kernel_root_hash = bytes.fromhex('020202020202020202020202020202020202020202020202020202020202020202')
         governance.using(baker).new_proposal(kernel_root_hash).send()
         self.bake_blocks(7)
-        governance.using(baker).vote(YAY_VOTE).send()
+        governance.using(baker).vote(YEA_VOTE).send()
         self.bake_blocks(7)
         
         for i, mock in enumerate([rollup_mock1, rollup_mock2, rollup_mock3, rollup_mock4, rollup_mock5]):

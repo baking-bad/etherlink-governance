@@ -1,5 +1,5 @@
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YAY_VOTE
+from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER
 from pytezos.client import PyTezosClient
@@ -105,7 +105,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_if_promotion_quorum_is_not_reached(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 2 bakers out of 5 will vote (40%)
-            'promotion_supermajority': 10, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 10, # 1 baker will vote yea, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -113,7 +113,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         baker1 = self.bootstrap_baker()
 
         # Period index: 1. Block: 2 of 3
-        governance.using(proposer).vote(YAY_VOTE).send()
+        governance.using(proposer).vote(YEA_VOTE).send()
         governance.using(baker1).vote(NAY_VOTE).send()
         self.bake_block()
 
@@ -123,7 +123,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -145,7 +145,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -165,7 +165,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_if_promotion_supermajority_is_not_reached(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)
-            'promotion_supermajority': 51, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 51, # 1 baker will vote yea, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -174,7 +174,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
 
         # Period index: 1. Block: 2 of 3
-        governance.using(proposer).vote(YAY_VOTE).send()
+        governance.using(proposer).vote(YEA_VOTE).send()
         governance.using(baker1).vote(NAY_VOTE).send()
         governance.using(baker2).vote(PASS_VOTE).send()
         self.bake_block()
@@ -185,7 +185,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -207,7 +207,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -242,7 +242,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -265,7 +265,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -300,7 +300,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -323,7 +323,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == 0 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == 0 
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -344,7 +344,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
     def test_should_reset_to_proposal_period_with_a_new_winner_and_event_if_promotion_period_passed_successfully(self) -> None:
         test = self.prepare_promotion_period({
             'promotion_quorum': 50, # 3 bakers out of 5 will vote (60%)  
-            'promotion_supermajority': 40, # 1 baker will vote yay, 1 baker will vote nay (50%)
+            'promotion_supermajority': 40, # 1 baker will vote yea, 1 baker will vote nay (50%)
         })
         governance: KernelGovernance = test['governance']
         proposer: PyTezosClient = test['proposer']
@@ -353,7 +353,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
 
         # Period index: 1. Block: 2 of 3
-        governance.using(proposer).vote(YAY_VOTE).send()
+        governance.using(proposer).vote(YEA_VOTE).send()
         governance.using(baker1).vote(NAY_VOTE).send()
         governance.using(baker2).vote(PASS_VOTE).send()
         self.bake_block()
@@ -364,7 +364,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 
@@ -386,7 +386,7 @@ class KernelGovernancePromotionPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['winner_candidate'] == kernel_root_hash
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
-        assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
+        assert storage['voting_context']['promotion_period']['yea_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['nay_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['promotion_period']['pass_voting_power'] == DEFAULT_VOTING_POWER 
         assert storage['voting_context']['promotion_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER 

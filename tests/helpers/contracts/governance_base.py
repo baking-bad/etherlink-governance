@@ -6,7 +6,7 @@ from typing import (
 PROPOSAL_PERIOD = 'proposal'
 PROMOTION_PERIOD = 'promotion'
 
-YAY_VOTE = 'yay'
+YEA_VOTE = 'yea'
 NAY_VOTE = 'nay'
 PASS_VOTE = 'pass'
 

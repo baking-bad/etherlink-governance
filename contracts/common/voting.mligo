@@ -49,11 +49,11 @@ let get_promotion_winner
         (promotion_period : Storage.promotion_period_t)
         (config : Storage.config_t)
         : pt option =
-    let { total_voting_power; yay_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
-    let quorum_reached = (yay_voting_power + nay_voting_power + pass_voting_power) * config.scale >= config.promotion_quorum * total_voting_power in
-    let yay_nay_voting_sum = yay_voting_power + nay_voting_power in
-    let super_majority_reached = if yay_nay_voting_sum > 0n
-        then yay_voting_power * config.scale >= config.promotion_supermajority * yay_nay_voting_sum
+    let { total_voting_power; yea_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
+    let quorum_reached = (yea_voting_power + nay_voting_power + pass_voting_power) * config.scale >= config.promotion_quorum * total_voting_power in
+    let yea_nay_voting_sum = yea_voting_power + nay_voting_power in
+    let super_majority_reached = if yea_nay_voting_sum > 0n
+        then yea_voting_power * config.scale >= config.promotion_supermajority * yea_nay_voting_sum
         else false in
     if quorum_reached && super_majority_reached 
         then winner_candidate
@@ -102,7 +102,7 @@ let init_new_promotion_voting_period
         period_type = Promotion;
         promotion_period = Some {
             voters = Big_map.empty;
-            yay_voting_power = 0n;
+            yea_voting_power = 0n;
             nay_voting_power = 0n; 
             pass_voting_power = 0n;
             total_voting_power = Tezos.get_total_voting_power ();
@@ -232,7 +232,7 @@ let assert_upvoting_allowed
 let assert_vote_value_correct
         (vote : string)
         : unit =
-    let value_is_correct = (vote = Constants.yay or vote = Constants.nay or vote = Constants.pass) in
+    let value_is_correct = (vote = Constants.yea or vote = Constants.nay or vote = Constants.pass) in
     assert_with_error value_is_correct Errors.incorrect_vote_value
 
 
@@ -371,8 +371,8 @@ let vote_promotion
         : Storage.promotion_period_t =
     let _ = assert_with_error (not Big_map.mem voter promotion_period.voters) Errors.promotion_already_voted in
     let _ = assert_vote_value_correct vote in
-    let updated_promotion_period = if vote = Constants.yay
-        then { promotion_period with yay_voting_power = promotion_period.yay_voting_power + voting_power }
+    let updated_promotion_period = if vote = Constants.yea
+        then { promotion_period with yea_voting_power = promotion_period.yea_voting_power + voting_power }
         else if vote = Constants.nay 
             then { promotion_period with nay_voting_power = promotion_period.nay_voting_power + voting_power }
             else { promotion_period with pass_voting_power = promotion_period.pass_voting_power + voting_power } in

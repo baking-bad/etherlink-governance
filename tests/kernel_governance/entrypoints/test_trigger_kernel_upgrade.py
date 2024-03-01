@@ -1,6 +1,6 @@
 from pytezos.client import PyTezosClient
 from tests.base import BaseTestCase
-from tests.helpers.contracts.governance_base import YAY_VOTE
+from tests.helpers.contracts.governance_base import YEA_VOTE
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from tests.helpers.errors import (
     LAST_WINNER_PAYLOAD_NOT_FOUND,
@@ -27,7 +27,7 @@ class KernelGovernanceTriggerKernelUpgradeTestCase(BaseTestCase):
         self.bake_blocks(2)
 
         # Period index: 1. Block: 2 of 2
-        governance.using(baker).vote(YAY_VOTE).send()
+        governance.using(baker).vote(YEA_VOTE).send()
         self.bake_blocks(2)
 
         return {
@@ -84,7 +84,7 @@ class KernelGovernanceTriggerKernelUpgradeTestCase(BaseTestCase):
 
         governance.using(baker).new_proposal(kernel_root_hash).send()
         self.bake_blocks(2)
-        governance.using(baker).vote(YAY_VOTE).send()
+        governance.using(baker).vote(YEA_VOTE).send()
         self.bake_blocks(2)
 
         governance.using(baker).trigger_kernel_upgrade(rollup_mock1.contract.address).send()
