@@ -1400,10 +1400,9 @@
          PAIR } ;
   view "get_voting_state"
        unit
-       (pair (pair %voting_context
-                (nat %period_index)
-                (or %period_type (unit %proposal) (unit %promotion))
-                (nat %remaining_blocks))
+       (pair (nat %period_index)
+             (or %period_type (unit %proposal) (unit %promotion))
+             (nat %remaining_blocks)
              (option %finished_voting
                 (pair (nat %finished_at_period_index)
                       (or %finished_at_period_type (unit %proposal) (unit %promotion))
@@ -1641,8 +1640,7 @@
          GET 3 ;
          DIG 3 ;
          CAR ;
-         PAIR 3 ;
-         PAIR } ;
+         PAIR 4 } ;
   view "get_upgrade_payload"
        (pair (string %public_key) (bytes %l2_address) (timestamp %activation_timestamp))
        bytes

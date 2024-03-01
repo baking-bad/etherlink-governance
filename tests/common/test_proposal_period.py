@@ -16,66 +16,54 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         storage = governance.contract.storage()
         assert storage['voting_context'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 3
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 3,
             'finished_voting': None
         }
 
         self.bake_block()
         # Period index: 0. Block: 2 of 3
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 2,
             'finished_voting': None
         }
         
         self.bake_block()
         # Period index: 0. Block: 3 of 3
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
 
         self.bake_block()
         # Period index: 1. Block: 1 of 3
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 1,
-                'remaining_blocks': 3
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 1,
+            'remaining_blocks': 3,
             'finished_voting': None
         }
 
         self.bake_block()
         # Period index: 1. Block: 2 of 3
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 1,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 1,
+            'remaining_blocks': 2,
             'finished_voting': None
         }
 
         self.bake_blocks(10)
         # Period index: 4. Block: 3 of 3
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 4,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 4,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
 
@@ -104,11 +92,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
 
@@ -122,11 +108,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 1,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 1,
+            'remaining_blocks': 2,
             'finished_voting': {
                 'finished_at_period_index': 1, 
                 'finished_at_period_type': PROPOSAL_PERIOD,
@@ -160,11 +144,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 2,
             'finished_voting': None
         }
 
@@ -180,11 +162,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
 
@@ -199,11 +179,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 1,
-                'remaining_blocks': 3
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 1,
+            'remaining_blocks': 3,
             'finished_voting': {
                 'finished_at_period_index': 1, 
                 'finished_at_period_type': PROPOSAL_PERIOD,
@@ -237,11 +215,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 2,
             'finished_voting': None
         }
 
@@ -258,11 +234,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
         
@@ -277,11 +251,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 1,
-                'remaining_blocks': 3
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 1,
+            'remaining_blocks': 3,
             'finished_voting': {
                 'finished_at_period_index': 1, 
                 'finished_at_period_type': PROPOSAL_PERIOD,
@@ -315,11 +287,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 2,
             'finished_voting': None
         }
 
@@ -335,11 +305,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
 
@@ -354,11 +322,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 2,
-                'remaining_blocks': 3
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 2,
+            'remaining_blocks': 3,
             'finished_voting': {
                 'finished_at_period_index': 2, 
                 'finished_at_period_type': PROMOTION_PERIOD,
@@ -392,11 +358,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 2
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 2,
             'finished_voting': None
         }
 
@@ -412,11 +376,9 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROPOSAL_PERIOD,
-                'period_index': 0,
-                'remaining_blocks': 1
-            },
+            'period_type': PROPOSAL_PERIOD,
+            'period_index': 0,
+            'remaining_blocks': 1,
             'finished_voting': None
         }
 
@@ -431,10 +393,8 @@ class KernelGovernanceProposalPeriodTestCase(BaseTestCase):
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
         assert governance.get_voting_state() == {
-            'voting_context': {
-                'period_type': PROMOTION_PERIOD,
-                'period_index': 1,
-                'remaining_blocks': 3
-            },
+            'period_type': PROMOTION_PERIOD,
+            'period_index': 1,
+            'remaining_blocks': 3,
             'finished_voting': None
         }
