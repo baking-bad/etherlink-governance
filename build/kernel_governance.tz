@@ -75,6 +75,7 @@
              CONCAT ;
              UNPACK key_hash ;
              IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+         LAMBDA nat bytes { BYTES } ;
          PUSH string "yay" ;
          PUSH string "nay" ;
          LAMBDA
@@ -93,14 +94,14 @@
                  EDIV ;
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR } } ;
-         DIG 7 ;
+         DIG 8 ;
          UNPAIR ;
          IF_LEFT
            { DIG 3 ;
              DIG 4 ;
-             DIG 5 ;
              DIG 6 ;
-             DIG 8 ;
+             DIG 7 ;
+             DIG 9 ;
              DROP 5 ;
              DUP 2 ;
              CAR ;
@@ -297,7 +298,7 @@
              DUP ;
              GET 10 ;
              UNIT ;
-             DIG 6 ;
+             DIG 7 ;
              SWAP ;
              EXEC ;
              DROP ;
@@ -321,7 +322,9 @@
              SWAP ;
              SUB ;
              ABS ;
-             BYTES ;
+             DUP 9 ;
+             SWAP ;
+             EXEC ;
              PUSH bytes 0x ;
              PUSH int 1 ;
              PUSH int 1 ;
@@ -376,15 +379,62 @@
                     COMPARE ;
                     LE } ;
              DROP 3 ;
+             PUSH bytes 0x ;
              NIL bytes ;
-             SWAP ;
-             CONS ;
-             PUSH bytes 0x88 ;
-             CONS ;
              DIG 2 ;
              CONS ;
-             PUSH bytes 0xeba1 ;
+             DIG 3 ;
              CONS ;
+             ITER { SWAP ;
+                    DUP 2 ;
+                    SIZE ;
+                    PUSH nat 55 ;
+                    DUP 2 ;
+                    COMPARE ;
+                    LE ;
+                    IF { PUSH nat 128 ; ADD ; DUP 10 ; SWAP ; EXEC }
+                       { DUP 10 ;
+                         SWAP ;
+                         EXEC ;
+                         NIL bytes ;
+                         DUP 2 ;
+                         CONS ;
+                         PUSH nat 183 ;
+                         DIG 2 ;
+                         SIZE ;
+                         ADD ;
+                         DUP 11 ;
+                         SWAP ;
+                         EXEC ;
+                         CONS ;
+                         CONCAT } ;
+                    DIG 2 ;
+                    SWAP ;
+                    CONCAT ;
+                    SWAP ;
+                    CONCAT } ;
+             DUP ;
+             SIZE ;
+             PUSH nat 55 ;
+             DUP 2 ;
+             COMPARE ;
+             LE ;
+             IF { PUSH nat 192 ; ADD ; DIG 8 ; SWAP ; EXEC }
+                { DUP 9 ;
+                  SWAP ;
+                  EXEC ;
+                  NIL bytes ;
+                  DUP 2 ;
+                  CONS ;
+                  PUSH nat 247 ;
+                  DIG 2 ;
+                  SIZE ;
+                  ADD ;
+                  DIG 9 ;
+                  SWAP ;
+                  EXEC ;
+                  CONS ;
+                  CONCAT } ;
              CONCAT ;
              RIGHT (or (pair bytes (ticket (pair nat (option bytes)))) bytes) ;
              SWAP ;
@@ -416,7 +466,9 @@
              SWAP ;
              DIG 2 ;
              CONS }
-           { IF_LEFT
+           { DIG 5 ;
+             DROP ;
+             IF_LEFT
                { DIG 8 ;
                  DROP ;
                  DUP 2 ;
@@ -1556,7 +1608,9 @@
   view "get_upgrade_payload"
        (pair (bytes %kernel_root_hash) (timestamp %activation_timestamp))
        bytes
-       { CAR ;
+       { LAMBDA nat bytes { BYTES } ;
+         SWAP ;
+         CAR ;
          UNPAIR ;
          PUSH nat 33 ;
          DUP 2 ;
@@ -1568,7 +1622,9 @@
          DIG 2 ;
          SUB ;
          ABS ;
-         BYTES ;
+         DUP 3 ;
+         SWAP ;
+         EXEC ;
          PUSH bytes 0x ;
          PUSH int 1 ;
          PUSH int 1 ;
@@ -1623,14 +1679,61 @@
                 COMPARE ;
                 LE } ;
          DROP 3 ;
+         PUSH bytes 0x ;
          NIL bytes ;
-         SWAP ;
+         DIG 2 ;
          CONS ;
-         PUSH bytes 0x88 ;
+         DIG 2 ;
          CONS ;
-         SWAP ;
-         CONS ;
-         PUSH bytes 0xeba1 ;
-         CONS ;
+         ITER { SWAP ;
+                DUP 2 ;
+                SIZE ;
+                PUSH nat 55 ;
+                DUP 2 ;
+                COMPARE ;
+                LE ;
+                IF { PUSH nat 128 ; ADD ; DUP 4 ; SWAP ; EXEC }
+                   { DUP 4 ;
+                     SWAP ;
+                     EXEC ;
+                     NIL bytes ;
+                     DUP 2 ;
+                     CONS ;
+                     PUSH nat 183 ;
+                     DIG 2 ;
+                     SIZE ;
+                     ADD ;
+                     DUP 5 ;
+                     SWAP ;
+                     EXEC ;
+                     CONS ;
+                     CONCAT } ;
+                DIG 2 ;
+                SWAP ;
+                CONCAT ;
+                SWAP ;
+                CONCAT } ;
+         DUP ;
+         SIZE ;
+         PUSH nat 55 ;
+         DUP 2 ;
+         COMPARE ;
+         LE ;
+         IF { PUSH nat 192 ; ADD ; DIG 2 ; SWAP ; EXEC }
+            { DUP 3 ;
+              SWAP ;
+              EXEC ;
+              NIL bytes ;
+              DUP 2 ;
+              CONS ;
+              PUSH nat 247 ;
+              DIG 2 ;
+              SIZE ;
+              ADD ;
+              DIG 3 ;
+              SWAP ;
+              EXEC ;
+              CONS ;
+              CONCAT } ;
          CONCAT } }
 

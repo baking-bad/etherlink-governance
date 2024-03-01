@@ -84,6 +84,12 @@ def pack(object: Any, type_expression: str) -> bytes:
     return to_michelson_type(object, type_expression).pack()
 
 
+def pack_sequencer_payload(payload):
+    return {
+        'public_key': payload['public_key'],
+        'l2_address': bytes.fromhex(payload['l2_address'])
+    }
+
 def originate_from_file(
     filename: str, client: PyTezosClient, storage: Any
 ) -> OperationGroup:

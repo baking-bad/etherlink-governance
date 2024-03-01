@@ -125,13 +125,13 @@ Creates and upvotes a new proposal.
 ##### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%COMMITTEE_ADDRESSES_SET%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "Pair \"%PUBLIC KEY%\" %L2_ADDRESS%"
 ```
 
 ##### Example
 
 ```bash
-octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "new_proposal" --arg "{ \"tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN\" }"
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "new_proposal" --arg "Pair \"edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X\" 0xb7a97043983f24991398e5a82f63f4c58a417185"
 ```
 
 #### upvote_proposal
@@ -141,13 +141,13 @@ Upvotes an existing proposal.
 ##### Client command
 
 ```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%COMMITTEE_ADDRESSES_SET%"
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "Pair \"%PUBLIC KEY%\" %L2_ADDRESS%"
 ```
 
 ##### Example
 
 ```bash
-octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "upvote_proposal" --arg "{ \"tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN\" }"
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "upvote_proposal" --arg "Pair \"edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X\" 0xb7a97043983f24991398e5a82f63f4c58a417185"
 ```
 
 #### vote
@@ -165,7 +165,7 @@ where `%YOUR_VOTE%` is one of the values: `yay`, `nay` or `pass`
 ##### Example
 
 ```bash
-octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "vote" --arg "\"yay\""
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "vote" --arg "\"yay\""
 ```
 
 

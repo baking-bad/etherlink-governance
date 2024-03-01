@@ -31,15 +31,20 @@ let timestamp_to_nat
         : nat =
     abs (value - (0 : timestamp))
 
-let nat_to_big_endian_bytes 
+let nat_to_bytes 
         (value : nat) 
         : bytes =
     [%Michelson ({| { BYTES } |} : nat -> bytes)] value
 
+let bytes_to_nat 
+        (value : bytes) 
+        : nat =
+    [%Michelson ({| { NAT } |} : bytes -> nat)] value
+
 let nat_to_little_endian_bytes
         (value : nat)
         : bytes = 
-    let bytes = nat_to_big_endian_bytes value in
+    let bytes = nat_to_bytes value in
     let mut res : bytes = 0x in
     let bytes_length = Bytes.length bytes in
     let _ = for i = 0 upto bytes_length - 1 do

@@ -4,7 +4,7 @@ from tests.helpers.errors import (
     INCORRECT_VOTE_VALUE, NO_VOTING_POWER, NOT_PROMOTION_PERIOD, PROMOTION_ALREADY_VOTED, 
     XTZ_IN_TRANSACTION_DISALLOWED
 )
-from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pkh
+from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_sequencer_payload, pkh
 
 class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_xtz_in_transaction(self) -> None:
@@ -41,9 +41,11 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        payload = bytes.fromhex(f"{'6564706b75426b6e5732386e5737324b4736526f48745957377031325436474b63376e4162775958356d385764397344564339796176'}{'71c7656ec7ab88b098defb751b7401b5f6d8976f'}")
-        # Period index: 0. Block: 2 of 3
-        governance.using(baker1).new_proposal(payload).send()
+        payload = {
+            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+        }# Period index: 0. Block: 2 of 3
+        governance.using(baker1).new_proposal(payload['public_key'], payload['l2_address']).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -77,9 +79,12 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'proposal_quorum': 20 # 1 baker out of 5 will vote
         })
         
-        payload = bytes.fromhex(f"{'6564706b75426b6e5732386e5737324b4736526f48745957377031325436474b63376e4162775958356d385764397344564339796176'}{'71c7656ec7ab88b098defb751b7401b5f6d8976f'}")
+        payload = {
+            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+        }
         # Period index: 0. Block: 2 of 3
-        governance.using(baker).new_proposal(payload).send()
+        governance.using(baker).new_proposal(payload['public_key'], payload['l2_address']).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -118,9 +123,12 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
             'finished_voting': None
         }
         
-        payload = bytes.fromhex(f"{'6564706b75426b6e5732386e5737324b4736526f48745957377031325436474b63376e4162775958356d385764397344564339796176'}{'71c7656ec7ab88b098defb751b7401b5f6d8976f'}")
+        payload = {
+            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+        }
         # Period index: 0. Block: 2 of 5
-        governance.using(baker1).new_proposal(payload).send()
+        governance.using(baker1).new_proposal(payload['public_key'], payload['l2_address']).send()
         self.bake_block()
         # Period index: 1. Block: 1 of 5
         self.bake_blocks(4)
@@ -128,7 +136,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         storage = governance.contract.storage()
         assert storage['voting_context']['period_type'] == PROPOSAL_PERIOD
         assert storage['voting_context']['period_index'] == 0
-        assert storage['voting_context']['proposal_period']['winner_candidate'] == payload
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == pack_sequencer_payload(payload)
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period'] == None
@@ -148,7 +156,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         storage = governance.contract.storage()
         assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
         assert storage['voting_context']['period_index'] == 1
-        assert storage['voting_context']['proposal_period']['winner_candidate'] == payload
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == pack_sequencer_payload(payload)
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
@@ -172,7 +180,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         storage = governance.contract.storage()
         assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
         assert storage['voting_context']['period_index'] == 1
-        assert storage['voting_context']['proposal_period']['winner_candidate'] == payload
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == pack_sequencer_payload(payload)
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
@@ -195,7 +203,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         storage = governance.contract.storage()
         assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
         assert storage['voting_context']['period_index'] == 1
-        assert storage['voting_context']['proposal_period']['winner_candidate'] == payload
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == pack_sequencer_payload(payload)
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER 
@@ -218,7 +226,7 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         storage = governance.contract.storage()
         assert storage['voting_context']['period_type'] == PROMOTION_PERIOD
         assert storage['voting_context']['period_index'] == 1
-        assert storage['voting_context']['proposal_period']['winner_candidate'] == payload
+        assert storage['voting_context']['proposal_period']['winner_candidate'] == pack_sequencer_payload(payload)
         assert storage['voting_context']['proposal_period']['max_upvotes_voting_power'] == DEFAULT_VOTING_POWER
         assert storage['voting_context']['proposal_period']['total_voting_power'] == DEFAULT_TOTAL_VOTING_POWER
         assert storage['voting_context']['promotion_period']['yay_voting_power'] == DEFAULT_VOTING_POWER  * 2

@@ -8,7 +8,10 @@
 
 module SequencerCommitteeGovernance = struct
 
-    type payload_t = bytes
+    type payload_t = {
+        public_key : string;
+        l2_address : bytes;
+    }
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
@@ -17,7 +20,7 @@ module SequencerCommitteeGovernance = struct
             (payload : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size payload in
+        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size payload.public_key payload.l2_address in
         Entrypoints.new_proposal payload storage
   
 
@@ -46,7 +49,7 @@ module SequencerCommitteeGovernance = struct
                 (payload : payload_t) 
                 : bytes -> 
             let activation_timestamp = Tezos.get_now () + storage.config.cooldown_period_sec in
-            Rollup.get_sequencer_upgrade_payload payload activation_timestamp in
+            Rollup.get_sequencer_upgrade_payload payload.public_key payload.l2_address activation_timestamp in
         Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
 
@@ -59,7 +62,8 @@ module SequencerCommitteeGovernance = struct
 
 
     type upgrade_payload_params_t = {
-        proposal_payload : payload_t;
+        public_key : string;
+        l2_address : bytes;
         activation_timestamp : timestamp;
     }
 
@@ -68,7 +72,7 @@ module SequencerCommitteeGovernance = struct
             (params: upgrade_payload_params_t) 
             (_ : storage_t) 
             : bytes = 
-        let { proposal_payload; activation_timestamp } = params in
-        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size proposal_payload in
-        Rollup.get_sequencer_upgrade_payload proposal_payload activation_timestamp
+        let { public_key; l2_address; activation_timestamp } = params in
+        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size public_key l2_address in
+        Rollup.get_sequencer_upgrade_payload public_key l2_address activation_timestamp
 end

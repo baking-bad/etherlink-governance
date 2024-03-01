@@ -25,16 +25,16 @@ class SequencerGovernance(GovernanceBase):
 
         return originate_from_file(filename, client, storage)
     
-    def new_proposal(self, addresses: list[str]) -> ContractCall:
+    def new_proposal(self, public_key : str, l2_address : bytes) -> ContractCall:
         """Creates a new proposal"""
 
-        return self.contract.new_proposal(addresses)
+        return self.contract.new_proposal(public_key, l2_address)
     
     
-    def upvote_proposal(self, addresses: list[str]) -> ContractCall:
+    def upvote_proposal(self, public_key : str, l2_address : bytes) -> ContractCall:
         """Upvotes an exist proposal"""
 
-        return self.contract.upvote_proposal(addresses)
+        return self.contract.upvote_proposal(public_key, l2_address)
     
     def vote(self, vote : str) -> ContractCall:
         """Votes for a hash in promotion period"""
@@ -46,5 +46,5 @@ class SequencerGovernance(GovernanceBase):
 
         return self.contract.trigger_committee_upgrade(rollup_address)
     
-    def get_upgrade_payload(self, proposal_payload : bytes, activation_timestamp : int):
-        return self.contract.get_upgrade_payload(proposal_payload, activation_timestamp).run_view()
+    def get_upgrade_payload(self, public_key : str, l2_address : bytes, activation_timestamp : int):
+        return self.contract.get_upgrade_payload(public_key, l2_address, activation_timestamp).run_view()
