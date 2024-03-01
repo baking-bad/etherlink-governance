@@ -38,6 +38,7 @@
                    (big_map %last_winner_trigger_history address unit)))
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
+         PUSH string "INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE" ;
          LAMBDA
            unit
            unit
@@ -98,7 +99,7 @@
                  EDIV ;
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR } } ;
-         DIG 8 ;
+         DIG 9 ;
          UNPAIR ;
          IF_LEFT
            { DIG 3 ;
@@ -106,7 +107,8 @@
              DIG 6 ;
              DIG 7 ;
              DIG 9 ;
-             DROP 5 ;
+             DIG 10 ;
+             DROP 6 ;
              DUP 2 ;
              CAR ;
              DIG 3 ;
@@ -490,7 +492,8 @@
              DROP ;
              IF_LEFT
                { DIG 8 ;
-                 DROP ;
+                 DIG 9 ;
+                 DROP 2 ;
                  DUP 2 ;
                  CAR ;
                  DIG 3 ;
@@ -767,7 +770,9 @@
                  DIG 4 ;
                  DROP 2 ;
                  IF_LEFT
-                   { DUP 2 ;
+                   { DIG 6 ;
+                     DROP ;
+                     DUP 2 ;
                      CAR ;
                      DIG 3 ;
                      SWAP ;
@@ -1070,13 +1075,24 @@
                      SOME ;
                      UPDATE 3 }
                    { DUP ;
-                     CDR ;
+                     UNPAIR ;
+                     SIZE ;
+                     PUSH nat 55 ;
+                     DUP 2 ;
+                     COMPARE ;
+                     EQ ;
+                     PUSH nat 54 ;
+                     DIG 2 ;
+                     COMPARE ;
+                     EQ ;
+                     OR ;
+                     IF {} { DUP 8 ; FAILWITH } ;
                      PUSH nat 20 ;
                      SWAP ;
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF {} { PUSH string "INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE" ; FAILWITH } ;
+                     IF { DIG 6 ; DROP } { DIG 6 ; FAILWITH } ;
                      DUP 2 ;
                      CAR ;
                      DIG 3 ;
@@ -1630,16 +1646,29 @@
   view "get_upgrade_payload"
        (pair (string %public_key) (bytes %l2_address) (timestamp %activation_timestamp))
        bytes
-       { LAMBDA nat bytes { BYTES } ;
-         SWAP ;
+       { PUSH string "INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE" ;
+         LAMBDA nat bytes { BYTES } ;
+         DIG 2 ;
          CAR ;
          UNPAIR 3 ;
+         DUP ;
+         SIZE ;
+         PUSH nat 55 ;
+         DUP 2 ;
+         COMPARE ;
+         EQ ;
+         PUSH nat 54 ;
+         DIG 2 ;
+         COMPARE ;
+         EQ ;
+         OR ;
+         IF {} { DUP 5 ; FAILWITH } ;
          PUSH nat 20 ;
          DUP 3 ;
          SIZE ;
          COMPARE ;
          EQ ;
-         IF {} { PUSH string "INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE" ; FAILWITH } ;
+         IF { DIG 4 ; DROP } { DIG 4 ; FAILWITH } ;
          PACK ;
          DUP ;
          PUSH nat 4 ;

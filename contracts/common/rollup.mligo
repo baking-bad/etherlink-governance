@@ -58,10 +58,11 @@ let get_kernel_upgrade_payload
 
 
 let assert_sequencer_upgrade_payload_has_correct_size
-        (_public_key : string)
+        (public_key : string)
         (l2_address : bytes)
         : unit =
-    //TODO : validate public key?
+    let public_key_length = String.length public_key in
+    let _ = assert_with_error ((public_key_length = 54n) || (public_key_length = 55n)) Errors.incorrect_sequencer_upgrade_payload_size in
     assert_with_error ((Bytes.length l2_address) = 20n) Errors.incorrect_sequencer_upgrade_payload_size
 
 
