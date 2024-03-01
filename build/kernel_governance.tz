@@ -5,7 +5,7 @@
     (pair (pair %config
              (nat %started_at_level)
              (nat %period_length)
-             (int %cooldown_period_sec)
+             (int %adoption_period_sec)
              (nat %upvoting_limit)
              (set %allowed_proposers address)
              (nat %scale)

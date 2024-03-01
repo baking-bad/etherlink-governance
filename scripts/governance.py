@@ -30,9 +30,9 @@ def originate_contract(contract_type, manager, config):
     help='The period life-time (in blocks), default: 75',
 )
 @click.option(
-    '--cooldown_period_sec',
+    '--adoption_period_sec',
     default=600,
-    help='The duration of the l2 cooldown period counted in seconds, default: 600',
+    help='The duration of the l2 adoption period counted in seconds, default: 600',
 )
 @click.option(
     '--upvoting_limit',
@@ -71,7 +71,7 @@ def deploy_contract(
     contract: str,
     started_at_level: int,
     period_length: int,
-    cooldown_period_sec: int,
+    adoption_period_sec: int,
     upvoting_limit: int,
     proposal_quorum: int,
     promotion_quorum: int,
@@ -89,7 +89,7 @@ def deploy_contract(
     config = {
         'started_at_level': int(started_at_level),
         'period_length': int(period_length),
-        'cooldown_period_sec' : int(cooldown_period_sec),
+        'adoption_period_sec' : int(adoption_period_sec),
         'upvoting_limit': int(upvoting_limit),
         'scale': int(scale),
         'allowed_proposers': list(allowed_proposer),

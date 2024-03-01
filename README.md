@@ -16,12 +16,12 @@ poetry run pytest
 
 ### Deploy Kernel Governance contract
 ```
-poetry run deploy_contract --contract kernel_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
+poetry run deploy_contract --contract kernel_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --adoption_period_sec 60
 ```
 
 ### Deploy Sequencer Committee Governance contract
 ```
-poetry run deploy_contract --contract sequencer_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --cooldown_period_sec 60
+poetry run deploy_contract --contract sequencer_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --adoption_period_sec 60
 ```
 
 ## Deployed contracts
@@ -220,11 +220,11 @@ type config_t = {
     period_length : nat;
 
     (* 
-        The duration of the l2 cooldown period counted in seconds. 
+        The duration of the l2 adoption period counted in seconds. 
         Used to generate an upgrade payload with activation timestamp 
         on trigger_upgrade entrypoint call 
     *)
-    cooldown_period_sec : int;
+    adoption_period_sec : int;
 
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               

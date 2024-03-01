@@ -46,7 +46,7 @@ module KernelGovernance = struct
         let pack_payload = fun 
                 (payload : payload_t) 
                 : bytes -> 
-            let activation_timestamp = Tezos.get_now () + storage.config.cooldown_period_sec in
+            let activation_timestamp = Tezos.get_now () + storage.config.adoption_period_sec in
             Rollup.get_kernel_upgrade_payload payload activation_timestamp in
         Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 

@@ -19,11 +19,11 @@ type config_t = {
     period_length : nat;
 
     (* 
-        The duration of the l2 cooldown period counted in seconds. 
+        The duration of the l2 adoption period counted in seconds. 
         Used to generate an upgrade payload with activation timestamp 
         on trigger_upgrade entrypoint call 
     *)
-    cooldown_period_sec : int;
+    adoption_period_sec : int;
 
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               
