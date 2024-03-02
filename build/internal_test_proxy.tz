@@ -135,9 +135,8 @@
   view "get_sequencer_upgrade_payload"
        (pair (string %public_key) (bytes %l2_address) (timestamp %activation_timestamp))
        bytes
-       { PUSH string "INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE" ;
-         LAMBDA nat bytes { BYTES } ;
-         DIG 2 ;
+       { LAMBDA nat bytes { BYTES } ;
+         SWAP ;
          CAR ;
          UNPAIR 3 ;
          DUP ;
@@ -151,13 +150,13 @@
          COMPARE ;
          EQ ;
          OR ;
-         IF {} { DUP 5 ; FAILWITH } ;
+         IF {} { PUSH string "INCORRECT_PUBLIC_KEY_SIZE" ; FAILWITH } ;
          PUSH nat 20 ;
          DUP 3 ;
          SIZE ;
          COMPARE ;
          EQ ;
-         IF { DIG 4 ; DROP } { DIG 4 ; FAILWITH } ;
+         IF {} { PUSH string "INCORRECT_L2_ADDRESS_SIZE" ; FAILWITH } ;
          PACK ;
          DUP ;
          PUSH nat 4 ;

@@ -12,3 +12,6 @@ class PayloadDecorationTestCase(BaseTestCase):
 
         with self.raisesMichelsonError(NOT_IMPLICIT_ADDRESS):
             proxy.address_to_key_hash('KT1ThEdxfUcWUwqsdergy3QnbCWGHSUHeHJq')
+
+        with self.raisesMichelsonError(NOT_IMPLICIT_ADDRESS):
+            proxy.address_to_key_hash('sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6')

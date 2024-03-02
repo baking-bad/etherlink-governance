@@ -62,8 +62,8 @@ let assert_sequencer_upgrade_payload_has_correct_size
         (l2_address : bytes)
         : unit =
     let public_key_length = String.length public_key in
-    let _ = assert_with_error ((public_key_length = 54n) || (public_key_length = 55n)) Errors.incorrect_sequencer_upgrade_payload_size in
-    assert_with_error ((Bytes.length l2_address) = 20n) Errors.incorrect_sequencer_upgrade_payload_size
+    let _ = assert_with_error ((public_key_length = 54n) || (public_key_length = 55n)) Errors.incorrect_public_key_size in
+    assert_with_error ((Bytes.length l2_address) = 20n) Errors.incorrect_l2_address_size
 
 
 let public_key_to_bytes

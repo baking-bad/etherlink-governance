@@ -38,7 +38,6 @@
                    (big_map %last_winner_trigger_history address unit)))
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
-         PUSH string "INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE" ;
          LAMBDA
            unit
            unit
@@ -108,7 +107,7 @@
                  EDIV ;
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR } } ;
-         DIG 9 ;
+         DIG 8 ;
          UNPAIR ;
          IF_LEFT
            { DIG 3 ;
@@ -116,8 +115,7 @@
              DIG 6 ;
              DIG 7 ;
              DIG 9 ;
-             DIG 10 ;
-             DROP 6 ;
+             DROP 5 ;
              DUP 2 ;
              CAR ;
              DIG 3 ;
@@ -501,8 +499,7 @@
              DROP ;
              IF_LEFT
                { DIG 8 ;
-                 DIG 9 ;
-                 DROP 2 ;
+                 DROP ;
                  DUP 2 ;
                  CAR ;
                  DIG 3 ;
@@ -779,9 +776,7 @@
                  DIG 4 ;
                  DROP 2 ;
                  IF_LEFT
-                   { DIG 6 ;
-                     DROP ;
-                     DUP 2 ;
+                   { DUP 2 ;
                      CAR ;
                      DIG 3 ;
                      SWAP ;
@@ -1095,13 +1090,13 @@
                      COMPARE ;
                      EQ ;
                      OR ;
-                     IF {} { DUP 8 ; FAILWITH } ;
+                     IF {} { PUSH string "INCORRECT_PUBLIC_KEY_SIZE" ; FAILWITH } ;
                      PUSH nat 20 ;
                      SWAP ;
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF { DIG 6 ; DROP } { DIG 6 ; FAILWITH } ;
+                     IF {} { PUSH string "INCORRECT_L2_ADDRESS_SIZE" ; FAILWITH } ;
                      DUP 2 ;
                      CAR ;
                      DIG 3 ;

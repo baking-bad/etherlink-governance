@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.errors import (
-    INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
+    INCORRECT_L2_ADDRESS_SIZE, INCORRECT_PUBLIC_KEY_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
     UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_sequencer_payload, pkh
@@ -12,10 +12,10 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance = self.deploy_sequencer_governance()
 
 
-        with self.raisesMichelsonError(INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE):
+        with self.raisesMichelsonError(INCORRECT_PUBLIC_KEY_SIZE):
+            governance.using(baker).new_proposal('edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1XFF', 'B7A97043983f24991398E5a82f63F4C58a417185').send()
+        with self.raisesMichelsonError(INCORRECT_L2_ADDRESS_SIZE):
             governance.using(baker).new_proposal('edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X', 'B7A97043983f24991398E5a82f63F4C58a41718543').send()
-        with self.raisesMichelsonError(INCORRECT_SEQUENCER_UPGRADE_PAYLOAD_SIZE):
-            governance.using(baker).new_proposal('edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X', 'B7A97043983f24991398E5a82f63F4C58a4171').send()
         governance.using(baker).new_proposal('edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X', 'B7A97043983f24991398E5a82f63F4C58a417185').send()
         self.bake_block()
 
