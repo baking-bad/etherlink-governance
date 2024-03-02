@@ -1,6 +1,8 @@
 #import "errors.mligo" "Errors"
-#import "utils.mligo" "Utils"
-#import "rlp.mligo" "RLP"
+#import "utils/converters.mligo" "Converters"
+#import "utils/rlp.mligo" "RLP"
+#import "utils/byte_utils.mligo" "ByteUtils"
+#import "utils/converters.mligo" "Converters"
 
 type content_t = nat * bytes option
 type ticket_t = content_t ticket
@@ -38,9 +40,9 @@ let get_upgrade_params
 let timestamp_to_padded_little_endian_bytes
         (value : timestamp)
         : bytes =
-    let timestamp_number : nat = Utils.timestamp_to_nat value in
-    let timestamp_bytes = Utils.nat_to_little_endian_bytes timestamp_number in
-    Utils.pad_end timestamp_bytes 8n 0x00
+    let timestamp_number : nat = Converters.timestamp_to_nat value in
+    let timestamp_bytes = Converters.nat_to_little_endian_bytes timestamp_number in
+    ByteUtils.pad_end timestamp_bytes 8n 0x00
 
 
 let assert_kernel_root_hash_has_correct_size
@@ -70,7 +72,7 @@ let public_key_to_bytes
         (public_key : string)
         : bytes =
     let michelson_bytes = Bytes.pack public_key in
-    let length = Utils.bytes_to_nat (Bytes.sub 2n 4n michelson_bytes) in
+    let length = Converters.bytes_to_nat (Bytes.sub 2n 4n michelson_bytes) in
     Bytes.sub 6n length michelson_bytes
 
 

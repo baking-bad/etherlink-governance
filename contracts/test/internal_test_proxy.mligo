@@ -1,5 +1,5 @@
 #import "../common/rollup.mligo" "Rollup"
-#import "../common/utils.mligo" "Utils"
+#import "../common/utils/converters.mligo" "Converters"
 
 module InternalTestProxy = struct
     (* The contract is used to test common internal functions *)
@@ -52,5 +52,5 @@ module InternalTestProxy = struct
             (address : address)
             (_ : storage_t)
             : key_hash =
-        Utils.address_to_key_hash address
+        Converters.address_to_key_hash address
 end

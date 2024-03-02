@@ -1,6 +1,5 @@
 #import "common/storage.mligo" "Storage"
 #import "common/errors.mligo" "Errors"
-#import "common/utils.mligo" "Utils"
 #import "common/voting.mligo" "Voting"
 #import "common/rollup.mligo" "Rollup"
 #import "common/entrypoints.mligo" "Entrypoints"

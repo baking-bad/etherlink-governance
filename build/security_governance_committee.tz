@@ -34,24 +34,6 @@
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
          LAMBDA
-           unit
-           unit
-           { DROP ;
-             PUSH string "XTZ_IN_TRANSACTION_DISALLOWED" ;
-             PUSH mutez 0 ;
-             AMOUNT ;
-             COMPARE ;
-             EQ ;
-             IF { DROP ; UNIT } { FAILWITH } } ;
-         LAMBDA
-           nat
-           unit
-           { PUSH nat 0 ;
-             SWAP ;
-             COMPARE ;
-             GT ;
-             IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
-         LAMBDA
            address
            key_hash
            { PACK ;
@@ -85,6 +67,24 @@
              IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          PUSH string "yea" ;
          PUSH string "nay" ;
+         LAMBDA
+           unit
+           unit
+           { DROP ;
+             PUSH string "XTZ_IN_TRANSACTION_DISALLOWED" ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             EQ ;
+             IF { DROP ; UNIT } { FAILWITH } } ;
+         LAMBDA
+           nat
+           unit
+           { PUSH nat 0 ;
+             SWAP ;
+             COMPARE ;
+             GT ;
+             IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
          LAMBDA
            (pair nat nat int nat (set address) nat nat nat nat)
            nat
@@ -300,17 +300,17 @@
                             { DIG 2 ; SWAP ; SOME ; UPDATE 9 ; EMPTY_BIG_MAP address unit ; UPDATE 10 } } } } ;
              SENDER ;
              DUP ;
-             DIG 8 ;
+             DIG 10 ;
              SWAP ;
              EXEC ;
              VOTING_POWER ;
              UNIT ;
-             DIG 10 ;
+             DIG 8 ;
              SWAP ;
              EXEC ;
              DROP ;
              DUP ;
-             DIG 9 ;
+             DIG 7 ;
              SWAP ;
              EXEC ;
              DROP ;
@@ -378,8 +378,8 @@
              UPDATE 7 ;
              SOME ;
              UPDATE 3 }
-           { DIG 3 ;
-             DIG 4 ;
+           { DIG 5 ;
+             DIG 6 ;
              DROP 2 ;
              IF_LEFT
                { DUP 2 ;
@@ -576,7 +576,7 @@
                                 { DIG 2 ; SWAP ; SOME ; UPDATE 9 ; EMPTY_BIG_MAP address unit ; UPDATE 10 } } } } ;
                  SENDER ;
                  DUP ;
-                 DIG 6 ;
+                 DIG 8 ;
                  SWAP ;
                  EXEC ;
                  VOTING_POWER ;
@@ -888,7 +888,7 @@
                                 { DIG 2 ; SWAP ; SOME ; UPDATE 9 ; EMPTY_BIG_MAP address unit ; UPDATE 10 } } } } ;
                  SENDER ;
                  DUP ;
-                 DIG 6 ;
+                 DIG 8 ;
                  SWAP ;
                  EXEC ;
                  VOTING_POWER ;

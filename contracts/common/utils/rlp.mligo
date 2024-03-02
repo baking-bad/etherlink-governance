@@ -1,4 +1,5 @@
-#import "utils.mligo" "Utils"
+#import "converters.mligo" "Converters"
+#import "../errors.mligo" "Errors"
 
 let encode_item
         (value : bytes)
@@ -6,11 +7,11 @@ let encode_item
     let length = Bytes.length value in
     let prefix = if length <= 55n
         then 
-            Utils.nat_to_bytes (length + 128n) 
+            Converters.nat_to_bytes (length + 128n) 
         else 
-            let length_bytes = Utils.nat_to_bytes length in
+            let length_bytes = Converters.nat_to_bytes length in
             let length_of_length = Bytes.length length_bytes in
-            Bytes.concats [Utils.nat_to_bytes (length_of_length + 183n); length_bytes] in
+            Bytes.concats [Converters.nat_to_bytes (length_of_length + 183n); length_bytes] in
     Bytes.concat prefix value
 
 let encode_list
@@ -21,9 +22,9 @@ let encode_list
     let list_length = Bytes.length list_body in
     let prefix = if list_length <= 55n
         then 
-            Utils.nat_to_bytes (list_length + 192n)
+            Converters.nat_to_bytes (list_length + 192n)
         else
-            let list_length_bytes = Utils.nat_to_bytes list_length in
+            let list_length_bytes = Converters.nat_to_bytes list_length in
             let length_of_list_length = Bytes.length list_length_bytes in
-            Bytes.concats [Utils.nat_to_bytes (length_of_list_length + 247n); list_length_bytes] in
+            Bytes.concats [Converters.nat_to_bytes (length_of_list_length + 247n); list_length_bytes] in
     Bytes.concat prefix list_body
