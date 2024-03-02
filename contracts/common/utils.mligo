@@ -22,9 +22,42 @@ let assert_proposer_allowed
 let address_to_key_hash
         (address : address)
         : key_hash =
+    (*
+        NOTE:
+        Bytes.pack for an address can return the following variants depending on address type 
+            tz1NyAf1KeeFCCPPAZ9ard9YVshVGFibzVKa -> 0x050a0000001600002486eda3c7bbbe6be511b46d6deeb1594258a7fd
+            tz2VGBaXuS6rnaa5hpC92qkgadRJKdEbeGwc -> 0x050a000000160001e5c6d1f726796e98b2bad2a819a36f742b2fe25b
+            tz3WEJYwJ6pPwVbSL8FrSoAXRmFHHZTuEnMA -> 0x050a0000001600026c9b3ad59e0f8bdc2bd2011675825f9f547131da
+            tz4Jxn8MpRndqWUzkuZbQKmE3aNWJzYsSEso -> 0x050a0000001600036d39817a1e9a4a66bd28c2f2bb430a04b2d93ecf
+            KT1GzjQs7HLLVGG95GxURZXAPqEquAVyYD4c -> 0x050a00000016015c49311596d2b140b04401f2824b8ff4fe1256a200
+        
+            the template for address in michelson bytes is 0xMMTT(LLx4)AA(DDx21)
+                MM      - Michelson bytes mark (0x05)
+                TT      - Michelson type (0x0a - address)
+                LLx4    - Data length (0x00000016 - 22 bytes)
+                AA      - Address Type (0x00 - implicit, 0x01 - originated)
+                DDx21   - Address Data
+
+        Bytes.pack for a key hash can return the following variants depending on address type 
+            tz1NyAf1KeeFCCPPAZ9ard9YVshVGFibzVKa -> 0x050a00000015002486eda3c7bbbe6be511b46d6deeb1594258a7fd
+            tz2VGBaXuS6rnaa5hpC92qkgadRJKdEbeGwc -> 0x050a0000001501e5c6d1f726796e98b2bad2a819a36f742b2fe25b
+            tz3WEJYwJ6pPwVbSL8FrSoAXRmFHHZTuEnMA -> 0x050a00000015026c9b3ad59e0f8bdc2bd2011675825f9f547131da
+            tz4Jxn8MpRndqWUzkuZbQKmE3aNWJzYsSEso -> 0x050a00000015036d39817a1e9a4a66bd28c2f2bb430a04b2d93ecf
+
+            the template for key hash in michelson bytes is 0xMMTT(LLx4)(DDx21)
+                MM      - Michelson bytes mark (0x05)
+                TT      - Michelson type (0x0a - address)
+                LLx4    - Data length (0x00000015 - 21 bytes)
+                DDx21   - Address Data
+
+        so it's enough to check, that AA byte == 0x00, remove it, and update LL bytes to reflect that data length is 21 byte now 
+    *)
     let address_packed = Bytes.pack address in
-    let key_hash_packed = Bytes.concats [(Bytes.sub 0n 5n address_packed); 0x15; (Bytes.sub 7n 21n address_packed)] in
-    Option.unopt_with_error (Bytes.unpack key_hash_packed) Errors.not_implicit_address
+    let address_type = Bytes.sub 6n 1n address_packed in
+    let _ = assert_with_error (address_type = 0x00) Errors.not_implicit_address in
+    let length = 0x00000015 in
+    let key_hash_packed = Bytes.concats [(Bytes.sub 0n 2n address_packed); length; (Bytes.sub 7n 21n address_packed)] in
+    Option.unopt_with_error (Bytes.unpack key_hash_packed) Errors.impossible_to_cast_address_to_key_hash
 
 let timestamp_to_nat
         (value : timestamp)

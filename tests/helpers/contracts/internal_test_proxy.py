@@ -21,3 +21,6 @@ class InternalTestProxy(ContractHelper):
     
     def get_sequencer_upgrade_payload(self, public_key : str, l2_address : bytes, activation_timestamp : int):
         return self.contract.get_sequencer_upgrade_payload(public_key, l2_address, activation_timestamp).run_view()
+    
+    def address_to_key_hash(self, address : str):
+        return self.contract.address_to_key_hash(address).run_view()

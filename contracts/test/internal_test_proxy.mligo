@@ -1,4 +1,5 @@
 #import "../common/rollup.mligo" "Rollup"
+#import "../common/utils.mligo" "Utils"
 
 module InternalTestProxy = struct
     (* The contract is used to test common internal functions *)
@@ -44,4 +45,12 @@ module InternalTestProxy = struct
         let { public_key; l2_address; activation_timestamp } = params in
         let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size public_key l2_address in
         Rollup.get_sequencer_upgrade_payload public_key l2_address activation_timestamp
+
+
+    [@view]
+    let address_to_key_hash
+            (address : address)
+            (_ : storage_t)
+            : key_hash =
+        Utils.address_to_key_hash address
 end
