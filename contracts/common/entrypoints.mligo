@@ -56,7 +56,7 @@ let vote
     let _ = Validation.assert_no_xtz_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_promotion voting_context in
-    let promotion_period = Option.unopt_with_error voting_context.promotion_period Errors.promotion_period_context_not_exist in
+    let promotion_period = Option.value_with_error Errors.promotion_period_context_not_exist voting_context.promotion_period  in
     let updated_promotion_period = Voting.vote_promotion vote voter voting_power promotion_period in
     let operations = match finished_voting with
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
@@ -75,7 +75,7 @@ let trigger_rollup_upgrade
     let last_winner_trigger_history = voting_context.last_winner_trigger_history in
     let _ = Validation.assert_no_xtz_in_transaction () in
     let _ = assert_with_error (not Big_map.mem rollup_address last_winner_trigger_history) Errors.upgrade_for_address_already_triggered in
-    let payload = Option.unopt_with_error voting_context.last_winner_payload Errors.last_winner_payload_not_found in
+    let payload = Option.value_with_error Errors.last_winner_payload_not_found voting_context.last_winner_payload  in
     let rollup_entry = Rollup.get_entry rollup_address in
     let upgrade_params = Rollup.get_upgrade_params (pack_payload payload) in
     let upgrade_operation = Tezos.transaction upgrade_params 0tez rollup_entry in

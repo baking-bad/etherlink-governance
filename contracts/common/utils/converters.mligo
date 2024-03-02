@@ -17,7 +17,7 @@ let nat_to_little_endian_bytes
     let mut res : bytes = 0x in
     let bytes_length = Bytes.length bytes in
     let _ = for i = 0 upto bytes_length - 1 do
-        let index : nat = Option.unopt (is_nat i) in
+        let index : nat = Option.value_with_error Errors.index_not_nat (is_nat i) in
         res := Bytes.concat (Bytes.sub index 1n bytes) res
     done in
     res
@@ -65,4 +65,4 @@ let address_to_key_hash
     let _ = assert_with_error (address_type = 0x00) Errors.not_implicit_address in
     let length = 0x00000015 in
     let key_hash_packed = Bytes.concats [(Bytes.sub 0n 2n address_packed); length; (Bytes.sub 7n 21n address_packed)] in
-    Option.unopt_with_error (Bytes.unpack key_hash_packed) Errors.impossible_to_cast_address_to_key_hash
+    Option.value_with_error Errors.impossible_to_cast_address_to_key_hash (Bytes.unpack key_hash_packed) 

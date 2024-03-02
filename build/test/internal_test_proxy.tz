@@ -36,7 +36,9 @@
                 DUG 3 ;
                 DIP 3
                     { ISNAT ;
-                      IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+                      PUSH string "INDEX_NOT_NAT" ;
+                      SWAP ;
+                      IF_NONE { FAILWITH } { SWAP ; DROP } ;
                       SWAP ;
                       DUP 3 ;
                       PUSH nat 1 ;
@@ -103,7 +105,12 @@
                      SWAP ;
                      EXEC ;
                      CONS ;
-                     CONCAT } ;
+                     PUSH bytes 0x ;
+                     SWAP ;
+                     NIL bytes ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     ITER { CONCAT } } ;
                 DIG 2 ;
                 SWAP ;
                 CONCAT ;
@@ -130,7 +137,12 @@
               SWAP ;
               EXEC ;
               CONS ;
-              CONCAT } ;
+              PUSH bytes 0x ;
+              SWAP ;
+              NIL bytes ;
+              SWAP ;
+              ITER { CONS } ;
+              ITER { CONCAT } } ;
          CONCAT } ;
   view "get_sequencer_upgrade_payload"
        (pair (string %public_key) (bytes %l2_address) (timestamp %activation_timestamp))
@@ -186,7 +198,9 @@
                 DUG 3 ;
                 DIP 3
                     { ISNAT ;
-                      IF_NONE { PUSH string "option is None" ; FAILWITH } {} ;
+                      PUSH string "INDEX_NOT_NAT" ;
+                      SWAP ;
+                      IF_NONE { FAILWITH } { SWAP ; DROP } ;
                       SWAP ;
                       DUP 3 ;
                       PUSH nat 1 ;
@@ -259,7 +273,12 @@
                      SWAP ;
                      EXEC ;
                      CONS ;
-                     CONCAT } ;
+                     PUSH bytes 0x ;
+                     SWAP ;
+                     NIL bytes ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     ITER { CONCAT } } ;
                 DIG 2 ;
                 SWAP ;
                 CONCAT ;
@@ -286,7 +305,12 @@
               SWAP ;
               EXEC ;
               CONS ;
-              CONCAT } ;
+              PUSH bytes 0x ;
+              SWAP ;
+              NIL bytes ;
+              SWAP ;
+              ITER { CONS } ;
+              ITER { CONCAT } } ;
          CONCAT } ;
   view "address_to_key_hash"
        address
@@ -302,7 +326,7 @@
          COMPARE ;
          EQ ;
          IF {} { PUSH string "NOT_IMPLICIT_ADDRESS" ; FAILWITH } ;
-         PUSH string "IMPOSSIBLE_TO_CAST_ADDRESS_TO_KEY_HASH" ;
+         PUSH bytes 0x ;
          NIL bytes ;
          DUP 3 ;
          PUSH nat 21 ;
@@ -318,7 +342,12 @@
          SLICE ;
          IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
          CONS ;
-         CONCAT ;
+         NIL bytes ;
+         SWAP ;
+         ITER { CONS } ;
+         ITER { CONCAT } ;
          UNPACK key_hash ;
+         PUSH string "IMPOSSIBLE_TO_CAST_ADDRESS_TO_KEY_HASH" ;
+         SWAP ;
          IF_NONE { FAILWITH } { SWAP ; DROP } } }
 

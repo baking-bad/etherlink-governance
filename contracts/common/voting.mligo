@@ -147,7 +147,7 @@ let init_new_voting_state
                         finished_voting = finished_voting;
                     })
         | Promotion ->
-            let promotion_period = Option.unopt voting_context.promotion_period in
+            let promotion_period = Option.value_with_error Errors.promotion_period_not_found voting_context.promotion_period in
             let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
             let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
             let init_new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context in

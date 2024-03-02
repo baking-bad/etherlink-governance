@@ -21,3 +21,5 @@ let impossible_to_cast_address_to_key_hash = "IMPOSSIBLE_TO_CAST_ADDRESS_TO_KEY_
 let wrong_rollup_entrypoint = "WRONG_ROLLUP_ENTRYPOINT"
 let upgrade_for_address_already_triggered = "UPGRADE_FOR_ADDRESS_ALREADY_TRIGGERED"
 let incorrect_committee_size = "INCORRECT_COMMITTEE_SIZE"
+let promotion_period_not_found = "PROMOTION_PERIOD_NOT_FOUND"
+let index_not_nat = "INDEX_NOT_NAT"
