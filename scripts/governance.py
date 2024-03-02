@@ -1,4 +1,5 @@
 from pytezos import pytezos
+from tests.helpers.contracts.security_governance_committee import SecurityGovernanceCommittee
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from typing import Optional
@@ -10,6 +11,8 @@ def originate_contract(contract_type, manager, config):
         return KernelGovernance.originate(manager, config).send()
     elif contract_type == 'sequencer_governance':
         return SequencerGovernance.originate(manager, config).send()
+    elif contract_type == 'security_governance_committee':
+        return SecurityGovernanceCommittee.originate(manager, config).send()
     else:
         raise ValueError("Incorrect contract_type")
 
@@ -17,7 +20,7 @@ def originate_contract(contract_type, manager, config):
 @click.option(
     '--contract',
     required=True,
-    help='"kernel_governance" or "sequencer_governance"',
+    help='"kernel_governance" or "sequencer_governance" or "security_governance_committee"',
 )
 @click.option(
     '--started_at_level',

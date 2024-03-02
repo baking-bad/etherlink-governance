@@ -13,5 +13,6 @@ __all__ = [
     'GovernanceBase',
     'SequencerGovernance',
     'RollupMock',
-    'InternalTestProxy'
+    'InternalTestProxy',
+    'SecurityGovernanceCommittee'
 ]
