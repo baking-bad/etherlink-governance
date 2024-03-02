@@ -59,20 +59,4 @@ module SequencerCommitteeGovernance = struct
             (storage : storage_t) 
             : payload_t Views.voting_state_t = 
         Views.get_voting_state storage
-
-
-    type upgrade_payload_params_t = {
-        public_key : string;
-        l2_address : bytes;
-        activation_timestamp : timestamp;
-    }
-
-    [@view] 
-    let get_upgrade_payload
-            (params: upgrade_payload_params_t) 
-            (_ : storage_t) 
-            : bytes = 
-        let { public_key; l2_address; activation_timestamp } = params in
-        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size public_key l2_address in
-        Rollup.get_sequencer_upgrade_payload public_key l2_address activation_timestamp
 end

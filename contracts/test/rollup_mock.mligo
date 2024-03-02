@@ -11,4 +11,4 @@ module RollupMock = struct
             (_ : storage_t)
             : return_t =
         [], Rollup.decode_upgrade_payload rollup_entry
-  end
+end

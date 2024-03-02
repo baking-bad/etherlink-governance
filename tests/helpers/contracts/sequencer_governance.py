@@ -45,6 +45,3 @@ class SequencerGovernance(GovernanceBase):
         """Triggers upgrade transaction to rollup with last winner committee addresses set"""
 
         return self.contract.trigger_committee_upgrade(rollup_address)
-    
-    def get_upgrade_payload(self, public_key : str, l2_address : bytes, activation_timestamp : int):
-        return self.contract.get_upgrade_payload(public_key, l2_address, activation_timestamp).run_view()

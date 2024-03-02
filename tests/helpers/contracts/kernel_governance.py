@@ -46,7 +46,4 @@ class KernelGovernance(GovernanceBase):
     def vote(self, vote : str) -> ContractCall:
         """Votes for a kernel_root_hash in promotion period"""
 
-        return self.contract.vote(vote )
-
-    def get_upgrade_payload(self, kernel_root_hash : bytes, activation_timestamp : int):
-        return self.contract.get_upgrade_payload(kernel_root_hash, activation_timestamp).run_view()
+        return self.contract.vote(vote)

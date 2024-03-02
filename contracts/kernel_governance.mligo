@@ -57,19 +57,4 @@ module KernelGovernance = struct
             (storage : storage_t) 
             : payload_t Views.voting_state_t = 
         Views.get_voting_state storage
-
-
-    type upgrade_payload_params_t = {
-        kernel_root_hash : payload_t;
-        activation_timestamp : timestamp;
-    }
-
-    [@view] 
-    let get_upgrade_payload
-            (params: upgrade_payload_params_t) 
-            (_ : storage_t) 
-            : bytes = 
-        let { kernel_root_hash; activation_timestamp } = params in
-        let _ = Rollup.assert_kernel_root_hash_has_correct_size kernel_root_hash in
-        Rollup.get_kernel_upgrade_payload kernel_root_hash activation_timestamp
 end
