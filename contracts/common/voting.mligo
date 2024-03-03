@@ -150,15 +150,15 @@ let init_new_voting_state
             let promotion_period = Option.value_with_error Errors.promotion_period_not_found voting_context.promotion_period in
             let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
             let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
-            let init_new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context in
+            let new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context in
             let updated_voting_context = (match promotion_winner with
                 | Some promotion_winner -> 
                     {
-                        init_new_proposal_voting_context with
+                        new_proposal_voting_context with
                         last_winner_payload = (Some promotion_winner);
                         last_winner_trigger_history = Big_map.empty;
                     }
-                | None -> init_new_proposal_voting_context) in
+                | None -> new_proposal_voting_context) in
             { 
                 voting_context = updated_voting_context;
                 finished_voting = finished_voting;
