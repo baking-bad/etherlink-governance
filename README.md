@@ -24,6 +24,11 @@ poetry run deploy_contract --contract kernel_governance --rpc-url https://rpc.tz
 poetry run deploy_contract --contract sequencer_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --adoption_period_sec 60
 ```
 
+### Deploy Proposers Governance contract
+```
+poetry run deploy_contract --contract proposers_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --adoption_period_sec 60
+```
+
 ## Deployed contracts
 
 ### Kernel Governance
@@ -185,9 +190,65 @@ octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "
 octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "trigger_committee_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
 ```
 
+## Proposers governance contract
+
+This contract serves as a supplementary contract for other governance contracts. The contract includes, as a payload, the addresses of allowed proposers for the main governance contract, which in turn utilizes the check_address_in_committee view of this contract to verify allowed proposers.
+
+### Entrypoints
+
+#### new_proposal
+
+Creates and upvotes a new proposal.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%ADDRESSES%"
+```
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "new_proposal" --arg "{ \"tz1KmScKtmTaeVQQBPXqi29Q846VkEbh39DQ\" ; \"tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq\" }"
+```
+
+#### upvote_proposal
+
+Upvotes an existing proposal.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%ADDRESSES%"
+```
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "upvote_proposal" --arg "{ \"tz1KmScKtmTaeVQQBPXqi29Q846VkEbh39DQ\" ; \"tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq\" }"
+```
+
+#### vote
+
+Votes with **yea**, **nay** or **pass** on the proposal that has advanced to the promotion period.
+
+##### Client command
+
+```bash
+octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
+```
+
+where `%YOUR_VOTE%` is one of the values: `yea`, `nay` or `pass`
+
+##### Example
+
+```bash
+octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "vote" --arg "\"yea\""
+```
+
 ## The get_voting_state on-chain view and voting_finished events
 
-**Note: Don't use the storage to get the actual state**
+**Note: Don't use just the storage to get the actual state**
 
 
 Use the [get_voting_state](https://better-call.dev/ghostnet/KT1JA6kdnWJqXRpKKHU5e99yuE3Yd1X5KyrL/views) view to obtain the actual state of current voting process at the time of the call. This returns the actual recalculated `voting_context` value as well as pending `voting_finished` event payload in case if the latest voting period is finished but the event was not sent to blockchain yet. The event will be sent after the next successful call to any entrypoint.
@@ -197,7 +258,7 @@ Use the [contract events](https://better-call.dev/ghostnet/KT1JA6kdnWJqXRpKKHU5e
 
 ## Config
 
-How to read values stored in the smart contract storage config
+All contracts mentioned above use the same config for voting process. Here is a description of the config values
 ```ocaml
 (*
     NOTE:
@@ -229,7 +290,7 @@ type config_t = {
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               
 
-    (* Another governance contract which keeps accounts that can submit new proposals (if None then anyone is allowed) *)
+    (* Another governance contract which keeps accounts that can submit new proposals (if None then any proposer is allowed) *)
     proposers_governance_contract : address option;
 
     (* 

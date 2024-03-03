@@ -30,7 +30,7 @@ type config_t = {
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               
 
-    (* Another governance contract which keeps accounts that can submit new proposals (if None then anyone is allowed) *)
+    (* Another governance contract which keeps accounts that can submit new proposals (if None then any proposer is allowed) *)
     proposers_governance_contract : address option;
 
     (* 
