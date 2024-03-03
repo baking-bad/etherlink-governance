@@ -4,8 +4,12 @@
 #import "common/entrypoints.mligo" "Entrypoints"
 #import "common/views.mligo" "Views"
 
-module SecurityGovernanceCommittee = struct
-
+module ProposersCommitteeGovernance = struct
+    (*
+        This contract serves as a supplementary contract for other governance contracts. 
+        The contract includes, as a payload, the addresses of allowed proposers for the main governance contract, 
+        which in turn utilizes the check_address_in_committee view of this contract to verify allowed proposers.
+    *)
     let max_committee_size = 20n
 
     type payload_t = address set 

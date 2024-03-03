@@ -10,10 +10,10 @@ from os.path import join
 from tests.helpers.metadata import Metadata
 
 
-class SecurityGovernanceCommittee(GovernanceBase):
+class ProposersGovernance(GovernanceBase):
     @classmethod
     def originate(self, client: PyTezosClient, custom_config=None, last_winner=None) -> OperationGroup:
-        """Deploys Security Governance Committee"""
+        """Deploys Proposers Governance contract"""
 
         metadata = Metadata.make_default(
             name='Security Governance Committee',
@@ -21,7 +21,7 @@ class SecurityGovernanceCommittee(GovernanceBase):
         )
 
         storage = self.make_storage(metadata, custom_config, last_winner)
-        filename = join(get_build_dir(), 'security_governance_committee.tz')
+        filename = join(get_build_dir(), 'proposers_governance.tz')
 
         return originate_from_file(filename, client, storage)
     
