@@ -76,6 +76,7 @@ let vote
     } in
     operations, updated_storage
 
+#if TRIGGER_ENABLED
 
 let trigger_rollup_upgrade
         (type pt)
@@ -104,3 +105,5 @@ let trigger_rollup_upgrade
         }
     } in 
     operations, updated_storage
+    
+#endif

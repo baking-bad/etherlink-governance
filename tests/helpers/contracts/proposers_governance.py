@@ -20,7 +20,7 @@ class ProposersGovernance(GovernanceBase):
             description='The Security Governance Committee contract allows bakers to make proposals and vote on allowed proposers for security governance contract',
         )
 
-        storage = self.make_storage(metadata, custom_config, last_winner)
+        storage = self.make_storage(metadata, is_trigger_enabled=False, custom_config=custom_config, last_winner=last_winner)
         filename = join(get_build_dir(), 'proposers_governance.tz')
 
         return originate_from_file(filename, client, storage)

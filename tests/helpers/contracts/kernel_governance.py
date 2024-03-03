@@ -20,7 +20,7 @@ class KernelGovernance(GovernanceBase):
             description='The Kernel Governance contract allows bakers to make proposals and vote on kernel upgrade',
         )
 
-        storage = self.make_storage(metadata, custom_config)
+        storage = self.make_storage(metadata, custom_config=custom_config)
         filename = join(get_build_dir(), 'kernel_governance.tz')
 
         return originate_from_file(filename, client, storage)

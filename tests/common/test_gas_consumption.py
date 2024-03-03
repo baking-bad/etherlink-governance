@@ -54,10 +54,9 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
         baker2 = self.bootstrap_baker()
         baker3 = self.bootstrap_baker()
         baker4 = self.bootstrap_baker()
-        proposers_governance = self.deploy_proposers_governance(last_winner={
-            'payload': [pkh(baker1), pkh(baker2), pkh(baker3), pkh(baker4)],
-            'trigger_history' : {}
-        })
+        proposers_governance = self.deploy_proposers_governance(
+            last_winner=[pkh(baker1), pkh(baker2), pkh(baker3), pkh(baker4)]
+        )
         governance_started_at_level = self.get_current_level() + 1
         governance = self.deploy_kernel_governance(custom_config={
             'started_at_level': governance_started_at_level,

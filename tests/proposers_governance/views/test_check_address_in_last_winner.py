@@ -17,10 +17,9 @@ class ProposersGovernanceCheckAddressInLastWinner(BaseTestCase):
         sender = self.bootstrap_baker()
         allowed_baker = self.bootstrap_baker()
         another_allowed_baker = self.bootstrap_baker()
-        governance = self.deploy_proposers_governance(last_winner={
-            'payload': [pkh(allowed_baker), pkh(another_allowed_baker)],
-            'trigger_history' : {}
-        })
+        governance = self.deploy_proposers_governance(
+            last_winner=[pkh(allowed_baker), pkh(another_allowed_baker)]
+        )
 
         assert governance.using(sender).check_address_in_last_winner(pkh(allowed_baker)) == True
         assert governance.using(sender).check_address_in_last_winner(pkh(another_allowed_baker)) == True
@@ -40,10 +39,7 @@ class ProposersGovernanceCheckAddressInLastWinner(BaseTestCase):
                 'promotion_quorum': 20, # 1 bakers out of 5 will vote (20%)  
                 'promotion_supermajority': 50, # 1 baker will vote yea
             },
-            last_winner={
-                'payload': [pkh(previously_allowed_baker)],
-                'trigger_history' : {}
-            }
+            last_winner=[pkh(previously_allowed_baker)]
         )
 
         assert governance.using(baker).check_address_in_last_winner(pkh(previously_allowed_baker)) == True

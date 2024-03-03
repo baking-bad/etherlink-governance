@@ -18,12 +18,14 @@ type config_t = {
     *)
     period_length : nat;
 
+#if TRIGGER_ENABLED
     (* 
         The duration of the l2 adoption period counted in seconds. 
         Used to generate an upgrade payload with activation timestamp 
         on trigger_upgrade entrypoint call 
     *)
     adoption_period_sec : int;
+#endif
 
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               
@@ -101,7 +103,9 @@ type 'pt voting_context_t = {
 
 type 'pt voting_winner_t = {
     payload : 'pt;
+#if TRIGGER_ENABLED
     trigger_history : (address, unit) big_map;
+#endif
 }
 
 type 'pt t = {

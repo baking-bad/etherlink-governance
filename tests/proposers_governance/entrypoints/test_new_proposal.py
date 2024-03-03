@@ -131,10 +131,9 @@ class ProposersGovernanceNewProposalTestCase(BaseTestCase):
         allowed_baker = self.bootstrap_baker()
         another_allowed_baker = self.bootstrap_baker()
         disallowed_baker = self.bootstrap_baker()
-        proposers_governance = self.deploy_proposers_governance(last_winner={
-            'payload': [pkh(allowed_baker), pkh(another_allowed_baker)],
-            'trigger_history' : {}
-        })
+        proposers_governance = self.deploy_proposers_governance(
+            last_winner=[pkh(allowed_baker), pkh(another_allowed_baker)]
+        )
         governance = self.deploy_proposers_governance(custom_config={
             'proposers_governance_contract': proposers_governance.address
         })
@@ -174,10 +173,9 @@ class ProposersGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_not_fail_if_proposer_is_in_the_allowed_proposers_list(self) -> None:
         allowed_baker = self.bootstrap_baker()
         another_allowed_baker = self.bootstrap_baker()
-        proposers_governance = self.deploy_proposers_governance(last_winner={
-            'payload': [pkh(allowed_baker), pkh(another_allowed_baker)],
-            'trigger_history' : {}
-        })
+        proposers_governance = self.deploy_proposers_governance(
+            last_winner=[pkh(allowed_baker), pkh(another_allowed_baker)]
+        )
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_proposers_governance(custom_config={
@@ -206,10 +204,9 @@ class ProposersGovernanceNewProposalTestCase(BaseTestCase):
 
     def test_should_not_fail_if_no_baker_is_in_the_allowed_proposers_list(self) -> None:
         no_baker = self.bootstrap_no_baker()
-        proposers_governance = self.deploy_proposers_governance(last_winner={
-            'payload': [pkh(no_baker)],
-            'trigger_history' : {}
-        })
+        proposers_governance = self.deploy_proposers_governance(
+            last_winner=[pkh(no_baker)]
+        )
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_proposers_governance(custom_config={
