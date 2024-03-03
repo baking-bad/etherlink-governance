@@ -12,13 +12,13 @@ PASS_VOTE = 'pass'
 
 class GovernanceBase(ContractHelper):
     @staticmethod
-    def make_storage(metadata: dict[str, Any], custom_config=None) -> dict[str, Any]:
+    def make_storage(metadata: dict[str, Any], custom_config=None, last_winner=None) -> dict[str, Any]:
         config = {
             'started_at_level': 0,
             'period_length': 10,
             'adoption_period_sec' : 60,
             'upvoting_limit': 20,
-            'allowed_proposers': [],
+            'proposers_governance_contract': None,
             'scale': 100,
             'proposal_quorum': 80,
             'promotion_quorum': 80,
@@ -28,9 +28,9 @@ class GovernanceBase(ContractHelper):
             config.update(custom_config)
 
         return {
-            'config' : config,
-            'voting_context' : None,
-            'last_winner' : None,
+            'config': config,
+            'voting_context': None,
+            'last_winner': last_winner,
             'metadata': {}
             # 'metadata': metadata
         }

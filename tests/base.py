@@ -8,6 +8,7 @@ from pytezos.rpc import RpcError
 from contextlib import contextmanager
 from tests.helpers.contracts.internal_test_proxy import InternalTestProxy
 from tests.helpers.contracts.rollup_mock import RollupMock
+from tests.helpers.contracts.security_governance_committee import SecurityGovernanceCommittee
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.utility import pkh
 from pytezos.contract.result import ContractCallResult
@@ -60,16 +61,23 @@ class BaseTestCase(SandboxedNodeTestCase):
     def deploy_kernel_governance(self, custom_config=None) -> KernelGovernance:
         """Deploys Kernel Governance contract"""
 
-        opg = KernelGovernance.originate(self.manager, custom_config=custom_config).send()
+        opg = KernelGovernance.originate(self.manager, custom_config).send()
         self.bake_block()
         return KernelGovernance.from_opg(self.manager, opg)
 
     def deploy_sequencer_governance(self, custom_config=None) -> SequencerGovernance:
         """Deploys Committee Governance contract"""
 
-        opg = SequencerGovernance.originate(self.manager, custom_config=custom_config).send()
+        opg = SequencerGovernance.originate(self.manager, custom_config).send()
         self.bake_block()
         return SequencerGovernance.from_opg(self.manager, opg)
+
+    def deploy_proposers_governance(self, custom_config=None, last_winner=None) -> SecurityGovernanceCommittee:
+        """Deploys Security Governance Committee contract"""
+
+        opg = SecurityGovernanceCommittee.originate(self.manager, custom_config, last_winner).send()
+        self.bake_block()
+        return SecurityGovernanceCommittee.from_opg(self.manager, opg)
 
     @contextmanager
     def raisesMichelsonError(self, error_message):

@@ -347,7 +347,7 @@
          ITER { CONS } ;
          ITER { CONCAT } ;
          UNPACK key_hash ;
-         PUSH string "IMPOSSIBLE_TO_CAST_ADDRESS_TO_KEY_HASH" ;
+         PUSH string "FAILED_TO_CAST_ADDRESS_TO_KEY_HASH" ;
          SWAP ;
          IF_NONE { FAILWITH } { SWAP ; DROP } } }
 

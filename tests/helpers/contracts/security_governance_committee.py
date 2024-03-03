@@ -12,7 +12,7 @@ from tests.helpers.metadata import Metadata
 
 class SecurityGovernanceCommittee(GovernanceBase):
     @classmethod
-    def originate(self, client: PyTezosClient, custom_config=None) -> OperationGroup:
+    def originate(self, client: PyTezosClient, custom_config=None, last_winner=None) -> OperationGroup:
         """Deploys Security Governance Committee"""
 
         metadata = Metadata.make_default(
@@ -20,7 +20,7 @@ class SecurityGovernanceCommittee(GovernanceBase):
             description='The Security Governance Committee contract allows bakers to make proposals and vote on allowed proposers for security governance contract',
         )
 
-        storage = self.make_storage(metadata, custom_config)
+        storage = self.make_storage(metadata, custom_config, last_winner)
         filename = join(get_build_dir(), 'security_governance_committee.tz')
 
         return originate_from_file(filename, client, storage)

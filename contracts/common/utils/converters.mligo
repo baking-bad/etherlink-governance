@@ -65,4 +65,4 @@ let address_to_key_hash
     let _ = assert_with_error (address_type = 0x00) Errors.not_implicit_address in
     let length = 0x00000015 in
     let key_hash_packed = Bytes.concats [(Bytes.sub 0n 2n address_packed); length; (Bytes.sub 7n 21n address_packed)] in
-    Option.value_with_error Errors.impossible_to_cast_address_to_key_hash (Bytes.unpack key_hash_packed) 
+    Option.value_with_error Errors.failed_to_cast_address_to_key_hash (Bytes.unpack key_hash_packed) 

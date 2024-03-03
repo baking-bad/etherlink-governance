@@ -1,22 +1,22 @@
 {
     "new_proposal_different_baker_nth_1": {
-        "consumed_gas": 6418,
+        "consumed_gas": 6424,
         "paid_storage_size_diff": 457
     },
     "new_proposal_different_baker_nth_2": {
-        "consumed_gas": 2038,
+        "consumed_gas": 2037,
         "paid_storage_size_diff": 238
     },
     "new_proposal_different_baker_nth_3": {
-        "consumed_gas": 2038,
+        "consumed_gas": 2037,
         "paid_storage_size_diff": 276
     },
     "new_proposal_different_baker_nth_4": {
-        "consumed_gas": 2038,
+        "consumed_gas": 2037,
         "paid_storage_size_diff": 276
     },
     "new_proposal_same_baker_nth_1": {
-        "consumed_gas": 6418,
+        "consumed_gas": 6424,
         "paid_storage_size_diff": 457
     },
     "new_proposal_same_baker_nth_2": {

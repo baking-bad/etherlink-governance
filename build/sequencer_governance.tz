@@ -9,7 +9,7 @@
              (nat %period_length)
              (int %adoption_period_sec)
              (nat %upvoting_limit)
-             (set %allowed_proposers address)
+             (option %proposers_governance_contract address)
              (nat %scale)
              (nat %proposal_quorum)
              (nat %promotion_quorum)
@@ -75,7 +75,7 @@
              ITER { CONS } ;
              ITER { CONCAT } ;
              UNPACK key_hash ;
-             PUSH string "IMPOSSIBLE_TO_CAST_ADDRESS_TO_KEY_HASH" ;
+             PUSH string "FAILED_TO_CAST_ADDRESS_TO_KEY_HASH" ;
              SWAP ;
              IF_NONE { FAILWITH } { SWAP ; DROP } } ;
          PUSH string "yea" ;
@@ -99,7 +99,7 @@
              GT ;
              IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
          LAMBDA
-           (pair nat nat int nat (set address) nat nat nat nat)
+           (pair nat nat int nat (option address) nat nat nat nat)
            nat
            { DUP ;
              CAR ;
@@ -329,7 +329,7 @@
                    { EMPTY_BIG_MAP address unit ; SWAP ; PAIR ; SOME } } ;
              DIG 2 ;
              SWAP ;
-             IF_NONE { PUSH string "LAST_WINNER_PAYLOAD_NOT_FOUND" ; FAILWITH } {} ;
+             IF_NONE { PUSH string "LAST_WINNER_NOT_FOUND" ; FAILWITH } {} ;
              DUP ;
              CDR ;
              DUP 5 ;
@@ -1356,17 +1356,16 @@
                      DUP 7 ;
                      CAR ;
                      GET 9 ;
-                     PUSH nat 0 ;
-                     DUP 2 ;
-                     SIZE ;
-                     COMPARE ;
-                     EQ ;
-                     IF { DROP ; DUP ; DIG 8 ; SWAP ; EXEC ; DROP }
-                        { DIG 8 ;
-                          DROP ;
-                          DUP 3 ;
-                          MEM ;
-                          IF {} { PUSH string "PROPOSER_NOT_ALLOWED" ; FAILWITH } } ;
+                     IF_NONE
+                       { DUP ; DIG 8 ; SWAP ; EXEC ; DROP }
+                       { DIG 8 ;
+                         DROP ;
+                         DUP 3 ;
+                         VIEW "check_address_in_committee" bool ;
+                         IF_NONE
+                           { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
+                           {} ;
+                         IF {} { PUSH string "PROPOSER_NOT_IN_COMMITTEE" ; FAILWITH } } ;
                      DUP 3 ;
                      GET 3 ;
                      IF_LEFT { DIG 8 ; DROP 2 } { DROP ; DIG 7 ; FAILWITH } ;

@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.errors import (
-    INCORRECT_L2_ADDRESS_SIZE, INCORRECT_PUBLIC_KEY_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_ALLOWED, 
+    INCORRECT_L2_ADDRESS_SIZE, INCORRECT_PUBLIC_KEY_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_IN_COMMITTEE, 
     UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_sequencer_payload, pkh
@@ -161,25 +161,29 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         allowed_baker = self.bootstrap_baker()
         another_allowed_baker = self.bootstrap_baker()
         disallowed_baker = self.bootstrap_baker()
+        proposers_governance = self.deploy_proposers_governance(last_winner={
+            'payload': [pkh(allowed_baker), pkh(another_allowed_baker)],
+            'trigger_history' : {}
+        })
         governance = self.deploy_sequencer_governance(custom_config={
-            'allowed_proposers': [pkh(allowed_baker), pkh(another_allowed_baker)]
+            'proposers_governance_contract': proposers_governance.address
         })
 
         payload = {
             'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
             'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
-        with self.raisesMichelsonError(PROPOSER_NOT_ALLOWED):
+        with self.raisesMichelsonError(PROPOSER_NOT_IN_COMMITTEE):
             governance.using(disallowed_baker).new_proposal(payload['public_key'], payload['l2_address']).send()
 
-    def test_should_not_fail_if_allowed_proposers_list_is_empty(self) -> None:
+    def test_should_not_fail_if_proposers_governance_contract_address_is_none(self) -> None:
         disallowed_baker = self.bootstrap_baker()
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'allowed_proposers': []
+            'proposers_governance_contract': None
         })
 
         payload = {
@@ -206,12 +210,16 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_not_fail_if_proposer_is_in_the_allowed_proposers_list(self) -> None:
         allowed_baker = self.bootstrap_baker()
         another_allowed_baker = self.bootstrap_baker()
+        proposers_governance = self.deploy_proposers_governance(last_winner={
+            'payload': [pkh(allowed_baker), pkh(another_allowed_baker)],
+            'trigger_history' : {}
+        })
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'allowed_proposers': [pkh(allowed_baker), pkh(another_allowed_baker)]
+            'proposers_governance_contract': proposers_governance.address
         })
 
         payload = {
@@ -237,12 +245,16 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
 
     def test_should_not_fail_if_no_baker_is_in_the_allowed_proposers_list(self) -> None:
         no_baker = self.bootstrap_no_baker()
+        proposers_governance = self.deploy_proposers_governance(last_winner={
+            'payload': [pkh(no_baker)],
+            'trigger_history' : {}
+        })
         # deploying will take 1 block
         governance_started_at_level = self.get_current_level() + 1 
         governance = self.deploy_sequencer_governance(custom_config={
             'started_at_level': governance_started_at_level,
             'period_length': 3,
-            'allowed_proposers': [pkh(no_baker)]
+            'proposers_governance_contract': proposers_governance.address
         })
 
         payload = {

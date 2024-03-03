@@ -63,10 +63,8 @@ def originate_contract(contract_type, manager, config):
     help='For example if scale = 100 and proposal_quorum = 80 then proposal_quorum == .80 == 80%',
 )
 @click.option(
-    '--allowed_proposer',
-    default=[],
-    multiple=True,
-    help='an accounts that can submit new proposals (if set is empty then anyone is allowed)',
+    '--proposers_governance_contract',
+    help='Another governance contract which keeps accounts that can submit new proposals (if None then anyone is allowed)',
 )
 @click.option('--private-key', default=None, help='Use the provided private key.')
 @click.option('--rpc-url', default=None, help='Tezos RPC URL.')
@@ -80,7 +78,7 @@ def deploy_contract(
     promotion_quorum: int,
     promotion_supermajority: int,
     scale: int,
-    allowed_proposer: list[str],
+    proposers_governance_contract: Optional[str],
     private_key: Optional[str],
     rpc_url: Optional[str],
 ) -> KernelGovernance:
@@ -95,7 +93,7 @@ def deploy_contract(
         'adoption_period_sec' : int(adoption_period_sec),
         'upvoting_limit': int(upvoting_limit),
         'scale': int(scale),
-        'allowed_proposers': list(allowed_proposer),
+        'proposers_governance_contract': proposers_governance_contract,
         'proposal_quorum': int(proposal_quorum),
         'promotion_quorum': int(promotion_quorum),
         'promotion_supermajority': int(promotion_supermajority),

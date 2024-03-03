@@ -3,7 +3,7 @@ from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import YEA_VOTE
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.errors import (
-    LAST_WINNER_PAYLOAD_NOT_FOUND,
+    LAST_WINNER_NOT_FOUND,
     UPGRADE_FOR_ADDRESS_ALREADY_TRIGGERED,
     XTZ_IN_TRANSACTION_DISALLOWED
 )
@@ -46,7 +46,7 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
         baker = self.bootstrap_baker()
         governance = self.deploy_sequencer_governance()
 
-        with self.raisesMichelsonError(LAST_WINNER_PAYLOAD_NOT_FOUND):
+        with self.raisesMichelsonError(LAST_WINNER_NOT_FOUND):
             governance.using(baker).trigger_committee_upgrade(DEFAULT_ADDRESS).send()
 
     def test_should_allow_no_baker_to_trigger_upgrade(self) -> None:
