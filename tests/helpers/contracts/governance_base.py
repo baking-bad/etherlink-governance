@@ -30,6 +30,7 @@ class GovernanceBase(ContractHelper):
         return {
             'config' : config,
             'voting_context' : None,
+            'last_winner' : None,
             'metadata': {}
             # 'metadata': metadata
         }

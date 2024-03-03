@@ -150,17 +150,8 @@ let init_new_voting_state
             let promotion_period = Option.value_with_error Errors.promotion_period_not_found voting_context.promotion_period in
             let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
             let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
-            let new_proposal_voting_context = init_new_proposal_voting_period period_index voting_context in
-            let updated_voting_context = (match promotion_winner with
-                | Some promotion_winner -> 
-                    {
-                        new_proposal_voting_context with
-                        last_winner_payload = (Some promotion_winner);
-                        last_winner_trigger_history = Big_map.empty;
-                    }
-                | None -> new_proposal_voting_context) in
             { 
-                voting_context = updated_voting_context;
+                voting_context = init_new_proposal_voting_period period_index voting_context;
                 finished_voting = finished_voting;
             }
 
@@ -174,17 +165,21 @@ let init_voting_context
         period_type = Proposal;
         proposal_period = get_new_proposal_period_content ();
         promotion_period = None;
-        last_winner_payload = None;
-        last_winner_trigger_history = Big_map.empty;
     }
 
+
+type 'pt extended_voting_state_t = {
+    voting_context : 'pt Storage.voting_context_t;
+    last_winner : 'pt Storage.voting_winner_t option;
+    finished_voting : 'pt Events.voting_finished_event_payload_t option;
+}
 
 let get_voting_state
         (type pt)
         (storage : pt Storage.t)
-        : pt voting_state_t = 
+        : pt extended_voting_state_t = 
     let period_index = get_period_index storage.config in
-    match storage.voting_context with
+    let voting_state = match storage.voting_context with
         | None ->  
             {
                 voting_context = init_voting_context period_index;
@@ -193,7 +188,21 @@ let get_voting_state
         | Some voting_context -> 
             if period_index = voting_context.period_index 
                 then { voting_context = voting_context; finished_voting = None; } 
-                else init_new_voting_state voting_context storage.config period_index
+                else init_new_voting_state voting_context storage.config period_index in
+    let { voting_context; finished_voting } = voting_state in
+    {
+        voting_context = voting_context;
+        finished_voting = finished_voting;
+        last_winner = match finished_voting with
+            | Some event -> (match event.winner_proposal_payload with
+                | Some winner_payload -> 
+                    Some {
+                        payload = winner_payload;
+                        trigger_history = Big_map.empty;
+                    }
+                | None -> storage.last_winner)
+            | None -> storage.last_winner
+    }
 
 
 [@inline]

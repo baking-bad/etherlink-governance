@@ -97,12 +97,16 @@ type 'pt voting_context_t = {
     period_type : period_type_t;
     proposal_period : 'pt proposal_period_t;
     promotion_period : promotion_period_t option;
-    last_winner_payload : 'pt option;
-    last_winner_trigger_history : (address, unit) big_map;
+}
+
+type 'pt voting_winner_t = {
+    payload : 'pt;
+    trigger_history : (address, unit) big_map;
 }
 
 type 'pt t = {
     config : config_t;
     voting_context : ('pt voting_context_t) option;
+    last_winner : ('pt voting_winner_t) option;
     metadata : (string, bytes) big_map;
 }

@@ -52,7 +52,7 @@ module SecurityGovernanceCommittee = struct
             (storage : storage_t) 
             : bool = 
         let voting_state = Voting.get_voting_state storage in
-        let voting_context = voting_state.voting_context in
-        let committee = Option.unopt_with_error voting_context.last_winner_payload Errors.last_winner_payload_not_found in
-        Set.mem address committee
+        let last_winner = voting_state.last_winner in
+        let last_winner = Option.unopt_with_error last_winner Errors.last_winner_payload_not_found in
+        Set.mem address last_winner.payload
 end
