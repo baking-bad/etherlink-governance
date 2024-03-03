@@ -15,7 +15,7 @@ let check_proposer_in_committee
         (proposer : address)
         (proposers_governance_contract : address)
         : bool = 
-    let view_result = Tezos.call_view "check_address_in_committee" proposer proposers_governance_contract in
+    let view_result = Tezos.call_view "check_address_in_last_winner" proposer proposers_governance_contract in
     match view_result with
         | Some result -> result
         | None -> failwith Errors.failed_to_check_proposer_in_committee

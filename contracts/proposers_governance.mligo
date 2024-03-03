@@ -10,7 +10,7 @@ module ProposersCommitteeGovernance = struct
         The contract includes, as a payload, the addresses of allowed proposers for the main governance contract, 
         which in turn utilizes the check_address_in_committee view of this contract to verify allowed proposers.
     *)
-    let max_committee_size = 20n
+    let max_addresses_size = 20n
 
     type payload_t = address set 
     type storage_t = payload_t Storage.t
@@ -22,7 +22,7 @@ module ProposersCommitteeGovernance = struct
             (addresses : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = assert_with_error (Set.size addresses <= max_committee_size) Errors.incorrect_committee_size in
+        let _ = assert_with_error (Set.size addresses <= max_addresses_size) Errors.incorrect_addresses_size in
         Entrypoints.new_proposal addresses storage
   
 
@@ -51,7 +51,7 @@ module ProposersCommitteeGovernance = struct
 
 
     [@view] 
-    let check_address_in_committee
+    let check_address_in_last_winner
             (address : address) 
             (storage : storage_t) 
             : bool = 

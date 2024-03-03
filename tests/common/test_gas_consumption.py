@@ -2,7 +2,7 @@ import secrets
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import YEA_VOTE
 from tests.helpers.operation_result_recorder import OperationResultRecorder
-from tests.helpers.utility import find_op_by_hash, get_tests_dir
+from tests.helpers.utility import find_op_by_hash, get_tests_dir, pkh
 from pytezos.operation.result import OperationResult
 from os.path import join
 
@@ -48,6 +48,30 @@ class KernelGovernanceGasConsumptionTestCase(BaseTestCase):
             self.bake_block()
             op = find_op_by_hash(self.manager, opg)
             self.recorder.add_element(f'new_proposal_different_baker_nth_{i + 1}', op)
+
+    def test_new_proposal_with_proposers_governance(self) -> None:
+        baker1 = self.bootstrap_baker()
+        baker2 = self.bootstrap_baker()
+        baker3 = self.bootstrap_baker()
+        baker4 = self.bootstrap_baker()
+        proposers_governance = self.deploy_proposers_governance(last_winner={
+            'payload': [pkh(baker1), pkh(baker2), pkh(baker3), pkh(baker4)],
+            'trigger_history' : {}
+        })
+        governance_started_at_level = self.get_current_level() + 1
+        governance = self.deploy_kernel_governance(custom_config={
+            'started_at_level': governance_started_at_level,
+            'period_length': 500,
+            'upvoting_limit': 500,
+            'proposers_governance_contract': proposers_governance.address
+        })
+
+        for i, baker in enumerate([baker1, baker2, baker3, baker4]):
+            random_bytes = secrets.token_bytes(33)
+            opg = governance.using(baker).new_proposal(random_bytes).send()
+            self.bake_block()
+            op = find_op_by_hash(self.manager, opg)
+            self.recorder.add_element(f'test_new_proposal_with_proposers_governance_nth_{i + 1}', op)
 
     def test_new_proposal_with_event(self) -> None:
         baker1 = self.bootstrap_baker()

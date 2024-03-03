@@ -715,7 +715,7 @@
                  SIZE ;
                  COMPARE ;
                  LE ;
-                 IF {} { PUSH string "INCORRECT_COMMITTEE_SIZE" ; FAILWITH } ;
+                 IF {} { PUSH string "INCORRECT_ADDRESSES_SIZE" ; FAILWITH } ;
                  DUP 2 ;
                  CAR ;
                  DIG 3 ;
@@ -935,7 +935,7 @@
                    { DIG 8 ;
                      DROP ;
                      DUP 3 ;
-                     VIEW "check_address_in_committee" bool ;
+                     VIEW "check_address_in_last_winner" bool ;
                      IF_NONE
                        { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
                        {} ;
@@ -1277,7 +1277,7 @@
          DIG 3 ;
          CAR ;
          PAIR 4 } ;
-  view "check_address_in_committee"
+  view "check_address_in_last_winner"
        address
        bool
        { UNPAIR ;
