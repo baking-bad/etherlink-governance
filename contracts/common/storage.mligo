@@ -24,7 +24,7 @@ type config_t = {
         Used to generate an upgrade payload with activation timestamp 
         on trigger_upgrade entrypoint call 
     *)
-    adoption_period_sec : int;
+    adoption_period_sec : nat;
 #endif
 
     (* Number of proposals that an account may upvote and submit *)

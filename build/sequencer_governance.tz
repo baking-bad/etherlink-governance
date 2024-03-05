@@ -7,7 +7,7 @@
     (pair (pair %config
              (nat %started_at_level)
              (nat %period_length)
-             (int %adoption_period_sec)
+             (nat %adoption_period_sec)
              (nat %upvoting_limit)
              (option %proposers_governance_contract address)
              (nat %scale)
@@ -99,7 +99,7 @@
              GT ;
              IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
          LAMBDA
-           (pair nat nat int nat (option address) nat nat nat nat)
+           (pair nat nat nat nat (option address) nat nat nat nat)
            nat
            { DUP ;
              CAR ;
@@ -344,6 +344,7 @@
              DUP 7 ;
              CAR ;
              GET 5 ;
+             INT ;
              NOW ;
              ADD ;
              DUP 2 ;

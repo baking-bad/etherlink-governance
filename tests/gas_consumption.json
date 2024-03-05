@@ -1,6 +1,6 @@
 {
     "new_proposal_different_baker_nth_1": {
-        "consumed_gas": 6424,
+        "consumed_gas": 6425,
         "paid_storage_size_diff": 457
     },
     "new_proposal_different_baker_nth_2": {
