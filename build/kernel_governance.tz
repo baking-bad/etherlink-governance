@@ -73,6 +73,38 @@
              PUSH string "FAILED_TO_CAST_ADDRESS_TO_KEY_HASH" ;
              SWAP ;
              IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+         LAMBDA
+           (pair (lambda nat bytes) (pair nat nat))
+           bytes
+           { UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             PUSH nat 56 ;
+             DUP 2 ;
+             COMPARE ;
+             LT ;
+             IF { ADD ; EXEC }
+                { DUP 3 ;
+                  SWAP ;
+                  EXEC ;
+                  DUP ;
+                  SIZE ;
+                  PUSH nat 9 ;
+                  DUP 2 ;
+                  COMPARE ;
+                  LT ;
+                  IF {} { PUSH string "INPUT_TOO_LONG_FOR_RLP" ; FAILWITH } ;
+                  PUSH nat 55 ;
+                  DIG 3 ;
+                  DIG 2 ;
+                  ADD ;
+                  ADD ;
+                  DIG 2 ;
+                  SWAP ;
+                  EXEC ;
+                  CONCAT } } ;
+         DUP 3 ;
+         APPLY ;
          PUSH string "yea" ;
          PUSH string "nay" ;
          LAMBDA
@@ -109,14 +141,14 @@
                  EDIV ;
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR } } ;
-         DIG 9 ;
+         DIG 10 ;
          UNPAIR ;
          IF_LEFT
            { DIG 3 ;
              DIG 5 ;
              DIG 6 ;
-             DIG 7 ;
-             DIG 10 ;
+             DIG 8 ;
+             DIG 11 ;
              DROP 5 ;
              UNIT ;
              DIG 4 ;
@@ -131,7 +163,7 @@
              DUP 3 ;
              GET 3 ;
              IF_NONE
-               { DIG 4 ;
+               { DIG 5 ;
                  DROP ;
                  NONE (pair nat (or unit unit) (option bytes)) ;
                  NONE (pair (big_map address unit) nat nat nat nat) ;
@@ -151,13 +183,13 @@
                  DUP 3 ;
                  COMPARE ;
                  EQ ;
-                 IF { SWAP ; DIG 5 ; DROP 2 ; NONE (pair nat (or unit unit) (option bytes)) ; SWAP }
+                 IF { SWAP ; DIG 6 ; DROP 2 ; NONE (pair nat (or unit unit) (option bytes)) ; SWAP }
                     { DUP 4 ;
                       CAR ;
                       DUP 2 ;
                       GET 3 ;
                       IF_LEFT
-                        { DIG 7 ;
+                        { DIG 8 ;
                           DROP 2 ;
                           DUP 2 ;
                           GET 5 ;
@@ -258,7 +290,7 @@
                         { DROP ;
                           DUP 2 ;
                           GET 6 ;
-                          IF_NONE { DIG 6 ; FAILWITH } { DIG 7 ; DROP } ;
+                          IF_NONE { DIG 7 ; FAILWITH } { DIG 8 ; DROP } ;
                           UNPAIR 5 ;
                           DROP ;
                           DIG 3 ;
@@ -349,7 +381,7 @@
              SWAP ;
              SUB ;
              ABS ;
-             DUP 8 ;
+             DIG 8 ;
              SWAP ;
              EXEC ;
              PUSH bytes 0x ;
@@ -408,73 +440,39 @@
                     COMPARE ;
                     LE } ;
              DROP 3 ;
-             PUSH bytes 0x ;
              NIL bytes ;
-             DIG 2 ;
+             SWAP ;
              CONS ;
-             DUP 4 ;
+             DUP 3 ;
              CAR ;
              CONS ;
-             ITER { SWAP ;
-                    DUP 2 ;
-                    SIZE ;
-                    PUSH nat 55 ;
-                    DUP 2 ;
-                    COMPARE ;
-                    LE ;
-                    IF { PUSH nat 128 ; ADD ; DUP 10 ; SWAP ; EXEC }
-                       { DUP 10 ;
-                         SWAP ;
-                         EXEC ;
-                         NIL bytes ;
-                         DUP 2 ;
-                         CONS ;
-                         PUSH nat 183 ;
-                         DIG 2 ;
-                         SIZE ;
-                         ADD ;
-                         DUP 11 ;
-                         SWAP ;
-                         EXEC ;
-                         CONS ;
-                         PUSH bytes 0x ;
-                         SWAP ;
-                         NIL bytes ;
-                         SWAP ;
-                         ITER { CONS } ;
-                         ITER { CONCAT } } ;
-                    DIG 2 ;
-                    SWAP ;
-                    CONCAT ;
-                    SWAP ;
-                    CONCAT } ;
-             DUP ;
-             SIZE ;
-             PUSH nat 55 ;
+             MAP { DUP ;
+                   SIZE ;
+                   PUSH bytes 0x80 ;
+                   DUP 3 ;
+                   COMPARE ;
+                   LT ;
+                   PUSH nat 1 ;
+                   DUP 3 ;
+                   COMPARE ;
+                   EQ ;
+                   AND ;
+                   IF { DROP ; PUSH bytes 0x }
+                      { PUSH nat 128 ; SWAP ; PAIR ; DUP 9 ; SWAP ; EXEC } ;
+                   CONCAT } ;
+             PUSH bytes 0x ;
+             SWAP ;
+             NIL bytes ;
+             SWAP ;
+             ITER { CONS } ;
+             ITER { CONCAT } ;
+             PUSH nat 192 ;
              DUP 2 ;
-             COMPARE ;
-             LE ;
-             IF { PUSH nat 192 ; ADD ; DIG 8 ; SWAP ; EXEC }
-                { DUP 9 ;
-                  SWAP ;
-                  EXEC ;
-                  NIL bytes ;
-                  DUP 2 ;
-                  CONS ;
-                  PUSH nat 247 ;
-                  DIG 2 ;
-                  SIZE ;
-                  ADD ;
-                  DIG 9 ;
-                  SWAP ;
-                  EXEC ;
-                  CONS ;
-                  PUSH bytes 0x ;
-                  SWAP ;
-                  NIL bytes ;
-                  SWAP ;
-                  ITER { CONS } ;
-                  ITER { CONCAT } } ;
+             SIZE ;
+             PAIR ;
+             DIG 8 ;
+             SWAP ;
+             EXEC ;
              CONCAT ;
              RIGHT (or (pair bytes (ticket (pair nat (option bytes)))) bytes) ;
              SWAP ;
@@ -508,8 +506,9 @@
              SWAP ;
              DIG 2 ;
              CONS }
-           { DIG 8 ;
-             DROP ;
+           { DIG 7 ;
+             DIG 9 ;
+             DROP 2 ;
              IF_LEFT
                { DIG 9 ;
                  DROP ;
