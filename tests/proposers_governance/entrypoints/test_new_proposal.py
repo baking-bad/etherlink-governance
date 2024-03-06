@@ -3,7 +3,7 @@ from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_P
 from tests.helpers.errors import (
     INCORRECT_ADDRESSES_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, 
     PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_IN_COMMITTEE, UPVOTING_LIMIT_EXCEEDED, 
-    XTZ_IN_TRANSACTION_DISALLOWED
+    TEZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, TEST_ADDRESSES_SET, pkh
 
@@ -19,12 +19,12 @@ class ProposersGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker).new_proposal(TEST_ADDRESSES_SET[0:20]).send()
         self.bake_block()
 
-    def test_should_fail_if_xtz_in_transaction(self) -> None:
+    def test_should_fail_if_tez_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
         governance = self.deploy_proposers_governance()
 
         addresses = TEST_ADDRESSES_SET[0:3]
-        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
+        with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).new_proposal(addresses).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:

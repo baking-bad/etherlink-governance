@@ -15,7 +15,7 @@ let new_proposal
     let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
     let proposer = Tezos.get_sender () in
     let voting_power = Tezos.voting_power (Converters.address_to_key_hash proposer) in
-    let _ = Validation.assert_no_xtz_in_transaction () in
+    let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_proposer_allowed proposer voting_power storage.config.proposers_governance_contract in
     let _ = Voting.assert_current_period_proposal voting_context in
     let updated_proposal_period = Voting.add_new_proposal_and_upvote payload proposer voting_power voting_context.proposal_period storage.config in
@@ -38,7 +38,7 @@ let upvote_proposal
     let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
     let upvoter = Tezos.get_sender () in
     let voting_power = Tezos.voting_power (Converters.address_to_key_hash upvoter) in
-    let _ = Validation.assert_no_xtz_in_transaction () in
+    let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_proposal voting_context in
     let updated_proposal_period = Voting.upvote_proposal payload upvoter voting_power voting_context.proposal_period storage.config in
@@ -61,7 +61,7 @@ let vote
     let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
     let voter = Tezos.get_sender () in
     let voting_power = Tezos.voting_power (Converters.address_to_key_hash voter) in
-    let _ = Validation.assert_no_xtz_in_transaction () in
+    let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_promotion voting_context in
     let promotion_period = Option.value_with_error Errors.promotion_period_context_not_exist voting_context.promotion_period  in
@@ -84,7 +84,7 @@ let trigger_rollup_upgrade
         (storage : pt Storage.t)
         (pack_payload : pt -> bytes)
         : operation list * pt Storage.t =
-    let _ = Validation.assert_no_xtz_in_transaction () in
+    let _ = Validation.assert_no_tez_in_transaction () in
     let { voting_context; finished_voting; last_winner = last_winner_opt } = Voting.get_voting_state storage in
     let last_winner = Option.value_with_error Errors.last_winner_not_found last_winner_opt  in
     let last_winner_trigger_history = last_winner.trigger_history in

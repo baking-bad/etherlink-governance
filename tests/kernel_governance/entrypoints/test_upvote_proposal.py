@@ -2,17 +2,17 @@ from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD
 from tests.helpers.errors import (
     NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_UPVOTED, 
-    UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
+    UPVOTING_LIMIT_EXCEEDED, TEZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER
 
 class KernelGovernanceUpvoteProposalTestCase(BaseTestCase):
-    def test_should_fail_if_xtz_in_transaction(self) -> None:
+    def test_should_fail_if_tez_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
         governance = self.deploy_kernel_governance()
 
         kernel_root_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
+        with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).upvote_proposal(kernel_root_hash).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:

@@ -3,7 +3,7 @@ from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_P
 from tests.helpers.errors import (
     INCORRECT_KERNEL_ROOT_HASH_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, 
     PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_IN_COMMITTEE, UPVOTING_LIMIT_EXCEEDED, 
-    XTZ_IN_TRANSACTION_DISALLOWED
+    TEZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pkh
 
@@ -19,12 +19,12 @@ class KernelGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker).new_proposal(bytes.fromhex('009279df4982e47cf101e2525b605fa06cd3ccc0f67d1c792a6a3ea56af9606abc')).send()
         self.bake_block()
 
-    def test_should_fail_if_xtz_in_transaction(self) -> None:
+    def test_should_fail_if_tez_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
         governance = self.deploy_kernel_governance()
 
         kernel_root_hash = bytes.fromhex('010101010101010101010101010101010101010101010101010101010101010101')
-        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
+        with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).new_proposal(kernel_root_hash).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:

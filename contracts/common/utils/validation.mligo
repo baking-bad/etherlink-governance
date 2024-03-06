@@ -1,9 +1,9 @@
 #import "../errors.mligo" "Errors"
 
-let assert_no_xtz_in_transaction
+let assert_no_tez_in_transaction
         (_ : unit)
         : unit =
-    assert_with_error (Tezos.get_amount () = 0mutez) Errors.xtz_in_transaction_disallowed 
+    assert_with_error (Tezos.get_amount () = 0mutez) Errors.tez_in_transaction_disallowed 
 
 let assert_voting_power_positive
         (voting_power : nat)

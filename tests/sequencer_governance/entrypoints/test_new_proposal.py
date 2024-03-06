@@ -2,7 +2,7 @@ from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.errors import (
     INCORRECT_L2_ADDRESS_SIZE, INCORRECT_PUBLIC_KEY_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_IN_COMMITTEE, 
-    UPVOTING_LIMIT_EXCEEDED, XTZ_IN_TRANSACTION_DISALLOWED
+    UPVOTING_LIMIT_EXCEEDED, TEZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_sequencer_payload, pkh
 
@@ -19,13 +19,13 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         governance.using(baker).new_proposal('edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X', 'B7A97043983f24991398E5a82f63F4C58a417185').send()
         self.bake_block()
 
-    def test_should_fail_if_xtz_in_transaction(self) -> None:
+    def test_should_fail_if_tez_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
         governance = self.deploy_sequencer_governance()
 
         public_key = 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X'
         l2_address = 'B7A97043983f24991398E5a82f63F4C58a417185'
-        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
+        with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).new_proposal(public_key, l2_address).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:

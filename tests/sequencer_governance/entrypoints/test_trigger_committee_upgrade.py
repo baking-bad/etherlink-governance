@@ -5,7 +5,7 @@ from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.errors import (
     LAST_WINNER_NOT_FOUND,
     UPGRADE_FOR_ADDRESS_ALREADY_TRIGGERED,
-    XTZ_IN_TRANSACTION_DISALLOWED
+    TEZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_ADDRESS
 import re
@@ -35,11 +35,11 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
             'baker': baker,
         }
 
-    def test_should_fail_if_xtz_in_transaction(self) -> None:
+    def test_should_fail_if_tez_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
         governance = self.deploy_sequencer_governance()
 
-        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
+        with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).trigger_committee_upgrade(DEFAULT_ADDRESS).with_amount(1).send()
 
     def test_should_fail_if_there_is_no_last_winner_payload(self) -> None:

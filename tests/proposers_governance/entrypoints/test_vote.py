@@ -2,16 +2,16 @@ from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import NAY_VOTE, PASS_VOTE, PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.errors import (
     INCORRECT_VOTE_VALUE, NO_VOTING_POWER, NOT_PROMOTION_PERIOD, PROMOTION_ALREADY_VOTED, 
-    XTZ_IN_TRANSACTION_DISALLOWED
+    TEZ_IN_TRANSACTION_DISALLOWED
 )
 from tests.helpers.utility import DEFAULT_VOTING_POWER, DEFAULT_TOTAL_VOTING_POWER, TEST_ADDRESSES_SET
 
 class ProposersGovernanceNewProposalTestCase(BaseTestCase):
-    def test_should_fail_if_xtz_in_transaction(self) -> None:
+    def test_should_fail_if_tez_in_transaction(self) -> None:
         baker = self.bootstrap_baker()
         governance = self.deploy_proposers_governance()
 
-        with self.raisesMichelsonError(XTZ_IN_TRANSACTION_DISALLOWED):
+        with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
             governance.using(baker).vote(YEA_VOTE).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:

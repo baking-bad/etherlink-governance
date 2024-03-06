@@ -75,7 +75,7 @@
            unit
            unit
            { DROP ;
-             PUSH string "XTZ_IN_TRANSACTION_DISALLOWED" ;
+             PUSH string "TEZ_IN_TRANSACTION_DISALLOWED" ;
              PUSH mutez 0 ;
              AMOUNT ;
              COMPARE ;
