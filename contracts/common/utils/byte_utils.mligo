@@ -1,5 +1,3 @@
-#import "../errors.mligo" "Errors"
-
 let pad_end
         (source : bytes)
         (target_length : nat)

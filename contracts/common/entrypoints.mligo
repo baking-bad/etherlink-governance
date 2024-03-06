@@ -3,7 +3,7 @@
 #import "voting.mligo" "Voting"
 #import "rollup.mligo" "Rollup"
 #import "events.mligo" "Events"
-#import "utils/validation.mligo" "Validation"
+#import "validation.mligo" "Validation"
 #import "utils/converters.mligo" "Converters"
 
 
