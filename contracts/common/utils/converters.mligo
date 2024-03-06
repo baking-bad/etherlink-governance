@@ -25,7 +25,7 @@ let nat_to_little_endian_bytes
 let timestamp_to_nat
         (value : timestamp)
         : nat =
-    abs (value - (0 : timestamp))
+    Option.value_with_error Errors.negative_timestamp (is_nat (value - (0 : timestamp)))
 
 let address_to_key_hash
         (address : address)

@@ -400,7 +400,10 @@
              PUSH timestamp 0 ;
              DIG 3 ;
              SUB ;
-             ABS ;
+             ISNAT ;
+             PUSH string "NEGATIVE_TIMESTAMP" ;
+             SWAP ;
+             IF_NONE { FAILWITH } { SWAP ; DROP } ;
              DIG 11 ;
              SWAP ;
              EXEC ;

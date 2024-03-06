@@ -93,6 +93,7 @@ let decode_upgrade_payload
         | M_right bytes -> bytes
         | M_left _ -> failwith Errors.wrong_rollup_entrypoint
 
+
 let get_activation_timestamp
         (adoption_period_sec : nat)
         : timestamp =
