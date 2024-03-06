@@ -52,10 +52,8 @@ let get_promotion_winner
     let { total_voting_power; yea_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
     let quorum_reached = (yea_voting_power + nay_voting_power + pass_voting_power) * config.scale >= config.promotion_quorum * total_voting_power in
     let yea_nay_voting_sum = yea_voting_power + nay_voting_power in
-    let super_majority_reached = if yea_nay_voting_sum > 0n
-        then yea_voting_power * config.scale >= config.promotion_supermajority * yea_nay_voting_sum
-        else false in
-    if quorum_reached && super_majority_reached 
+    let supermajority_reached = yea_nay_voting_sum > 0n && yea_voting_power * config.scale >= config.promotion_supermajority * yea_nay_voting_sum in
+    if quorum_reached && supermajority_reached 
         then winner_candidate
         else None
 

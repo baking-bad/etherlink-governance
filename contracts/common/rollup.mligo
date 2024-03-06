@@ -42,7 +42,7 @@ let timestamp_to_padded_little_endian_bytes
         : bytes =
     let timestamp_number : nat = Converters.timestamp_to_nat value in
     let timestamp_bytes = Converters.nat_to_little_endian_bytes timestamp_number in
-    ByteUtils.pad_end timestamp_bytes 8n 0x00
+    ByteUtils.pad_end timestamp_bytes 8n
 
 
 let assert_kernel_root_hash_has_correct_size
