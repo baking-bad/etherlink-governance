@@ -1335,21 +1335,22 @@
                      DIG 9 ;
                      SWAP ;
                      EXEC ;
+                     DUP ;
                      VOTING_POWER ;
                      UNIT ;
-                     DIG 9 ;
+                     DIG 10 ;
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DUP 7 ;
+                     DUP 8 ;
                      CAR ;
                      GET 9 ;
                      IF_NONE
-                       { DUP ; DIG 8 ; SWAP ; EXEC ; DROP }
-                       { DIG 8 ;
+                       { SWAP ; DROP ; DUP ; DIG 8 ; SWAP ; EXEC ; DROP }
+                       { DIG 9 ;
                          DROP ;
-                         DUP 3 ;
-                         VIEW "check_address_in_last_winner" bool ;
+                         DIG 2 ;
+                         VIEW "check_key_hash_in_last_winner" bool ;
                          IF_NONE
                            { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
                            {} ;

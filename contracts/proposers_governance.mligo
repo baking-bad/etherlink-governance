@@ -7,31 +7,31 @@
 module ProposersCommitteeGovernance = struct
     (*
         This contract serves as a supplementary contract for other governance contracts. 
-        The contract includes, as a payload, the addresses of allowed proposers for the main governance contract, 
-        which in turn utilizes the check_address_in_committee view of this contract to verify allowed proposers.
+        The contract includes, as a payload, the key hash set of allowed proposers for the main governance contract, 
+        which in turn utilizes the check_key_hash_in_last_winner view of this contract to verify allowed proposers.
     *)
-    let max_addresses_size = 20n
+    let max_key_hash_set_size = 20n
 
-    type payload_t = address set 
+    type payload_t = key_hash set 
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
 
 
     [@entry] 
     let new_proposal 
-            (addresses : payload_t)
+            (key_hash_set : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = assert_with_error (Set.size addresses <= max_addresses_size) Errors.incorrect_addresses_size in
-        Entrypoints.new_proposal addresses storage
+        let _ = assert_with_error (Set.size key_hash_set <= max_key_hash_set_size) Errors.incorrect_key_hash_set_size in
+        Entrypoints.new_proposal key_hash_set storage
   
 
     [@entry]
     let upvote_proposal 
-            (addresses : payload_t)
+            (key_hash_set : payload_t)
             (storage : storage_t) 
             : return_t = 
-        Entrypoints.upvote_proposal addresses storage
+        Entrypoints.upvote_proposal key_hash_set storage
   
 
     [@entry]
@@ -51,12 +51,11 @@ module ProposersCommitteeGovernance = struct
 
 
     [@view] 
-    let check_address_in_last_winner
-            (address : address) 
+    let check_key_hash_in_last_winner
+            (key_hash : key_hash) 
             (storage : storage_t) 
             : bool = 
         let voting_state = Voting.get_voting_state storage in
-        let last_winner = voting_state.last_winner in
-        let last_winner = Option.unopt_with_error last_winner Errors.last_winner_not_found in
-        Set.mem address last_winner.payload
+        let last_winner = Option.unopt_with_error voting_state.last_winner Errors.last_winner_not_found in
+        Set.mem key_hash last_winner.payload
 end

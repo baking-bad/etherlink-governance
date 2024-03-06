@@ -11,16 +11,16 @@ let assert_voting_power_positive
     assert_with_error (voting_power > 0n) Errors.no_voting_power
 
 let check_proposer_in_committee 
-        (proposer : address)
+        (proposer : key_hash)
         (proposers_governance_contract : address)
         : bool = 
-    let view_result = Tezos.call_view "check_address_in_last_winner" proposer proposers_governance_contract in
+    let view_result = Tezos.call_view "check_key_hash_in_last_winner" proposer proposers_governance_contract in
     match view_result with
         | Some result -> result
         | None -> failwith Errors.failed_to_check_proposer_in_committee
 
 let assert_proposer_allowed
-        (proposer : address)
+        (proposer : key_hash)
         (voting_power : nat)
         (proposers_governance_contract_opt : address option)
         : unit =

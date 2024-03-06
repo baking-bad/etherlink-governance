@@ -1,7 +1,7 @@
 from tests.base import BaseTestCase
 from tests.helpers.contracts.governance_base import PROMOTION_PERIOD, PROPOSAL_PERIOD, YEA_VOTE
 from tests.helpers.errors import (
-    INCORRECT_ADDRESSES_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, 
+    INCORRECT_KEY_HASH_SET_SIZE, NO_VOTING_POWER, NOT_PROPOSAL_PERIOD, 
     PROPOSAL_ALREADY_CREATED, PROPOSER_NOT_IN_COMMITTEE, UPVOTING_LIMIT_EXCEEDED, 
     TEZ_IN_TRANSACTION_DISALLOWED
 )
@@ -14,7 +14,7 @@ class ProposersGovernanceNewProposalTestCase(BaseTestCase):
 
         assert len(TEST_ADDRESSES_SET) > 20
 
-        with self.raisesMichelsonError(INCORRECT_ADDRESSES_SIZE):
+        with self.raisesMichelsonError(INCORRECT_KEY_HASH_SET_SIZE):
             governance.using(baker).new_proposal(TEST_ADDRESSES_SET).send()
         governance.using(baker).new_proposal(TEST_ADDRESSES_SET[0:20]).send()
         self.bake_block()

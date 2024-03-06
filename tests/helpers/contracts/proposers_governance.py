@@ -46,5 +46,5 @@ class ProposersGovernance(GovernanceBase):
 
         return self.contract.trigger_committee_upgrade(rollup_address)
 
-    def check_address_in_last_winner(self, address : str):
-        return self.contract.check_address_in_last_winner(address).run_view()
+    def check_key_hash_in_last_winner(self, address : str):
+        return self.contract.check_key_hash_in_last_winner(address).run_view()

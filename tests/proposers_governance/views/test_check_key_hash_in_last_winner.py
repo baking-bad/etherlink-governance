@@ -11,7 +11,7 @@ class ProposersGovernanceCheckAddressInLastWinner(BaseTestCase):
         governance = self.deploy_proposers_governance()
 
         with self.raisesMichelsonError(LAST_WINNER_NOT_FOUND):
-            governance.using(baker).check_address_in_last_winner(TEST_ADDRESSES_SET[0])
+            governance.using(baker).check_key_hash_in_last_winner(TEST_ADDRESSES_SET[0])
 
     def test_should_check_correctly_for_originated_contract_with_winner(self) -> None:
         sender = self.bootstrap_baker()
@@ -21,9 +21,9 @@ class ProposersGovernanceCheckAddressInLastWinner(BaseTestCase):
             last_winner=[pkh(allowed_baker), pkh(another_allowed_baker)]
         )
 
-        assert governance.using(sender).check_address_in_last_winner(pkh(allowed_baker)) == True
-        assert governance.using(sender).check_address_in_last_winner(pkh(another_allowed_baker)) == True
-        assert governance.using(sender).check_address_in_last_winner(pkh(sender)) == False
+        assert governance.using(sender).check_key_hash_in_last_winner(pkh(allowed_baker)) == True
+        assert governance.using(sender).check_key_hash_in_last_winner(pkh(another_allowed_baker)) == True
+        assert governance.using(sender).check_key_hash_in_last_winner(pkh(sender)) == False
 
     def test_should_check_correctly_after_full_voting_cycle_with_new_winner(self) -> None:
         baker = self.bootstrap_baker()
@@ -42,30 +42,30 @@ class ProposersGovernanceCheckAddressInLastWinner(BaseTestCase):
             last_winner=[pkh(previously_allowed_baker)]
         )
 
-        assert governance.using(baker).check_address_in_last_winner(pkh(previously_allowed_baker)) == True
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_allowed_baker)) == False
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_another_allowed_baker)) == False
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(previously_allowed_baker)) == True
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_allowed_baker)) == False
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_another_allowed_baker)) == False
 
         addresses = [pkh(new_allowed_baker), pkh(new_another_allowed_baker)]
         governance.using(baker).new_proposal(addresses).send()
         self.bake_blocks(2)
 
-        assert governance.using(baker).check_address_in_last_winner(pkh(previously_allowed_baker)) == True
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_allowed_baker)) == False
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_another_allowed_baker)) == False
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(previously_allowed_baker)) == True
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_allowed_baker)) == False
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_another_allowed_baker)) == False
         
         governance.using(baker).vote(YEA_VOTE).send()
         self.bake_blocks(2)
 
-        assert governance.using(baker).check_address_in_last_winner(pkh(previously_allowed_baker)) == False
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_allowed_baker)) == True
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_another_allowed_baker)) == True
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(previously_allowed_baker)) == False
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_allowed_baker)) == True
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_another_allowed_baker)) == True
 
         addresses2 = [pkh(previously_allowed_baker)]
         governance.using(baker).new_proposal(addresses2).send()
         self.bake_blocks(2)
 
-        assert governance.using(baker).check_address_in_last_winner(pkh(previously_allowed_baker)) == False
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_allowed_baker)) == True
-        assert governance.using(baker).check_address_in_last_winner(pkh(new_another_allowed_baker)) == True
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(previously_allowed_baker)) == False
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_allowed_baker)) == True
+        assert governance.using(baker).check_key_hash_in_last_winner(pkh(new_another_allowed_baker)) == True
 
