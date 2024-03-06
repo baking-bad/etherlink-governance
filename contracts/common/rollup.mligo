@@ -92,3 +92,8 @@ let decode_upgrade_payload
      match rollup_entry with
         | M_right bytes -> bytes
         | M_left _ -> failwith Errors.wrong_rollup_entrypoint
+
+let get_activation_timestamp
+        (adoption_period_sec : nat)
+        : timestamp =
+    Tezos.get_now () + (int adoption_period_sec)

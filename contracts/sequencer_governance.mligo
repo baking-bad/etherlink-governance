@@ -47,7 +47,7 @@ module SequencerCommitteeGovernance = struct
         let pack_payload = fun 
                 (payload : payload_t) 
                 : bytes -> 
-            let activation_timestamp = Tezos.get_now () + (int storage.config.adoption_period_sec) in
+            let activation_timestamp = Rollup.get_activation_timestamp storage.config.adoption_period_sec in
             Rollup.get_sequencer_upgrade_payload payload.public_key payload.l2_address activation_timestamp in
         Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
