@@ -13,11 +13,10 @@ let new_proposal
         (storage : pt Storage.t) 
         : operation list * pt Storage.t = 
     let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
-    let proposer = Tezos.get_sender () in
-    let proposer_key_hash = Converters.address_to_key_hash proposer in
-    let voting_power = Tezos.voting_power proposer_key_hash in
+    let proposer = Converters.address_to_key_hash (Tezos.get_sender ()) in
+    let voting_power = Tezos.voting_power proposer in
     let _ = Validation.assert_no_tez_in_transaction () in
-    let _ = Validation.assert_proposer_allowed proposer_key_hash voting_power storage.config.proposers_governance_contract in
+    let _ = Validation.assert_proposer_allowed proposer voting_power storage.config.proposers_governance_contract in
     let _ = Voting.assert_current_period_proposal voting_context in
     let updated_proposal_period = Voting.add_new_proposal_and_upvote payload proposer voting_power voting_context.proposal_period storage.config in
     let operations = match finished_voting with
@@ -37,8 +36,8 @@ let upvote_proposal
         (storage : pt Storage.t)
         : operation list * pt Storage.t = 
     let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
-    let upvoter = Tezos.get_sender () in
-    let voting_power = Tezos.voting_power (Converters.address_to_key_hash upvoter) in
+    let upvoter = Converters.address_to_key_hash (Tezos.get_sender ()) in
+    let voting_power = Tezos.voting_power upvoter in
     let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_proposal voting_context in
@@ -60,8 +59,8 @@ let vote
         (storage : pt Storage.t)
         : operation list * pt Storage.t =
     let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
-    let voter = Tezos.get_sender () in
-    let voting_power = Tezos.voting_power (Converters.address_to_key_hash voter) in
+    let voter = Converters.address_to_key_hash (Tezos.get_sender ()) in
+    let voting_power = Tezos.voting_power voter in
     let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
     let _ = Voting.assert_current_period_promotion voting_context in

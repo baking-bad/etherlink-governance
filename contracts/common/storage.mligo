@@ -60,11 +60,11 @@ type config_t = {
 }
 
 (*
-    'pt - payload type. for kernel governance it is bytes, for committee governance it is address set
+    'pt - payload type. The value that bakers vote for
 *)
 type 'pt proposal_t = {
     payload : 'pt;
-    proposer : address;
+    proposer : key_hash;
     upvotes_voting_power : nat;
 }
 
@@ -72,8 +72,8 @@ type 'pt proposals_t = (bytes, ('pt proposal_t)) big_map
 
 type payload_key_t = bytes
 
-type upvoters_upvotes_count_t = (address, nat) big_map
-type upvoters_proposals_t = (address * payload_key_t, unit) big_map
+type upvoters_upvotes_count_t = (key_hash, nat) big_map
+type upvoters_proposals_t = (key_hash * payload_key_t, unit) big_map
 
 type 'pt proposal_period_t = {
     upvoters_upvotes_count : upvoters_upvotes_count_t;
@@ -85,7 +85,7 @@ type 'pt proposal_period_t = {
 }
 
 type promotion_period_t = {
-    voters : (address, unit) big_map;
+    voters : (key_hash, unit) big_map;
     yea_voting_power : nat;
     nay_voting_power : nat;
     pass_voting_power : nat;

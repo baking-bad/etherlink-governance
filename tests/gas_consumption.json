@@ -1,35 +1,35 @@
 {
     "new_proposal_different_baker_nth_1": {
-        "consumed_gas": 6366,
-        "paid_storage_size_diff": 457
+        "consumed_gas": 6363,
+        "paid_storage_size_diff": 456
     },
     "new_proposal_different_baker_nth_2": {
         "consumed_gas": 2038,
-        "paid_storage_size_diff": 238
+        "paid_storage_size_diff": 237
     },
     "new_proposal_different_baker_nth_3": {
         "consumed_gas": 2038,
-        "paid_storage_size_diff": 276
+        "paid_storage_size_diff": 275
     },
     "new_proposal_different_baker_nth_4": {
         "consumed_gas": 2038,
-        "paid_storage_size_diff": 276
+        "paid_storage_size_diff": 275
     },
     "new_proposal_same_baker_nth_1": {
-        "consumed_gas": 6366,
-        "paid_storage_size_diff": 457
+        "consumed_gas": 6363,
+        "paid_storage_size_diff": 456
     },
     "new_proposal_same_baker_nth_2": {
         "consumed_gas": 2499,
-        "paid_storage_size_diff": 171
+        "paid_storage_size_diff": 170
     },
     "new_proposal_same_baker_nth_3": {
         "consumed_gas": 2499,
-        "paid_storage_size_diff": 209
+        "paid_storage_size_diff": 208
     },
     "new_proposal_same_baker_nth_4": {
         "consumed_gas": 2499,
-        "paid_storage_size_diff": 209
+        "paid_storage_size_diff": 208
     },
     "new_proposal_with_10_proposals_on_previous_voting_period": {
         "consumed_gas": 1669,
@@ -48,20 +48,20 @@
         "paid_storage_size_diff": 0
     },
     "test_new_proposal_with_proposers_governance_nth_1": {
-        "consumed_gas": 11104,
-        "paid_storage_size_diff": 457
+        "consumed_gas": 11098,
+        "paid_storage_size_diff": 456
     },
     "test_new_proposal_with_proposers_governance_nth_2": {
-        "consumed_gas": 6775,
-        "paid_storage_size_diff": 238
+        "consumed_gas": 6772,
+        "paid_storage_size_diff": 237
     },
     "test_new_proposal_with_proposers_governance_nth_3": {
-        "consumed_gas": 6775,
-        "paid_storage_size_diff": 276
+        "consumed_gas": 6772,
+        "paid_storage_size_diff": 275
     },
     "test_new_proposal_with_proposers_governance_nth_4": {
-        "consumed_gas": 6775,
-        "paid_storage_size_diff": 276
+        "consumed_gas": 6772,
+        "paid_storage_size_diff": 275
     },
     "trigger_upgrade_nth_1": {
         "consumed_gas": 2644,

@@ -229,7 +229,7 @@ let assert_current_period_promotion
 let assert_upvoting_allowed
         (upvoters_upvotes_count : Storage.upvoters_upvotes_count_t)
         (config : Storage.config_t)
-        (voter : address)
+        (voter : key_hash)
         : unit =
     let upvotes_count = match Big_map.find_opt voter upvoters_upvotes_count with
         | Some count -> count
@@ -255,7 +255,7 @@ let get_payload_key
 
 [@inline]
 let add_proposal_to_upvoter
-        (upvoter : address)
+        (upvoter : key_hash)
         (payload_key : Storage.payload_key_t)
         (upvoters_proposals : Storage.upvoters_proposals_t)
         : Storage.upvoters_proposals_t =
@@ -264,7 +264,7 @@ let add_proposal_to_upvoter
 
 [@inline]
 let increment_upvotes_count
-        (upvoter : address)
+        (upvoter : key_hash)
         (upvoters_upvotes_count : Storage.upvoters_upvotes_count_t)
         : Storage.upvoters_upvotes_count_t =
     match Big_map.find_opt upvoter upvoters_upvotes_count with
@@ -308,7 +308,7 @@ let update_winner_candidate
 let add_new_proposal_and_upvote
         (type pt)
         (payload : pt)
-        (proposer : address)
+        (proposer : key_hash)
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
@@ -333,7 +333,7 @@ let add_new_proposal_and_upvote
 
 [@inline]
 let assert_proposal_not_already_upvoted
-        (upvoter : address)
+        (upvoter : key_hash)
         (payload_key : Storage.payload_key_t)
         (upvoters_proposals : Storage.upvoters_proposals_t)
         : unit =
@@ -344,7 +344,7 @@ let assert_proposal_not_already_upvoted
 let upvote_proposal
         (type pt)
         (payload : pt)
-        (upvoter : address)
+        (upvoter : key_hash)
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
@@ -374,7 +374,7 @@ let upvote_proposal
 [@inline]
 let vote_promotion
         (vote : string)
-        (voter : address)
+        (voter : key_hash)
         (voting_power : nat)
         (promotion_period :Storage.promotion_period_t)
         : Storage.promotion_period_t =
