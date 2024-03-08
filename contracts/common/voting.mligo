@@ -106,7 +106,7 @@ let init_new_promotion_voting_period
     }   
 
 
-type 'pt voting_state_t = {
+type 'pt internal_voting_state_t = {
     voting_context : 'pt Storage.voting_context_t;
     finished_voting : 'pt Events.voting_finished_event_payload_t option;
 }
@@ -116,7 +116,7 @@ let init_new_voting_state
         (voting_context : pt Storage.voting_context_t)
         (config : Storage.config_t)
         (period_index : nat)
-        : pt voting_state_t =
+        : pt internal_voting_state_t =
     match voting_context.period_type with
         | Proposal -> 
             (match get_proposal_winner voting_context.proposal_period config with
@@ -164,7 +164,7 @@ let init_voting_context
     }
 
 
-type 'pt extended_voting_state_t = {
+type 'pt voting_state_t = {
     voting_context : 'pt Storage.voting_context_t;
     last_winner : 'pt Storage.voting_winner_t option;
     finished_voting : 'pt Events.voting_finished_event_payload_t option;
@@ -173,7 +173,7 @@ type 'pt extended_voting_state_t = {
 let get_voting_state
         (type pt)
         (storage : pt Storage.t)
-        : pt extended_voting_state_t = 
+        : pt voting_state_t = 
     let period_index = get_period_index storage.config in
     let voting_state = match storage.voting_context with
         | None ->  
