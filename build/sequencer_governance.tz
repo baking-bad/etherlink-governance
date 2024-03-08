@@ -225,18 +225,13 @@
                                    DUP 2 ;
                                    GET 3 ;
                                    PUSH nat 1 ;
-                                   DUP 4 ;
+                                   DIG 3 ;
                                    CAR ;
                                    ADD ;
                                    PAIR 3 ;
                                    SOME }
-                                 { NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
-                              SWAP ;
-                              DIG 2 ;
-                              UPDATE 1 ;
-                              UNIT ;
-                              LEFT unit ;
-                              UPDATE 3 ;
+                                 { DROP ; NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
+                              NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                               TOTAL_VOTING_POWER ;
                               NONE (pair string bytes) ;
                               NONE nat ;
@@ -244,9 +239,10 @@
                               EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                               EMPTY_BIG_MAP key_hash nat ;
                               PAIR 6 ;
-                              UPDATE 5 ;
-                              NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                              UPDATE 6 }
+                              UNIT ;
+                              LEFT unit ;
+                              DIG 4 ;
+                              PAIR 4 }
                             { DROP ;
                               PUSH nat 1 ;
                               DUP 2 ;
@@ -272,7 +268,9 @@
                                    PAIR 5 ;
                                    SOME ;
                                    UPDATE 6 }
-                                 { NONE (pair string bytes) ;
+                                 { SWAP ;
+                                   DROP ;
+                                   NONE (pair string bytes) ;
                                    UNIT ;
                                    RIGHT unit ;
                                    PUSH nat 1 ;
@@ -280,12 +278,7 @@
                                    ADD ;
                                    PAIR 3 ;
                                    SOME ;
-                                   SWAP ;
-                                   DIG 2 ;
-                                   UPDATE 1 ;
-                                   UNIT ;
-                                   LEFT unit ;
-                                   UPDATE 3 ;
+                                   NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                    TOTAL_VOTING_POWER ;
                                    NONE (pair string bytes) ;
                                    NONE nat ;
@@ -293,9 +286,10 @@
                                    EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                    EMPTY_BIG_MAP key_hash nat ;
                                    PAIR 6 ;
-                                   UPDATE 5 ;
-                                   NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                   UPDATE 6 } } }
+                                   UNIT ;
+                                   LEFT unit ;
+                                   DIG 4 ;
+                                   PAIR 4 } } }
                         { DROP ;
                           DUP 2 ;
                           GET 6 ;
@@ -339,17 +333,12 @@
                           DUP 2 ;
                           GET 3 ;
                           PUSH nat 1 ;
-                          DUP 4 ;
+                          DIG 3 ;
                           CAR ;
                           ADD ;
                           PAIR 3 ;
                           SOME ;
-                          SWAP ;
-                          DIG 2 ;
-                          UPDATE 1 ;
-                          UNIT ;
-                          LEFT unit ;
-                          UPDATE 3 ;
+                          NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                           TOTAL_VOTING_POWER ;
                           NONE (pair string bytes) ;
                           NONE nat ;
@@ -357,9 +346,10 @@
                           EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                           EMPTY_BIG_MAP key_hash nat ;
                           PAIR 6 ;
-                          UPDATE 5 ;
-                          NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                          UPDATE 6 } } } ;
+                          UNIT ;
+                          LEFT unit ;
+                          DIG 4 ;
+                          PAIR 4 } } } ;
              DUP 2 ;
              DIG 2 ;
              IF_NONE
@@ -605,18 +595,13 @@
                                        DUP 2 ;
                                        GET 3 ;
                                        PUSH nat 1 ;
-                                       DUP 4 ;
+                                       DIG 3 ;
                                        CAR ;
                                        ADD ;
                                        PAIR 3 ;
                                        SOME }
-                                     { NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
-                                  SWAP ;
-                                  DIG 2 ;
-                                  UPDATE 1 ;
-                                  UNIT ;
-                                  LEFT unit ;
-                                  UPDATE 3 ;
+                                     { DROP ; NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
+                                  NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                   TOTAL_VOTING_POWER ;
                                   NONE (pair string bytes) ;
                                   NONE nat ;
@@ -624,9 +609,10 @@
                                   EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                   EMPTY_BIG_MAP key_hash nat ;
                                   PAIR 6 ;
-                                  UPDATE 5 ;
-                                  NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                  UPDATE 6 }
+                                  UNIT ;
+                                  LEFT unit ;
+                                  DIG 4 ;
+                                  PAIR 4 }
                                 { DROP ;
                                   PUSH nat 1 ;
                                   DUP 2 ;
@@ -652,7 +638,9 @@
                                        PAIR 5 ;
                                        SOME ;
                                        UPDATE 6 }
-                                     { NONE (pair string bytes) ;
+                                     { SWAP ;
+                                       DROP ;
+                                       NONE (pair string bytes) ;
                                        UNIT ;
                                        RIGHT unit ;
                                        PUSH nat 1 ;
@@ -660,12 +648,7 @@
                                        ADD ;
                                        PAIR 3 ;
                                        SOME ;
-                                       SWAP ;
-                                       DIG 2 ;
-                                       UPDATE 1 ;
-                                       UNIT ;
-                                       LEFT unit ;
-                                       UPDATE 3 ;
+                                       NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                        TOTAL_VOTING_POWER ;
                                        NONE (pair string bytes) ;
                                        NONE nat ;
@@ -673,9 +656,10 @@
                                        EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                        EMPTY_BIG_MAP key_hash nat ;
                                        PAIR 6 ;
-                                       UPDATE 5 ;
-                                       NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                       UPDATE 6 } } }
+                                       UNIT ;
+                                       LEFT unit ;
+                                       DIG 4 ;
+                                       PAIR 4 } } }
                             { DROP ;
                               DUP 2 ;
                               GET 6 ;
@@ -719,17 +703,12 @@
                               DUP 2 ;
                               GET 3 ;
                               PUSH nat 1 ;
-                              DUP 4 ;
+                              DIG 3 ;
                               CAR ;
                               ADD ;
                               PAIR 3 ;
                               SOME ;
-                              SWAP ;
-                              DIG 2 ;
-                              UPDATE 1 ;
-                              UNIT ;
-                              LEFT unit ;
-                              UPDATE 3 ;
+                              NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                               TOTAL_VOTING_POWER ;
                               NONE (pair string bytes) ;
                               NONE nat ;
@@ -737,9 +716,10 @@
                               EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                               EMPTY_BIG_MAP key_hash nat ;
                               PAIR 6 ;
-                              UPDATE 5 ;
-                              NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                              UPDATE 6 } } } ;
+                              UNIT ;
+                              LEFT unit ;
+                              DIG 4 ;
+                              PAIR 4 } } } ;
                  DUP 2 ;
                  DIG 2 ;
                  IF_NONE
@@ -898,18 +878,13 @@
                                            DUP 2 ;
                                            GET 3 ;
                                            PUSH nat 1 ;
-                                           DUP 4 ;
+                                           DIG 3 ;
                                            CAR ;
                                            ADD ;
                                            PAIR 3 ;
                                            SOME }
-                                         { NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
-                                      SWAP ;
-                                      DIG 2 ;
-                                      UPDATE 1 ;
-                                      UNIT ;
-                                      LEFT unit ;
-                                      UPDATE 3 ;
+                                         { DROP ; NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
+                                      NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                       TOTAL_VOTING_POWER ;
                                       NONE (pair string bytes) ;
                                       NONE nat ;
@@ -917,9 +892,10 @@
                                       EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                       EMPTY_BIG_MAP key_hash nat ;
                                       PAIR 6 ;
-                                      UPDATE 5 ;
-                                      NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                      UPDATE 6 }
+                                      UNIT ;
+                                      LEFT unit ;
+                                      DIG 4 ;
+                                      PAIR 4 }
                                     { DROP ;
                                       PUSH nat 1 ;
                                       DUP 2 ;
@@ -945,7 +921,9 @@
                                            PAIR 5 ;
                                            SOME ;
                                            UPDATE 6 }
-                                         { NONE (pair string bytes) ;
+                                         { SWAP ;
+                                           DROP ;
+                                           NONE (pair string bytes) ;
                                            UNIT ;
                                            RIGHT unit ;
                                            PUSH nat 1 ;
@@ -953,12 +931,7 @@
                                            ADD ;
                                            PAIR 3 ;
                                            SOME ;
-                                           SWAP ;
-                                           DIG 2 ;
-                                           UPDATE 1 ;
-                                           UNIT ;
-                                           LEFT unit ;
-                                           UPDATE 3 ;
+                                           NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                            TOTAL_VOTING_POWER ;
                                            NONE (pair string bytes) ;
                                            NONE nat ;
@@ -966,9 +939,10 @@
                                            EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                            EMPTY_BIG_MAP key_hash nat ;
                                            PAIR 6 ;
-                                           UPDATE 5 ;
-                                           NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                           UPDATE 6 } } }
+                                           UNIT ;
+                                           LEFT unit ;
+                                           DIG 4 ;
+                                           PAIR 4 } } }
                                 { DROP ;
                                   DUP 2 ;
                                   GET 6 ;
@@ -1012,17 +986,12 @@
                                   DUP 2 ;
                                   GET 3 ;
                                   PUSH nat 1 ;
-                                  DUP 4 ;
+                                  DIG 3 ;
                                   CAR ;
                                   ADD ;
                                   PAIR 3 ;
                                   SOME ;
-                                  SWAP ;
-                                  DIG 2 ;
-                                  UPDATE 1 ;
-                                  UNIT ;
-                                  LEFT unit ;
-                                  UPDATE 3 ;
+                                  NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                   TOTAL_VOTING_POWER ;
                                   NONE (pair string bytes) ;
                                   NONE nat ;
@@ -1030,9 +999,10 @@
                                   EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                   EMPTY_BIG_MAP key_hash nat ;
                                   PAIR 6 ;
-                                  UPDATE 5 ;
-                                  NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                  UPDATE 6 } } } ;
+                                  UNIT ;
+                                  LEFT unit ;
+                                  DIG 4 ;
+                                  PAIR 4 } } } ;
                      DUP 2 ;
                      DIG 2 ;
                      IF_NONE
@@ -1236,18 +1206,13 @@
                                            DUP 2 ;
                                            GET 3 ;
                                            PUSH nat 1 ;
-                                           DUP 4 ;
+                                           DIG 3 ;
                                            CAR ;
                                            ADD ;
                                            PAIR 3 ;
                                            SOME }
-                                         { NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
-                                      SWAP ;
-                                      DIG 2 ;
-                                      UPDATE 1 ;
-                                      UNIT ;
-                                      LEFT unit ;
-                                      UPDATE 3 ;
+                                         { DROP ; NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
+                                      NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                       TOTAL_VOTING_POWER ;
                                       NONE (pair string bytes) ;
                                       NONE nat ;
@@ -1255,9 +1220,10 @@
                                       EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                       EMPTY_BIG_MAP key_hash nat ;
                                       PAIR 6 ;
-                                      UPDATE 5 ;
-                                      NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                      UPDATE 6 }
+                                      UNIT ;
+                                      LEFT unit ;
+                                      DIG 4 ;
+                                      PAIR 4 }
                                     { DROP ;
                                       PUSH nat 1 ;
                                       DUP 2 ;
@@ -1283,7 +1249,9 @@
                                            PAIR 5 ;
                                            SOME ;
                                            UPDATE 6 }
-                                         { NONE (pair string bytes) ;
+                                         { SWAP ;
+                                           DROP ;
+                                           NONE (pair string bytes) ;
                                            UNIT ;
                                            RIGHT unit ;
                                            PUSH nat 1 ;
@@ -1291,12 +1259,7 @@
                                            ADD ;
                                            PAIR 3 ;
                                            SOME ;
-                                           SWAP ;
-                                           DIG 2 ;
-                                           UPDATE 1 ;
-                                           UNIT ;
-                                           LEFT unit ;
-                                           UPDATE 3 ;
+                                           NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                            TOTAL_VOTING_POWER ;
                                            NONE (pair string bytes) ;
                                            NONE nat ;
@@ -1304,9 +1267,10 @@
                                            EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                            EMPTY_BIG_MAP key_hash nat ;
                                            PAIR 6 ;
-                                           UPDATE 5 ;
-                                           NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                           UPDATE 6 } } }
+                                           UNIT ;
+                                           LEFT unit ;
+                                           DIG 4 ;
+                                           PAIR 4 } } }
                                 { DROP ;
                                   DUP 2 ;
                                   GET 6 ;
@@ -1350,17 +1314,12 @@
                                   DUP 2 ;
                                   GET 3 ;
                                   PUSH nat 1 ;
-                                  DUP 4 ;
+                                  DIG 3 ;
                                   CAR ;
                                   ADD ;
                                   PAIR 3 ;
                                   SOME ;
-                                  SWAP ;
-                                  DIG 2 ;
-                                  UPDATE 1 ;
-                                  UNIT ;
-                                  LEFT unit ;
-                                  UPDATE 3 ;
+                                  NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                   TOTAL_VOTING_POWER ;
                                   NONE (pair string bytes) ;
                                   NONE nat ;
@@ -1368,9 +1327,10 @@
                                   EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                   EMPTY_BIG_MAP key_hash nat ;
                                   PAIR 6 ;
-                                  UPDATE 5 ;
-                                  NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                                  UPDATE 6 } } } ;
+                                  UNIT ;
+                                  LEFT unit ;
+                                  DIG 4 ;
+                                  PAIR 4 } } } ;
                      DUP 2 ;
                      DIG 2 ;
                      IF_NONE
@@ -1570,18 +1530,13 @@
                                DUP 2 ;
                                GET 3 ;
                                PUSH nat 1 ;
-                               DUP 4 ;
+                               DIG 3 ;
                                CAR ;
                                ADD ;
                                PAIR 3 ;
                                SOME }
-                             { NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
-                          SWAP ;
-                          DIG 2 ;
-                          UPDATE 1 ;
-                          UNIT ;
-                          LEFT unit ;
-                          UPDATE 3 ;
+                             { DROP ; NONE (pair nat (or unit unit) (option (pair string bytes))) } ;
+                          NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                           TOTAL_VOTING_POWER ;
                           NONE (pair string bytes) ;
                           NONE nat ;
@@ -1589,9 +1544,10 @@
                           EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                           EMPTY_BIG_MAP key_hash nat ;
                           PAIR 6 ;
-                          UPDATE 5 ;
-                          NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                          UPDATE 6 }
+                          UNIT ;
+                          LEFT unit ;
+                          DIG 4 ;
+                          PAIR 4 }
                         { DROP ;
                           PUSH nat 1 ;
                           DUP 2 ;
@@ -1617,7 +1573,9 @@
                                PAIR 5 ;
                                SOME ;
                                UPDATE 6 }
-                             { NONE (pair string bytes) ;
+                             { SWAP ;
+                               DROP ;
+                               NONE (pair string bytes) ;
                                UNIT ;
                                RIGHT unit ;
                                PUSH nat 1 ;
@@ -1625,12 +1583,7 @@
                                ADD ;
                                PAIR 3 ;
                                SOME ;
-                               SWAP ;
-                               DIG 2 ;
-                               UPDATE 1 ;
-                               UNIT ;
-                               LEFT unit ;
-                               UPDATE 3 ;
+                               NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                                TOTAL_VOTING_POWER ;
                                NONE (pair string bytes) ;
                                NONE nat ;
@@ -1638,9 +1591,10 @@
                                EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                EMPTY_BIG_MAP key_hash nat ;
                                PAIR 6 ;
-                               UPDATE 5 ;
-                               NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                               UPDATE 6 } } }
+                               UNIT ;
+                               LEFT unit ;
+                               DIG 4 ;
+                               PAIR 4 } } }
                     { DROP ;
                       DUP 2 ;
                       GET 6 ;
@@ -1684,17 +1638,12 @@
                       DUP 2 ;
                       GET 3 ;
                       PUSH nat 1 ;
-                      DUP 4 ;
+                      DIG 3 ;
                       CAR ;
                       ADD ;
                       PAIR 3 ;
                       SOME ;
-                      SWAP ;
-                      DIG 2 ;
-                      UPDATE 1 ;
-                      UNIT ;
-                      LEFT unit ;
-                      UPDATE 3 ;
+                      NONE (pair (big_map key_hash unit) nat nat nat nat) ;
                       TOTAL_VOTING_POWER ;
                       NONE (pair string bytes) ;
                       NONE nat ;
@@ -1702,9 +1651,10 @@
                       EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                       EMPTY_BIG_MAP key_hash nat ;
                       PAIR 6 ;
-                      UPDATE 5 ;
-                      NONE (pair (big_map key_hash unit) nat nat nat nat) ;
-                      UPDATE 6 } } } ;
+                      UNIT ;
+                      LEFT unit ;
+                      DIG 4 ;
+                      PAIR 4 } } } ;
          DUP 2 ;
          DIG 2 ;
          IF_NONE

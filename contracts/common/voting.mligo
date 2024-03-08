@@ -77,10 +77,8 @@ let get_new_proposal_period_content
 let init_new_proposal_voting_period
         (type pt)
         (period_index : nat)
-        (voting_context : pt Storage.voting_context_t)
         : pt Storage.voting_context_t =
     { 
-        voting_context with
         period_index = period_index;
         period_type = Proposal;
         proposal_period = (get_new_proposal_period_content ());
@@ -132,7 +130,7 @@ let init_new_voting_state
                             }
                         else 
                             {
-                                voting_context = init_new_proposal_voting_period period_index voting_context;
+                                voting_context = init_new_proposal_voting_period period_index;
                                 finished_voting = Some (Events.create_voting_finished_event promotion_period_index Promotion None);
                             })
                 | None ->
@@ -141,7 +139,7 @@ let init_new_voting_state
                         then Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type None)
                         else None in
                     {
-                        voting_context = init_new_proposal_voting_period period_index voting_context;
+                        voting_context = init_new_proposal_voting_period period_index;
                         finished_voting = finished_voting;
                     })
         | Promotion ->
@@ -149,7 +147,7 @@ let init_new_voting_state
             let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
             let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
             { 
-                voting_context = init_new_proposal_voting_period period_index voting_context;
+                voting_context = init_new_proposal_voting_period period_index;
                 finished_voting = finished_voting;
             }
 
