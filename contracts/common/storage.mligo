@@ -84,21 +84,22 @@ type 'pt proposal_period_t = {
     total_voting_power : nat;
 }
 
-type promotion_period_t = {
+type 'pt promotion_period_t = {
     voters : (key_hash, unit) big_map;
     yea_voting_power : nat;
     nay_voting_power : nat;
     pass_voting_power : nat;
     total_voting_power : nat;
+    winner_candidate : 'pt;
 }
 
-type period_type_t = Proposal | Promotion
+type 'pt period_t = 
+    | Proposal of 'pt proposal_period_t 
+    | Promotion of 'pt promotion_period_t
 
 type 'pt voting_context_t = {
     period_index : nat;
-    period_type : period_type_t;
-    proposal_period : 'pt proposal_period_t;
-    promotion_period : promotion_period_t option;
+    period : 'pt period_t;
 }
 
 type 'pt voting_winner_t = {

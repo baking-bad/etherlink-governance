@@ -45,16 +45,15 @@ let get_proposal_winner
 [@inline]
 let get_promotion_winner
         (type pt)
-        (winner_candidate : pt option)
-        (promotion_period : Storage.promotion_period_t)
+        (promotion_period : pt Storage.promotion_period_t)
         (config : Storage.config_t)
         : pt option =
-    let { total_voting_power; yea_voting_power; nay_voting_power; pass_voting_power; voters = _} = promotion_period in 
+    let { total_voting_power; yea_voting_power; nay_voting_power; pass_voting_power; winner_candidate; voters = _} = promotion_period in 
     let quorum_reached = (yea_voting_power + nay_voting_power + pass_voting_power) * config.scale >= config.promotion_quorum * total_voting_power in
     let yea_nay_voting_sum = yea_voting_power + nay_voting_power in
     let supermajority_reached = yea_nay_voting_sum > 0n && yea_voting_power * config.scale >= config.promotion_supermajority * yea_nay_voting_sum in
     if quorum_reached && supermajority_reached 
-        then winner_candidate
+        then Some winner_candidate
         else None
 
 
@@ -80,29 +79,27 @@ let init_new_proposal_voting_period
         : pt Storage.voting_context_t =
     { 
         period_index = period_index;
-        period_type = Proposal;
-        proposal_period = (get_new_proposal_period_content ());
-        promotion_period = None;
+        period = Proposal (get_new_proposal_period_content ());
     }   
 
 
 [@inline]
 let init_new_promotion_voting_period
         (type pt)
-        (voting_context : pt Storage.voting_context_t)
         (period_index : nat)
+        (winner_candidate: pt)
         : pt Storage.voting_context_t =
+    let promotion_period : pt Storage.promotion_period_t = {
+        voters = Big_map.empty;
+        yea_voting_power = 0n;
+        nay_voting_power = 0n; 
+        pass_voting_power = 0n;
+        winner_candidate = winner_candidate;
+        total_voting_power = Tezos.get_total_voting_power ();
+    } in
     { 
-        voting_context with 
         period_index = period_index;
-        period_type = Promotion;
-        promotion_period = Some {
-            voters = Big_map.empty;
-            yea_voting_power = 0n;
-            nay_voting_power = 0n; 
-            pass_voting_power = 0n;
-            total_voting_power = Tezos.get_total_voting_power ();
-        }
+        period = Promotion promotion_period;
     }   
 
 
@@ -117,15 +114,15 @@ let init_new_voting_state
         (config : Storage.config_t)
         (period_index : nat)
         : pt internal_voting_state_t =
-    match voting_context.period_type with
-        | Proposal -> 
-            (match get_proposal_winner voting_context.proposal_period config with
-                | Some _proposal_winner -> 
+    match voting_context.period with
+        | Proposal proposal_period -> 
+            (match get_proposal_winner proposal_period config with
+                | Some proposal_winner -> 
                     let promotion_period_index = voting_context.period_index + 1n in
                     (if period_index = promotion_period_index
                         then 
                             {
-                                voting_context = init_new_promotion_voting_period voting_context period_index;
+                                voting_context = init_new_promotion_voting_period period_index proposal_winner;
                                 finished_voting = None;
                             }
                         else 
@@ -134,18 +131,17 @@ let init_new_voting_state
                                 finished_voting = Some (Events.create_voting_finished_event promotion_period_index Promotion None);
                             })
                 | None ->
-                    let at_least_one_proposal_was_submitted = Option.is_some voting_context.proposal_period.max_upvotes_voting_power in
+                    let at_least_one_proposal_was_submitted = Option.is_some proposal_period.max_upvotes_voting_power in
                     let finished_voting = if at_least_one_proposal_was_submitted
-                        then Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type None)
+                        then Some (Events.create_voting_finished_event voting_context.period_index Proposal None)
                         else None in
                     {
                         voting_context = init_new_proposal_voting_period period_index;
                         finished_voting = finished_voting;
                     })
-        | Promotion ->
-            let promotion_period = Option.value_with_error Errors.promotion_period_not_found voting_context.promotion_period in
-            let promotion_winner = get_promotion_winner voting_context.proposal_period.winner_candidate promotion_period config in
-            let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index voting_context.period_type promotion_winner) in
+        | Promotion promotion_period ->
+            let promotion_winner = get_promotion_winner promotion_period config in
+            let finished_voting = Some (Events.create_voting_finished_event voting_context.period_index Promotion promotion_winner) in
             { 
                 voting_context = init_new_proposal_voting_period period_index;
                 finished_voting = finished_voting;
@@ -158,9 +154,7 @@ let init_voting_context
         : pt Storage.voting_context_t = 
     {
         period_index = period_index;
-        period_type = Proposal;
-        proposal_period = get_new_proposal_period_content ();
-        promotion_period = None;
+        period = Proposal (get_new_proposal_period_content ());
     }
 
 
@@ -204,23 +198,23 @@ let get_voting_state
 
 
 [@inline]
-let assert_current_period_proposal 
+let get_proposal_period 
         (type pt)
         (voting_context : pt Storage.voting_context_t)
-        : unit =
-    match voting_context.period_type with 
-        | Proposal -> unit
-        | Promotion -> failwith Errors.not_proposal_period
+        : pt Storage.proposal_period_t =
+    match voting_context.period with 
+        | Proposal proposal_period -> proposal_period
+        | Promotion _ -> failwith Errors.not_proposal_period
 
 
 [@inline]
-let assert_current_period_promotion 
+let get_promotion_period 
         (type pt)
         (voting_context : pt Storage.voting_context_t)
-        : unit =
-    match voting_context.period_type with
-        | Promotion -> unit
-        | Proposal -> failwith Errors.not_promotion_period
+        : pt Storage.promotion_period_t =
+    match voting_context.period with
+        | Promotion promotion_period -> promotion_period
+        | Proposal _ -> failwith Errors.not_promotion_period
 
 
 [@inline]
@@ -310,7 +304,7 @@ let add_new_proposal_and_upvote
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
-        : pt Storage.proposal_period_t =
+        : pt Storage.period_t =
     let upvoters_upvotes_count = proposal_period.upvoters_upvotes_count in
     let _ = assert_upvoting_allowed upvoters_upvotes_count config proposer in
     let key = get_payload_key payload in
@@ -326,7 +320,8 @@ let add_new_proposal_and_upvote
         upvoters_proposals = add_proposal_to_upvoter proposer key proposal_period.upvoters_proposals;
         proposals = Big_map.add key value proposal_period.proposals
     } in
-    update_winner_candidate voting_power payload updated_proposal_period
+    let proposal_period = update_winner_candidate voting_power payload updated_proposal_period in
+    Proposal proposal_period
 
 
 [@inline]
@@ -346,7 +341,7 @@ let upvote_proposal
         (voting_power : nat)
         (proposal_period : pt Storage.proposal_period_t)
         (config : Storage.config_t)
-        : pt Storage.proposal_period_t =
+        : pt Storage.period_t =
     let upvoters_upvotes_count = proposal_period.upvoters_upvotes_count in
     let _ = assert_upvoting_allowed upvoters_upvotes_count config upvoter in
     let key = get_payload_key payload in
@@ -366,16 +361,17 @@ let upvote_proposal
         upvoters_proposals = add_proposal_to_upvoter upvoter key upvoters_proposals;
         proposals = Big_map.update key (Some updated_proposal) proposal_period.proposals;
     } in
-    update_winner_candidate upvotes_voting_power payload updated_proposal_period
-
+    let proposal_period = update_winner_candidate upvotes_voting_power payload updated_proposal_period in
+    Proposal proposal_period
 
 [@inline]
 let vote_promotion
+        (type pt)
         (vote : string)
         (voter : key_hash)
         (voting_power : nat)
-        (promotion_period :Storage.promotion_period_t)
-        : Storage.promotion_period_t =
+        (promotion_period : pt Storage.promotion_period_t)
+        : pt Storage.period_t =
     let _ = assert_with_error (not Big_map.mem voter promotion_period.voters) Errors.promotion_already_voted in
     let _ = assert_vote_value_correct vote in
     let updated_promotion_period = if vote = Constants.yea
@@ -383,7 +379,8 @@ let vote_promotion
         else if vote = Constants.nay 
             then { promotion_period with nay_voting_power = promotion_period.nay_voting_power + voting_power }
             else { promotion_period with pass_voting_power = promotion_period.pass_voting_power + voting_power } in
-    { 
+    let promotion_period = { 
         updated_promotion_period with 
         voters = Big_map.add voter unit promotion_period.voters
-    }
+    } in
+    Promotion promotion_period

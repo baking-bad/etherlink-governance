@@ -17,14 +17,14 @@ let new_proposal
     let voting_power = Tezos.voting_power proposer in
     let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_proposer_allowed proposer voting_power storage.config.proposers_governance_contract in
-    let _ = Voting.assert_current_period_proposal voting_context in
-    let updated_proposal_period = Voting.add_new_proposal_and_upvote payload proposer voting_power voting_context.proposal_period storage.config in
+    let proposal_period = Voting.get_proposal_period voting_context in
+    let updated_period = Voting.add_new_proposal_and_upvote payload proposer voting_power proposal_period storage.config in
     let operations = match finished_voting with
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
         | None -> [] in
     let updated_storage = { 
         storage with 
-        voting_context = Some { voting_context with proposal_period = updated_proposal_period; };
+        voting_context = Some { voting_context with period = updated_period; };
         last_winner = last_winner;
     } in
     operations, updated_storage
@@ -40,14 +40,14 @@ let upvote_proposal
     let voting_power = Tezos.voting_power upvoter in
     let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
-    let _ = Voting.assert_current_period_proposal voting_context in
-    let updated_proposal_period = Voting.upvote_proposal payload upvoter voting_power voting_context.proposal_period storage.config in
+    let proposal_period = Voting.get_proposal_period voting_context in
+    let updated_period = Voting.upvote_proposal payload upvoter voting_power proposal_period storage.config in
     let operations = match finished_voting with
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
         | None -> [] in
     let updated_storage = { 
         storage with 
-        voting_context = Some { voting_context with proposal_period = updated_proposal_period };
+        voting_context = Some { voting_context with period = updated_period };
         last_winner = last_winner; 
     } in
     operations, updated_storage
@@ -63,15 +63,14 @@ let vote
     let voting_power = Tezos.voting_power voter in
     let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
-    let _ = Voting.assert_current_period_promotion voting_context in
-    let promotion_period = Option.value_with_error Errors.promotion_period_context_not_exist voting_context.promotion_period  in
-    let updated_promotion_period = Voting.vote_promotion vote voter voting_power promotion_period in
+    let promotion_period = Voting.get_promotion_period voting_context in
+    let updated_period = Voting.vote_promotion vote voter voting_power promotion_period in
     let operations = match finished_voting with
         | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
         | None -> [] in
     let updated_storage = { 
         storage with 
-        voting_context = Some { voting_context with promotion_period = Some updated_promotion_period };
+        voting_context = Some { voting_context with period = updated_period };
         last_winner = last_winner;
     } in
     operations, updated_storage
