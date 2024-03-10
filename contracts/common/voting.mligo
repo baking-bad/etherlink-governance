@@ -230,14 +230,6 @@ let assert_upvoting_allowed
 
 
 [@inline]
-let assert_vote_value_correct
-        (vote : string)
-        : unit =
-    let value_is_correct = (vote = Constants.yea or vote = Constants.nay or vote = Constants.pass) in
-    assert_with_error value_is_correct Errors.incorrect_vote_value
-
-
-[@inline]
 let get_payload_key
         (type pt)
         (payload : pt)
@@ -373,14 +365,15 @@ let vote_promotion
         (promotion_period : pt Storage.promotion_period_t)
         : pt Storage.period_t =
     let _ = assert_with_error (not Big_map.mem voter promotion_period.voters) Errors.promotion_already_voted in
-    let _ = assert_vote_value_correct vote in
     let updated_promotion_period = if vote = Constants.yea
         then { promotion_period with yea_voting_power = promotion_period.yea_voting_power + voting_power }
         else if vote = Constants.nay 
             then { promotion_period with nay_voting_power = promotion_period.nay_voting_power + voting_power }
-            else { promotion_period with pass_voting_power = promotion_period.pass_voting_power + voting_power } in
+            else if vote = Constants.pass  
+                then { promotion_period with pass_voting_power = promotion_period.pass_voting_power + voting_power }
+                else failwith Errors.incorrect_vote_value in
     let promotion_period = { 
         updated_promotion_period with 
-        voters = Big_map.add voter unit promotion_period.voters
+        voters = Big_map.add voter vote promotion_period.voters
     } in
     Promotion promotion_period

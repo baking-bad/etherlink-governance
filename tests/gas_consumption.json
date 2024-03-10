@@ -1,22 +1,22 @@
 {
     "new_proposal_different_baker_nth_1": {
-        "consumed_gas": 5760,
+        "consumed_gas": 5693,
         "paid_storage_size_diff": 449
     },
     "new_proposal_different_baker_nth_2": {
-        "consumed_gas": 2036,
+        "consumed_gas": 2035,
         "paid_storage_size_diff": 237
     },
     "new_proposal_different_baker_nth_3": {
-        "consumed_gas": 2036,
+        "consumed_gas": 2035,
         "paid_storage_size_diff": 275
     },
     "new_proposal_different_baker_nth_4": {
-        "consumed_gas": 2036,
+        "consumed_gas": 2035,
         "paid_storage_size_diff": 275
     },
     "new_proposal_same_baker_nth_1": {
-        "consumed_gas": 5760,
+        "consumed_gas": 5693,
         "paid_storage_size_diff": 449
     },
     "new_proposal_same_baker_nth_2": {
@@ -48,19 +48,19 @@
         "paid_storage_size_diff": 75
     },
     "test_new_proposal_with_proposers_governance_nth_1": {
-        "consumed_gas": 9977,
+        "consumed_gas": 9856,
         "paid_storage_size_diff": 449
     },
     "test_new_proposal_with_proposers_governance_nth_2": {
-        "consumed_gas": 6252,
+        "consumed_gas": 6198,
         "paid_storage_size_diff": 237
     },
     "test_new_proposal_with_proposers_governance_nth_3": {
-        "consumed_gas": 6252,
+        "consumed_gas": 6198,
         "paid_storage_size_diff": 275
     },
     "test_new_proposal_with_proposers_governance_nth_4": {
-        "consumed_gas": 6252,
+        "consumed_gas": 6198,
         "paid_storage_size_diff": 275
     },
     "trigger_upgrade_nth_1": {
@@ -84,15 +84,15 @@
         "paid_storage_size_diff": 110
     },
     "upvote_nth_1": {
-        "consumed_gas": 2501,
+        "consumed_gas": 2500,
         "paid_storage_size_diff": 134
     },
     "upvote_nth_2": {
-        "consumed_gas": 2501,
+        "consumed_gas": 2500,
         "paid_storage_size_diff": 134
     },
     "upvote_nth_3": {
-        "consumed_gas": 2501,
+        "consumed_gas": 2500,
         "paid_storage_size_diff": 134
     },
     "vote_nth_1": {

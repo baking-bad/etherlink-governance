@@ -85,7 +85,7 @@ type 'pt proposal_period_t = {
 }
 
 type 'pt promotion_period_t = {
-    voters : (key_hash, unit) big_map;
+    voters : (key_hash, string) big_map;
     yea_voting_power : nat;
     nay_voting_power : nat;
     pass_voting_power : nat;
