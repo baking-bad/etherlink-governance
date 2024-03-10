@@ -17,7 +17,7 @@ module KernelGovernance = struct
             (kernel_root_hash : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = Rollup.assert_kernel_root_hash_has_correct_size kernel_root_hash in
+        let _ = Rollup.assert_kernel_root_hash_has_correct_length kernel_root_hash in
         Entrypoints.new_proposal kernel_root_hash storage
   
 

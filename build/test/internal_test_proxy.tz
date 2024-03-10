@@ -45,7 +45,7 @@
          SIZE ;
          COMPARE ;
          EQ ;
-         IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_SIZE" ; FAILWITH } ;
+         IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_LENGTH" ; FAILWITH } ;
          PUSH timestamp 0 ;
          DIG 2 ;
          SUB ;
@@ -146,7 +146,9 @@
          EXEC ;
          CONCAT } ;
   view "get_sequencer_upgrade_payload"
-       (pair (string %public_key) (bytes %l2_address) (timestamp %activation_timestamp))
+       (pair (string %sequencer_pk)
+             (bytes %pool_address)
+             (timestamp %activation_timestamp))
        bytes
        { LAMBDA nat bytes { BYTES } ;
          LAMBDA
@@ -195,13 +197,13 @@
          COMPARE ;
          EQ ;
          OR ;
-         IF {} { PUSH string "INCORRECT_PUBLIC_KEY_SIZE" ; FAILWITH } ;
+         IF {} { PUSH string "INCORRECT_SEQUENCER_PK_LENGTH" ; FAILWITH } ;
          PUSH nat 20 ;
          DUP 3 ;
          SIZE ;
          COMPARE ;
          EQ ;
-         IF {} { PUSH string "INCORRECT_L2_ADDRESS_SIZE" ; FAILWITH } ;
+         IF {} { PUSH string "INCORRECT_POOL_ADDRESS_LENGTH" ; FAILWITH } ;
          PACK ;
          DUP ;
          PUSH nat 4 ;

@@ -1040,7 +1040,7 @@
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_SIZE" ; FAILWITH } ;
+                     IF {} { PUSH string "INCORRECT_KERNEL_ROOT_HASH_LENGTH" ; FAILWITH } ;
                      DUP 2 ;
                      CAR ;
                      DIG 3 ;
@@ -1236,7 +1236,7 @@
                        { DIG 8 ;
                          DROP ;
                          DUP 3 ;
-                         VIEW "check_key_hash_in_last_winner" bool ;
+                         VIEW "check_proposer_in_last_winner" bool ;
                          IF_NONE
                            { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
                            {} ;

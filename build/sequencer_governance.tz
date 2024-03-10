@@ -1,8 +1,8 @@
 { parameter
     (or (address %trigger_committee_upgrade)
         (or (string %vote)
-            (or (pair %upvote_proposal (string %public_key) (bytes %l2_address))
-                (pair %new_proposal (string %public_key) (bytes %l2_address))))) ;
+            (or (pair %upvote_proposal (string %sequencer_pk) (bytes %pool_address))
+                (pair %new_proposal (string %sequencer_pk) (bytes %pool_address))))) ;
   storage
     (pair (pair %config
              (nat %started_at_level)
@@ -22,11 +22,11 @@
                          (big_map %upvoters_proposals (pair key_hash bytes) unit)
                          (big_map %proposals
                             bytes
-                            (pair (pair %payload (string %public_key) (bytes %l2_address))
+                            (pair (pair %payload (string %sequencer_pk) (bytes %pool_address))
                                   (key_hash %proposer)
                                   (nat %upvotes_voting_power)))
                          (option %max_upvotes_voting_power nat)
-                         (option %winner_candidate (pair (string %public_key) (bytes %l2_address)))
+                         (option %winner_candidate (pair (string %sequencer_pk) (bytes %pool_address)))
                          (nat %total_voting_power))
                       (pair %promotion
                          (big_map %voters key_hash unit)
@@ -34,9 +34,9 @@
                          (nat %nay_voting_power)
                          (nat %pass_voting_power)
                          (nat %total_voting_power)
-                         (pair %winner_candidate (string %public_key) (bytes %l2_address))))))
+                         (pair %winner_candidate (string %sequencer_pk) (bytes %pool_address))))))
           (option %last_winner
-             (pair (pair %payload (string %public_key) (bytes %l2_address))
+             (pair (pair %payload (string %sequencer_pk) (bytes %pool_address))
                    (big_map %trigger_history address unit)))
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
@@ -482,7 +482,8 @@
                  EMIT %voting_finished
                    (pair (nat %finished_at_period_index)
                          (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                         (option %winner_proposal_payload (pair (string %public_key) (bytes %l2_address)))) ;
+                         (option %winner_proposal_payload
+                            (pair (string %sequencer_pk) (bytes %pool_address)))) ;
                  CONS } ;
              DIG 5 ;
              DIG 4 ;
@@ -756,7 +757,8 @@
                      EMIT %voting_finished
                        (pair (nat %finished_at_period_index)
                              (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                             (option %winner_proposal_payload (pair (string %public_key) (bytes %l2_address)))) ;
+                             (option %winner_proposal_payload
+                                (pair (string %sequencer_pk) (bytes %pool_address)))) ;
                      CONS } ;
                  DIG 4 ;
                  DIG 3 ;
@@ -1046,7 +1048,8 @@
                          EMIT %voting_finished
                            (pair (nat %finished_at_period_index)
                                  (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                                 (option %winner_proposal_payload (pair (string %public_key) (bytes %l2_address)))) ;
+                                 (option %winner_proposal_payload
+                                    (pair (string %sequencer_pk) (bytes %pool_address)))) ;
                          CONS } ;
                      DIG 4 ;
                      DIG 3 ;
@@ -1068,13 +1071,13 @@
                      COMPARE ;
                      EQ ;
                      OR ;
-                     IF {} { PUSH string "INCORRECT_PUBLIC_KEY_SIZE" ; FAILWITH } ;
+                     IF {} { PUSH string "INCORRECT_SEQUENCER_PK_LENGTH" ; FAILWITH } ;
                      PUSH nat 20 ;
                      SWAP ;
                      SIZE ;
                      COMPARE ;
                      EQ ;
-                     IF {} { PUSH string "INCORRECT_L2_ADDRESS_SIZE" ; FAILWITH } ;
+                     IF {} { PUSH string "INCORRECT_POOL_ADDRESS_LENGTH" ; FAILWITH } ;
                      DUP 2 ;
                      CAR ;
                      DIG 3 ;
@@ -1270,7 +1273,7 @@
                        { DIG 8 ;
                          DROP ;
                          DUP 3 ;
-                         VIEW "check_key_hash_in_last_winner" bool ;
+                         VIEW "check_proposer_in_last_winner" bool ;
                          IF_NONE
                            { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
                            {} ;
@@ -1349,7 +1352,8 @@
                          EMIT %voting_finished
                            (pair (nat %finished_at_period_index)
                                  (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                                 (option %winner_proposal_payload (pair (string %public_key) (bytes %l2_address)))) ;
+                                 (option %winner_proposal_payload
+                                    (pair (string %sequencer_pk) (bytes %pool_address)))) ;
                          CONS } ;
                      DIG 4 ;
                      DIG 3 ;
@@ -1369,7 +1373,8 @@
              (option %finished_voting
                 (pair (nat %finished_at_period_index)
                       (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                      (option %winner_proposal_payload (pair (string %public_key) (bytes %l2_address))))))
+                      (option %winner_proposal_payload
+                         (pair (string %sequencer_pk) (bytes %pool_address))))))
        { PUSH string "CURRENT_LEVEL_LESS_THAN_START_LEVEL" ;
          SWAP ;
          CDR ;

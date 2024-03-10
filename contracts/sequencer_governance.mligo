@@ -8,8 +8,8 @@
 module SequencerCommitteeGovernance = struct
 
     type payload_t = {
-        public_key : string;
-        l2_address : bytes;
+        sequencer_pk : string;
+        pool_address : bytes;
     }
     type storage_t = payload_t Storage.t
     type return_t = operation list * storage_t
@@ -19,7 +19,8 @@ module SequencerCommitteeGovernance = struct
             (payload : payload_t)
             (storage : storage_t) 
             : return_t = 
-        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size payload.public_key payload.l2_address in
+        let { sequencer_pk; pool_address; } = payload in
+        let _ = Rollup.assert_sequencer_upgrade_payload_is_correct sequencer_pk pool_address in
         Entrypoints.new_proposal payload storage
   
 
@@ -48,7 +49,7 @@ module SequencerCommitteeGovernance = struct
                 (payload : payload_t) 
                 : bytes -> 
             let activation_timestamp = Rollup.get_activation_timestamp storage.config.adoption_period_sec in
-            Rollup.get_sequencer_upgrade_payload payload.public_key payload.l2_address activation_timestamp in
+            Rollup.get_sequencer_upgrade_payload payload.sequencer_pk payload.pool_address activation_timestamp in
         Entrypoints.trigger_rollup_upgrade rollup_address storage pack_payload
 
 

@@ -42,10 +42,10 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         })
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }# Period index: 0. Block: 2 of 3
-        governance.using(baker1).new_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker1).new_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -80,11 +80,11 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         })
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 2 of 3
-        governance.using(baker).new_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker).new_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
         
         # Period index: 0. Block: 3 of 3
@@ -122,11 +122,11 @@ class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
         }
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 2 of 5
-        governance.using(baker1).new_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker1).new_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
         # Period index: 1. Block: 1 of 5
         self.bake_blocks(4)

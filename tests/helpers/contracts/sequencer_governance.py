@@ -25,16 +25,16 @@ class SequencerGovernance(GovernanceBase):
 
         return originate_from_file(filename, client, storage)
     
-    def new_proposal(self, public_key : str, l2_address : bytes) -> ContractCall:
+    def new_proposal(self, sequencer_pk : str, pool_address : bytes) -> ContractCall:
         """Creates a new proposal"""
 
-        return self.contract.new_proposal(public_key, l2_address)
+        return self.contract.new_proposal(sequencer_pk, pool_address)
     
     
-    def upvote_proposal(self, public_key : str, l2_address : bytes) -> ContractCall:
+    def upvote_proposal(self, sequencer_pk : str, pool_address : bytes) -> ContractCall:
         """Upvotes an exist proposal"""
 
-        return self.contract.upvote_proposal(public_key, l2_address)
+        return self.contract.upvote_proposal(sequencer_pk, pool_address)
     
     def vote(self, vote : str) -> ContractCall:
         """Votes for a hash in promotion period"""

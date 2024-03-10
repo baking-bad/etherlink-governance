@@ -27,13 +27,13 @@ module InternalTestProxy = struct
             (_ : storage_t) 
             : bytes = 
         let { kernel_root_hash; activation_timestamp } = params in
-        let _ = Rollup.assert_kernel_root_hash_has_correct_size kernel_root_hash in
+        let _ = Rollup.assert_kernel_root_hash_has_correct_length kernel_root_hash in
         Rollup.get_kernel_upgrade_payload kernel_root_hash activation_timestamp
 
         
     type sequencer_upgrade_payload_params_t = {
-        public_key : string;
-        l2_address : bytes;
+        sequencer_pk : string;
+        pool_address : bytes;
         activation_timestamp : timestamp;
     }
 
@@ -42,9 +42,9 @@ module InternalTestProxy = struct
             (params: sequencer_upgrade_payload_params_t) 
             (_ : storage_t) 
             : bytes = 
-        let { public_key; l2_address; activation_timestamp } = params in
-        let _ = Rollup.assert_sequencer_upgrade_payload_has_correct_size public_key l2_address in
-        Rollup.get_sequencer_upgrade_payload public_key l2_address activation_timestamp
+        let { sequencer_pk; pool_address; activation_timestamp } = params in
+        let _ = Rollup.assert_sequencer_upgrade_payload_is_correct sequencer_pk pool_address in
+        Rollup.get_sequencer_upgrade_payload sequencer_pk pool_address activation_timestamp
 
 
     [@view]

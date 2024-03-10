@@ -11,7 +11,7 @@ from tests.helpers.utility import DEFAULT_ADDRESS
 import re
 
 class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
-    def prepare_last_winner(self, public_key, l2_address):
+    def prepare_last_winner(self, sequencer_pk, pool_address):
         baker = self.bootstrap_baker()
         governance_started_at_level = self.get_current_level() + 1
         governance = self.deploy_sequencer_governance(custom_config={
@@ -23,7 +23,7 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
         })
 
         # Period index: 0. Block: 2 of 2
-        governance.using(baker).new_proposal(public_key, l2_address).send()
+        governance.using(baker).new_proposal(sequencer_pk, pool_address).send()
         self.bake_blocks(2)
 
         # Period index: 1. Block: 2 of 2
@@ -52,9 +52,9 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
     def test_should_allow_no_baker_to_trigger_upgrade(self) -> None:
         no_baker = self.bootstrap_no_baker()
         rollup_mock = self.deploy_rollup_mock()
-        public_key = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
-        l2_address = '71c7656ec7ab88b098defb751b7401b5f6d8976f'
-        test = self.prepare_last_winner(public_key, l2_address)
+        sequencer_pk = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
+        pool_address = '71c7656ec7ab88b098defb751b7401b5f6d8976f'
+        test = self.prepare_last_winner(sequencer_pk, pool_address)
         governance : SequencerGovernance = test['governance']
 
         governance.using(no_baker).trigger_committee_upgrade(rollup_mock.contract.address).send()
@@ -63,9 +63,9 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
     def test_should_fail_to_send_last_winner_second_time_to_the_same_address_but_reset_for_new_winner(self) -> None:
         rollup_mock1 = self.deploy_rollup_mock()
         rollup_mock2 = self.deploy_rollup_mock()
-        public_key = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
-        l2_address = '71c7656ec7ab88b098defb751b7401b5f6d8976f'
-        test = self.prepare_last_winner(public_key, l2_address)
+        sequencer_pk = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
+        pool_address = '71c7656ec7ab88b098defb751b7401b5f6d8976f'
+        test = self.prepare_last_winner(sequencer_pk, pool_address)
         governance : SequencerGovernance = test['governance']
         baker : PyTezosClient = test['baker']
 
@@ -82,7 +82,7 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
         with self.raisesMichelsonError(UPGRADE_FOR_ADDRESS_ALREADY_TRIGGERED):
             governance.using(baker).trigger_committee_upgrade(rollup_mock2.contract.address).send()
 
-        governance.using(baker).new_proposal(public_key, l2_address).send()
+        governance.using(baker).new_proposal(sequencer_pk, pool_address).send()
         self.bake_blocks(2)
         governance.using(baker).vote(YEA_VOTE).send()
         self.bake_blocks(2)
@@ -107,13 +107,13 @@ class CommitteeGovernanceTriggerCommitteeUpgradeTestCase(BaseTestCase):
 
     def test_should_send_last_winner_payload_to_rollup(self) -> None:
         rollup_mock = self.deploy_rollup_mock()
-        public_key = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
-        l2_address = '71c7656ec7ab88b098defb751b7401b5f6d8976f'
-        test = self.prepare_last_winner(public_key, l2_address)
+        sequencer_pk = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
+        pool_address = '71c7656ec7ab88b098defb751b7401b5f6d8976f'
+        test = self.prepare_last_winner(sequencer_pk, pool_address)
         governance : SequencerGovernance = test['governance']
         baker : PyTezosClient = test['baker']
 
-        payload_pattern = rf'^F855B6{public_key.encode().hex()}94{l2_address}88[\da-f]{{16}}$'
+        payload_pattern = rf'^F855B6{sequencer_pk.encode().hex()}94{pool_address}88[\da-f]{{16}}$'
         assert not re.match(payload_pattern, rollup_mock.contract.storage().hex(), re.IGNORECASE)
 
         governance.using(baker).trigger_committee_upgrade(rollup_mock.contract.address).send()

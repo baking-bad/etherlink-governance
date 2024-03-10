@@ -8,7 +8,6 @@ from pytezos.michelson.types.base import MichelsonType
 from typing import Any
 
 
-# Default address used as a placeholder in the contract storage
 DEFAULT_ADDRESS = 'tz1burnburnburnburnburnburnburjAYjjX'
 DEFAULT_VOTING_POWER = 4000000000000
 DEFAULT_TOTAL_VOTING_POWER = 20000000000000
@@ -111,8 +110,8 @@ def pack(object: Any, type_expression: str) -> bytes:
 
 def pack_sequencer_payload(payload):
     return {
-        'public_key': payload['public_key'],
-        'l2_address': bytes.fromhex(payload['l2_address'])
+        'sequencer_pk': payload['sequencer_pk'],
+        'pool_address': bytes.fromhex(payload['pool_address'])
     }
 
 def originate_from_file(

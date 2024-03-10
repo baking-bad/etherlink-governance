@@ -12,22 +12,22 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         governance = self.deploy_sequencer_governance()
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         with self.raisesMichelsonError(TEZ_IN_TRANSACTION_DISALLOWED):
-            governance.using(baker).upvote_proposal(payload['public_key'], payload['l2_address']).with_amount(1).send()
+            governance.using(baker).upvote_proposal(payload['sequencer_pk'], payload['pool_address']).with_amount(1).send()
 
     def test_should_fail_if_sender_has_no_voting_power(self) -> None:
         no_baker = self.bootstrap_no_baker()
         governance = self.deploy_sequencer_governance()
 
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         with self.raisesMichelsonError(NO_VOTING_POWER):
-            governance.using(no_baker).upvote_proposal(payload['public_key'], payload['l2_address']).send()
+            governance.using(no_baker).upvote_proposal(payload['sequencer_pk'], payload['pool_address']).send()
 
     def test_should_fail_if_current_period_is_not_proposal(self) -> None:
         baker = self.bootstrap_baker()
@@ -41,11 +41,11 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         })
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 2 of 2
-        governance.using(baker).new_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker).new_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
 
         self.bake_block()
@@ -56,7 +56,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
 
         # Period index: 1. Block: 2 of 2
         with self.raisesMichelsonError(NOT_PROPOSAL_PERIOD):
-            governance.using(baker).upvote_proposal(payload['public_key'], payload['l2_address']).send()
+            governance.using(baker).upvote_proposal(payload['sequencer_pk'], payload['pool_address']).send()
 
     def test_should_fail_if_upvoting_limit_is_exceeded(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -72,35 +72,35 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         })
         
         payload1 = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 2 of 7
-        governance.using(baker1).new_proposal(payload1['public_key'], payload1['l2_address']).send()
+        governance.using(baker1).new_proposal(payload1['sequencer_pk'], payload1['pool_address']).send()
         self.bake_block()
         # Period index: 0. Block: 3 of 7
         payload2 = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417186'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417186'
         }
-        governance.using(baker1).new_proposal(payload2['public_key'], payload2['l2_address']).send()
+        governance.using(baker1).new_proposal(payload2['sequencer_pk'], payload2['pool_address']).send()
         self.bake_block()
         # Period index: 0. Block: 4 of 7
         payload3 = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417188'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417188'
         }
-        governance.using(baker2).new_proposal(payload3['public_key'], payload3['l2_address']).send()
+        governance.using(baker2).new_proposal(payload3['sequencer_pk'], payload3['pool_address']).send()
         self.bake_block()
         # Period index: 0. Block: 5 of 7
-        governance.using(baker3).upvote_proposal(payload1['public_key'], payload1['l2_address']).send()
+        governance.using(baker3).upvote_proposal(payload1['sequencer_pk'], payload1['pool_address']).send()
         self.bake_block()
         # Period index: 0. Block: 6 of 7
-        governance.using(baker3).upvote_proposal(payload2['public_key'], payload2['l2_address']).send()
+        governance.using(baker3).upvote_proposal(payload2['sequencer_pk'], payload2['pool_address']).send()
         self.bake_block()
 
         with self.raisesMichelsonError(UPVOTING_LIMIT_EXCEEDED):
-            governance.using(baker3).upvote_proposal(payload3['public_key'], payload3['l2_address']).send()
+            governance.using(baker3).upvote_proposal(payload3['sequencer_pk'], payload3['pool_address']).send()
 
 
     def test_should_fail_if_proposal_already_upvoted_by_proposer(self) -> None:
@@ -115,17 +115,17 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         })
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 1 of 5
-        governance.using(baker).new_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker).new_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
         self.bake_block()
         self.bake_block()
 
         with self.raisesMichelsonError(PROPOSAL_ALREADY_UPVOTED):
-            governance.using(baker).upvote_proposal(payload['public_key'], payload['l2_address']).send()
+            governance.using(baker).upvote_proposal(payload['sequencer_pk'], payload['pool_address']).send()
 
     def test_should_fail_if_proposal_already_upvoted_by_another_baker(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -140,19 +140,19 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         })
         
         payload = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 1 of 5
-        governance.using(baker1).new_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker1).new_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
 
         # Period index: 0. Block: 2 of 5
-        governance.using(baker2).upvote_proposal(payload['public_key'], payload['l2_address']).send()
+        governance.using(baker2).upvote_proposal(payload['sequencer_pk'], payload['pool_address']).send()
         self.bake_block()
 
         with self.raisesMichelsonError(PROPOSAL_ALREADY_UPVOTED):
-            governance.using(baker2).upvote_proposal(payload['public_key'], payload['l2_address']).send()
+            governance.using(baker2).upvote_proposal(payload['sequencer_pk'], payload['pool_address']).send()
 
     def test_should_upvote_proposal_with_correct_parameters(self) -> None:
         baker1 = self.bootstrap_baker()
@@ -175,11 +175,11 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         }
         
         payload1 = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417185'
         }
         # Period index: 0. Block: 2 of 6
-        governance.using(baker1).new_proposal(payload1['public_key'], payload1['l2_address']).send()
+        governance.using(baker1).new_proposal(payload1['sequencer_pk'], payload1['pool_address']).send()
         self.bake_block()
 
         storage = governance.contract.storage()
@@ -195,7 +195,7 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         }
 
         # Period index: 0. Block: 3 of 6
-        governance.using(baker2).upvote_proposal(payload1['public_key'], payload1['l2_address']).send()
+        governance.using(baker2).upvote_proposal(payload1['sequencer_pk'], payload1['pool_address']).send()
         self.bake_block()
 
         storage = governance.contract.storage()
@@ -211,11 +211,11 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         }
 
         payload2 = {
-            'public_key': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
-            'l2_address': 'B7A97043983f24991398E5a82f63F4C58a417186'
+            'sequencer_pk': 'edpkurcgafZ2URyB6zsm5d1YqmLt9r1Lk89J81N6KpyMaUzXWEsv1X',
+            'pool_address': 'B7A97043983f24991398E5a82f63F4C58a417186'
         }
         # Period index: 0. Block: 4 of 6
-        governance.using(baker1).new_proposal(payload2['public_key'], payload2['l2_address']).send()
+        governance.using(baker1).new_proposal(payload2['sequencer_pk'], payload2['pool_address']).send()
         self.bake_block()
         storage = governance.contract.storage()
         assert storage['voting_context']['period_index'] == 0
@@ -230,10 +230,10 @@ class CommitteeGovernanceUpvoteProposalTestCase(BaseTestCase):
         }
 
         # Period index: 0. Block: 5 of 6
-        governance.using(baker2).upvote_proposal(payload2['public_key'], payload2['l2_address']).send()
+        governance.using(baker2).upvote_proposal(payload2['sequencer_pk'], payload2['pool_address']).send()
         self.bake_block()
         # Period index: 0. Block: 6 of 6
-        governance.using(baker3).upvote_proposal(payload2['public_key'], payload2['l2_address']).send()
+        governance.using(baker3).upvote_proposal(payload2['sequencer_pk'], payload2['pool_address']).send()
         self.bake_block()
         storage = governance.contract.storage()
         assert storage['voting_context']['period_index'] == 0

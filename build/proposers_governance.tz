@@ -658,7 +658,7 @@
                  SIZE ;
                  COMPARE ;
                  LE ;
-                 IF {} { PUSH string "INCORRECT_KEY_HASH_SET_SIZE" ; FAILWITH } ;
+                 IF {} { PUSH string "INCORRECT_PROPOSERS_SET_SIZE" ; FAILWITH } ;
                  DUP 2 ;
                  CAR ;
                  DIG 3 ;
@@ -851,7 +851,7 @@
                    { DIG 8 ;
                      DROP ;
                      DUP 3 ;
-                     VIEW "check_key_hash_in_last_winner" bool ;
+                     VIEW "check_proposer_in_last_winner" bool ;
                      IF_NONE
                        { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
                        {} ;
@@ -1171,7 +1171,7 @@
          DIG 3 ;
          CAR ;
          PAIR 4 } ;
-  view "check_key_hash_in_last_winner"
+  view "check_proposer_in_last_winner"
        key_hash
        bool
        { UNPAIR ;
