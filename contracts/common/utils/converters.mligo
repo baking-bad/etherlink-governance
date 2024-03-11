@@ -32,6 +32,11 @@ let address_to_key_hash
         : key_hash =
     (*
         NOTE:
+        This is a workaround solution. 
+        Use the IMPLICIT instruction of type address -> option key_hash when it will be available
+        (See: https://gitlab.com/nomadic-labs/tezos/-/merge_requests/93)
+        
+        Explanation of workaround
         Bytes.pack for an address can return the following variants depending on address type 
             tz1NyAf1KeeFCCPPAZ9ard9YVshVGFibzVKa -> 0x050a0000001600002486eda3c7bbbe6be511b46d6deeb1594258a7fd
             tz2VGBaXuS6rnaa5hpC92qkgadRJKdEbeGwc -> 0x050a000000160001e5c6d1f726796e98b2bad2a819a36f742b2fe25b
