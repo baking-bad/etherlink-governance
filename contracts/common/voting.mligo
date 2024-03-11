@@ -58,28 +58,21 @@ let get_promotion_winner
 
 
 [@inline]
-let get_new_proposal_period_content
+let init_new_proposal_voting_period
         (type pt)
-        (_ : unit)
-        : pt Storage.proposal_period_t =
-    {
+        (period_index : nat)
+        : pt Storage.voting_context_t =
+    let proposal_period : pt Storage.proposal_period_t= {
         proposals = Big_map.empty;
         upvoters_upvotes_count = Big_map.empty;
         upvoters_proposals = Big_map.empty;
         max_upvotes_voting_power = None; 
         winner_candidate = None;
         total_voting_power = Tezos.get_total_voting_power ();
-    }
-
-
-[@inline]
-let init_new_proposal_voting_period
-        (type pt)
-        (period_index : nat)
-        : pt Storage.voting_context_t =
+    } in
     { 
         period_index = period_index;
-        period = Proposal (get_new_proposal_period_content ());
+        period = Proposal proposal_period;
     }   
 
 
@@ -148,15 +141,6 @@ let init_new_voting_state
             }
 
 
-let init_voting_context
-        (type pt)
-        (period_index : nat)
-        : pt Storage.voting_context_t = 
-    {
-        period_index = period_index;
-        period = Proposal (get_new_proposal_period_content ());
-    }
-
 
 type 'pt voting_state_t = {
     voting_context : 'pt Storage.voting_context_t;
@@ -172,7 +156,7 @@ let get_voting_state
     let voting_state = match storage.voting_context with
         | None ->  
             {
-                voting_context = init_voting_context period_index;
+                voting_context = init_new_proposal_voting_period period_index;
                 finished_voting = None
             }
         | Some voting_context -> 
