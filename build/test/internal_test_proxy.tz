@@ -319,6 +319,7 @@
        address
        key_hash
        { CAR ;
+         DUP ;
          PACK ;
          PUSH bytes 0x00 ;
          DUP 2 ;
@@ -352,5 +353,13 @@
          UNPACK key_hash ;
          PUSH string "FAILED_TO_CAST_ADDRESS_TO_KEY_HASH" ;
          SWAP ;
-         IF_NONE { FAILWITH } { SWAP ; DROP } } }
+         IF_NONE { FAILWITH } { SWAP ; DROP } ;
+         PUSH string "KEY_HASH_NOT_EQUAL_TO_SOURCE_ADDRESS" ;
+         DIG 2 ;
+         DUP 3 ;
+         IMPLICIT_ACCOUNT ;
+         ADDRESS ;
+         COMPARE ;
+         EQ ;
+         IF { DROP } { FAILWITH } } }
 
