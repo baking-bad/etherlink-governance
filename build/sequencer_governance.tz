@@ -671,28 +671,21 @@
                               LEFT (pair (big_map key_hash string) nat nat nat nat (pair string bytes)) } ;
                           DIG 2 ;
                           PAIR } } ;
-                 DUP 2 ;
-                 DIG 2 ;
-                 IF_NONE
-                   { DUP 4 ; GET 5 }
-                   { GET 4 ;
-                     IF_NONE
-                       { DUP 4 ; GET 5 }
-                       { EMPTY_BIG_MAP address unit ; SWAP ; PAIR ; SOME } } ;
-                 DIG 2 ;
+                 SWAP ;
+                 DROP ;
                  SENDER ;
-                 DIG 8 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
                  DUP ;
                  VOTING_POWER ;
                  UNIT ;
-                 DIG 9 ;
+                 DIG 7 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
                  DUP ;
-                 DIG 8 ;
+                 DIG 6 ;
                  SWAP ;
                  EXEC ;
                  DROP ;
@@ -706,24 +699,24 @@
                  NOT ;
                  IF {} { PUSH string "PROMOTION_ALREADY_VOTED" ; FAILWITH } ;
                  PUSH string "yea" ;
-                 DUP 8 ;
+                 DUP 6 ;
                  COMPARE ;
                  EQ ;
                  IF { DUP ; DIG 2 ; DUP 3 ; GET 3 ; ADD ; UPDATE 3 }
                     { PUSH string "nay" ;
-                      DUP 8 ;
+                      DUP 6 ;
                       COMPARE ;
                       EQ ;
                       IF { DUP ; DIG 2 ; DUP 3 ; GET 5 ; ADD ; UPDATE 5 }
                          { PUSH string "pass" ;
-                           DUP 8 ;
+                           DUP 6 ;
                            COMPARE ;
                            EQ ;
                            IF { DUP ; DIG 2 ; DUP 3 ; GET 7 ; ADD ; UPDATE 7 }
                               { SWAP ; DROP ; PUSH string "INCORRECT_VOTE_VALUE" ; FAILWITH } } } ;
                  SWAP ;
                  CAR ;
-                 DIG 6 ;
+                 DIG 4 ;
                  SOME ;
                  DIG 3 ;
                  UPDATE ;
@@ -735,25 +728,10 @@
                          (option nat)
                          (option (pair string bytes))
                          nat) ;
-                 DIG 3 ;
-                 IF_NONE
-                   { NIL operation }
-                   { NIL operation ;
-                     SWAP ;
-                     EMIT %voting_finished
-                       (pair (nat %finished_at_period_index)
-                             (or %finished_at_period_type (unit %proposal) (unit %promotion))
-                             (option %winner_proposal_payload
-                                (pair (string %sequencer_pk) (bytes %pool_address)))) ;
-                     CONS } ;
-                 DIG 4 ;
-                 DIG 3 ;
-                 DIG 3 ;
                  UPDATE 2 ;
                  SOME ;
                  UPDATE 3 ;
-                 DIG 2 ;
-                 UPDATE 5 }
+                 NIL operation }
                { IF_LEFT
                    { DUP 2 ;
                      CAR ;
@@ -1345,8 +1323,8 @@
                      SOME ;
                      UPDATE 3 ;
                      DIG 2 ;
-                     UPDATE 5 } } ;
-             SWAP } ;
+                     UPDATE 5 } ;
+                 SWAP } } ;
          PAIR } ;
   view "get_voting_state"
        unit

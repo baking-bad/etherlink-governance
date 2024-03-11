@@ -58,22 +58,19 @@ let vote
         (vote : string)
         (storage : pt Storage.t)
         : operation list * pt Storage.t =
-    let { voting_context; finished_voting; last_winner } = Voting.get_voting_state storage in
+    let voting_state = Voting.get_voting_state storage in
+    let voting_context = voting_state.voting_context in
     let voter = Converters.address_to_key_hash (Tezos.get_sender ()) in
     let voting_power = Tezos.voting_power voter in
     let _ = Validation.assert_no_tez_in_transaction () in
     let _ = Validation.assert_voting_power_positive voting_power in
     let promotion_period = Voting.get_promotion_period voting_context in
     let updated_period = Voting.vote_promotion vote voter voting_power promotion_period in
-    let operations = match finished_voting with
-        | Some event_payload -> [Events.create_voting_finished_event_operation event_payload]
-        | None -> [] in
     let updated_storage = { 
         storage with 
         voting_context = Some { voting_context with period = updated_period };
-        last_winner = last_winner;
     } in
-    operations, updated_storage
+    [], updated_storage
 
 #if TRIGGER_ENABLED
 
