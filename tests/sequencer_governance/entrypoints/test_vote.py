@@ -4,7 +4,7 @@ from tests.helpers.errors import (
     INCORRECT_VOTE_VALUE, NO_VOTING_POWER, NOT_PROMOTION_PERIOD, PROMOTION_ALREADY_VOTED, 
     TEZ_IN_TRANSACTION_DISALLOWED
 )
-from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_sequencer_payload, pkh
+from tests.helpers.utility import DEFAULT_TOTAL_VOTING_POWER, DEFAULT_VOTING_POWER, pack_sequencer_payload
 
 class CommitteeGovernanceNewProposalTestCase(BaseTestCase):
     def test_should_fail_if_tez_in_transaction(self) -> None:

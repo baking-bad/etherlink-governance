@@ -8,7 +8,6 @@ from pytezos.rpc import RpcError
 from contextlib import contextmanager
 from tests.helpers.contracts.internal_test_proxy import InternalTestProxy
 from tests.helpers.contracts.rollup_mock import RollupMock
-from tests.helpers.contracts.proposers_governance import ProposersGovernance
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.utility import pkh
 from pytezos.contract.result import ContractCallResult
@@ -71,13 +70,6 @@ class BaseTestCase(SandboxedNodeTestCase):
         opg = SequencerGovernance.originate(self.manager, custom_config).send()
         self.bake_block()
         return SequencerGovernance.from_opg(self.manager, opg)
-
-    def deploy_proposers_governance(self, custom_config=None, last_winner=None) -> ProposersGovernance:
-        """Deploys Proposers Governance contract"""
-
-        opg = ProposersGovernance.originate(self.manager, custom_config, last_winner).send()
-        self.bake_block()
-        return ProposersGovernance.from_opg(self.manager, opg)
 
     @contextmanager
     def raisesMichelsonError(self, error_message):

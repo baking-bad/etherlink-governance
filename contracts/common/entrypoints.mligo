@@ -16,7 +16,7 @@ let new_proposal
     let proposer = Converters.address_to_key_hash (Tezos.get_sender ()) in
     let voting_power = Tezos.voting_power proposer in
     let _ = Validation.assert_no_tez_in_transaction () in
-    let _ = Validation.assert_proposer_allowed proposer voting_power storage.config.proposers_governance_contract in
+    let _ = Validation.assert_voting_power_positive voting_power in
     let proposal_period = Voting.get_proposal_period voting_context in
     let updated_period = Voting.add_new_proposal_and_upvote payload proposer voting_power proposal_period storage.config in
     let operations = match finished_voting with
@@ -72,7 +72,6 @@ let vote
     } in
     [], updated_storage
 
-#if TRIGGER_ENABLED
 
 let trigger_rollup_upgrade
         (type pt)
@@ -101,5 +100,3 @@ let trigger_rollup_upgrade
         }
     } in 
     operations, updated_storage
-    
-#endif

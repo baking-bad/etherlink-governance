@@ -172,9 +172,7 @@ let get_voting_state
                 | Some winner_payload -> 
                     Some {
                         payload = winner_payload;
-#if TRIGGER_ENABLED
                         trigger_history = Big_map.empty;
-#endif
                     }
                 | None -> storage.last_winner)
             | None -> storage.last_winner

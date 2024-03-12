@@ -1,5 +1,4 @@
 from pytezos import pytezos
-from tests.helpers.contracts.proposers_governance import ProposersGovernance
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from typing import Optional
@@ -7,15 +6,13 @@ import click
 from scripts.environment import load_or_ask
 from enum import Enum
 
-ContractType = Enum('ContractType', ['kernel_governance', 'sequencer_governance', 'proposers_governance'])
+ContractType = Enum('ContractType', ['kernel_governance', 'sequencer_governance'])
 
 def originate_contract(contract_type, manager, config, last_winner):
     if contract_type == ContractType.kernel_governance.name:
         return KernelGovernance.originate(manager, config).send()
     elif contract_type == ContractType.sequencer_governance.name:
         return SequencerGovernance.originate(manager, config).send()
-    elif contract_type == ContractType.proposers_governance.name:
-        return ProposersGovernance.originate(manager, config, last_winner).send()
     else:
         raise ValueError("Incorrect contract_type")
 
@@ -23,7 +20,7 @@ def originate_contract(contract_type, manager, config, last_winner):
 @click.option(
     '--contract',
     required=True,
-    help='"kernel_governance" or "sequencer_governance" or "proposers_governance"',
+    help='"kernel_governance" or "sequencer_governance"',
 )
 @click.option(
     '--started_at_level',
@@ -65,16 +62,6 @@ def originate_contract(contract_type, manager, config, last_winner):
     default=100,
     help='For example if scale = 100 and proposal_quorum = 80 then proposal_quorum == .80 == 80%',
 )
-@click.option(
-    '--proposers_governance_contract',
-    help='Another governance contract which keeps accounts that can submit new proposals (if None then anyone is allowed)',
-)
-@click.option(
-    '--last_winner_payload',
-    default=[],
-    multiple=True,
-    help='an item to fill initial last winner on origination)',
-)
 @click.option('--private-key', default=None, help='Use the provided private key.')
 @click.option('--rpc-url', default=None, help='Tezos RPC URL.')
 def deploy_contract(
@@ -87,8 +74,6 @@ def deploy_contract(
     promotion_quorum: int,
     promotion_supermajority: int,
     scale: int,
-    proposers_governance_contract: Optional[str],
-    last_winner_payload: list[str],
     private_key: Optional[str],
     rpc_url: Optional[str],
 ) -> KernelGovernance:
@@ -100,19 +85,16 @@ def deploy_contract(
     config = {
         'started_at_level': int(started_at_level),
         'period_length': int(period_length),
+        'adoption_period_sec': int(adoption_period_sec),
         'upvoting_limit': int(upvoting_limit),
         'scale': int(scale),
-        'proposers_governance_contract': proposers_governance_contract,
         'proposal_quorum': int(proposal_quorum),
         'promotion_quorum': int(promotion_quorum),
         'promotion_supermajority': int(promotion_supermajority),
     }
-    if contract in [ContractType.kernel_governance.name, ContractType.sequencer_governance.name]: 
-        config['adoption_period_sec'] = int(adoption_period_sec)
     
-    last_winner = list(last_winner_payload) if len(last_winner_payload) > 0 else None 
     manager = pytezos.using(shell=rpc_url, key=private_key)
-    opg = originate_contract(contract, manager, config, last_winner)
+    opg = originate_contract(contract, manager, config)
     manager.wait(opg)
     kernelGovernance = KernelGovernance.from_opg(manager, opg)
     return kernelGovernance

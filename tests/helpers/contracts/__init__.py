@@ -1,6 +1,5 @@
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
-from tests.helpers.contracts.proposers_governance import ProposersGovernance
 from tests.helpers.contracts.rollup_mock import RollupMock
 from tests.helpers.contracts.internal_test_proxy import InternalTestProxy
 from tests.helpers.contracts.contract import ContractHelper
@@ -15,5 +14,4 @@ __all__ = [
     'SequencerGovernance',
     'RollupMock',
     'InternalTestProxy',
-    'ProposersGovernance'
 ]

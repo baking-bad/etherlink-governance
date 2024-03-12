@@ -9,7 +9,6 @@
              (nat %period_length)
              (nat %adoption_period_sec)
              (nat %upvoting_limit)
-             (option %proposers_governance_contract address)
              (nat %scale)
              (nat %proposal_quorum)
              (nat %promotion_quorum)
@@ -138,7 +137,7 @@
              GT ;
              IF { UNIT } { PUSH string "NO_VOTING_POWER" ; FAILWITH } } ;
          LAMBDA
-           (pair nat nat nat nat (option address) nat nat nat nat)
+           (pair nat nat nat nat nat nat nat nat)
            nat
            { DUP ;
              CAR ;
@@ -196,12 +195,12 @@
                       CDR ;
                       IF_LEFT
                         { DUP 2 ;
-                          GET 13 ;
+                          GET 11 ;
                           DUP 2 ;
                           GET 10 ;
                           MUL ;
                           DIG 2 ;
-                          GET 11 ;
+                          GET 9 ;
                           DUP 3 ;
                           GET 7 ;
                           IF_NONE { PUSH nat 0 } {} ;
@@ -280,10 +279,10 @@
                           DROP ;
                           DIG 3 ;
                           DUP 6 ;
-                          GET 15 ;
+                          GET 13 ;
                           MUL ;
                           DUP 6 ;
-                          GET 11 ;
+                          GET 9 ;
                           DIG 4 ;
                           DUP 5 ;
                           DUP 5 ;
@@ -297,10 +296,10 @@
                           ADD ;
                           DUP ;
                           DUP 6 ;
-                          GET 16 ;
+                          GET 14 ;
                           MUL ;
                           DIG 5 ;
-                          GET 11 ;
+                          GET 9 ;
                           DIG 4 ;
                           MUL ;
                           COMPARE ;
@@ -544,12 +543,12 @@
                           CDR ;
                           IF_LEFT
                             { DUP 2 ;
-                              GET 13 ;
+                              GET 11 ;
                               DUP 2 ;
                               GET 10 ;
                               MUL ;
                               DIG 2 ;
-                              GET 11 ;
+                              GET 9 ;
                               DUP 3 ;
                               GET 7 ;
                               IF_NONE { PUSH nat 0 } {} ;
@@ -628,10 +627,10 @@
                               DROP ;
                               DIG 3 ;
                               DUP 6 ;
-                              GET 15 ;
+                              GET 13 ;
                               MUL ;
                               DUP 6 ;
-                              GET 11 ;
+                              GET 9 ;
                               DIG 4 ;
                               DUP 5 ;
                               DUP 5 ;
@@ -645,10 +644,10 @@
                               ADD ;
                               DUP ;
                               DUP 6 ;
-                              GET 16 ;
+                              GET 14 ;
                               MUL ;
                               DIG 5 ;
-                              GET 11 ;
+                              GET 9 ;
                               DIG 4 ;
                               MUL ;
                               COMPARE ;
@@ -773,12 +772,12 @@
                               CDR ;
                               IF_LEFT
                                 { DUP 2 ;
-                                  GET 13 ;
+                                  GET 11 ;
                                   DUP 2 ;
                                   GET 10 ;
                                   MUL ;
                                   DIG 2 ;
-                                  GET 11 ;
+                                  GET 9 ;
                                   DUP 3 ;
                                   GET 7 ;
                                   IF_NONE { PUSH nat 0 } {} ;
@@ -857,10 +856,10 @@
                                   DROP ;
                                   DIG 3 ;
                                   DUP 6 ;
-                                  GET 15 ;
+                                  GET 13 ;
                                   MUL ;
                                   DUP 6 ;
-                                  GET 11 ;
+                                  GET 9 ;
                                   DIG 4 ;
                                   DUP 5 ;
                                   DUP 5 ;
@@ -874,10 +873,10 @@
                                   ADD ;
                                   DUP ;
                                   DUP 6 ;
-                                  GET 16 ;
+                                  GET 14 ;
                                   MUL ;
                                   DIG 5 ;
-                                  GET 11 ;
+                                  GET 9 ;
                                   DIG 4 ;
                                   MUL ;
                                   COMPARE ;
@@ -1079,12 +1078,12 @@
                               CDR ;
                               IF_LEFT
                                 { DUP 2 ;
-                                  GET 13 ;
+                                  GET 11 ;
                                   DUP 2 ;
                                   GET 10 ;
                                   MUL ;
                                   DIG 2 ;
-                                  GET 11 ;
+                                  GET 9 ;
                                   DUP 3 ;
                                   GET 7 ;
                                   IF_NONE { PUSH nat 0 } {} ;
@@ -1163,10 +1162,10 @@
                                   DROP ;
                                   DIG 3 ;
                                   DUP 6 ;
-                                  GET 15 ;
+                                  GET 13 ;
                                   MUL ;
                                   DUP 6 ;
-                                  GET 11 ;
+                                  GET 9 ;
                                   DIG 4 ;
                                   DUP 5 ;
                                   DUP 5 ;
@@ -1180,10 +1179,10 @@
                                   ADD ;
                                   DUP ;
                                   DUP 6 ;
-                                  GET 16 ;
+                                  GET 14 ;
                                   MUL ;
                                   DIG 5 ;
-                                  GET 11 ;
+                                  GET 9 ;
                                   DIG 4 ;
                                   MUL ;
                                   COMPARE ;
@@ -1235,19 +1234,11 @@
                      SWAP ;
                      EXEC ;
                      DROP ;
-                     DUP 7 ;
-                     CAR ;
-                     GET 9 ;
-                     IF_NONE
-                       { DUP ; DIG 8 ; SWAP ; EXEC ; DROP }
-                       { DIG 8 ;
-                         DROP ;
-                         DUP 3 ;
-                         VIEW "check_proposer_in_last_winner" bool ;
-                         IF_NONE
-                           { PUSH string "FAILED_TO_CHECK_PROPOSER_IN_COMMITTEE" ; FAILWITH }
-                           {} ;
-                         IF {} { PUSH string "PROPOSER_NOT_IN_COMMITTEE" ; FAILWITH } } ;
+                     DUP ;
+                     DIG 8 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
                      DUP 3 ;
                      CDR ;
                      IF_LEFT { DIG 8 ; DROP } { DROP ; DIG 7 ; FAILWITH } ;
@@ -1389,12 +1380,12 @@
                   CDR ;
                   IF_LEFT
                     { DUP 2 ;
-                      GET 13 ;
+                      GET 11 ;
                       DUP 2 ;
                       GET 10 ;
                       MUL ;
                       DIG 2 ;
-                      GET 11 ;
+                      GET 9 ;
                       DUP 3 ;
                       GET 7 ;
                       IF_NONE { PUSH nat 0 } {} ;
@@ -1473,10 +1464,10 @@
                       DROP ;
                       DIG 3 ;
                       DUP 6 ;
-                      GET 15 ;
+                      GET 13 ;
                       MUL ;
                       DUP 6 ;
-                      GET 11 ;
+                      GET 9 ;
                       DIG 4 ;
                       DUP 5 ;
                       DUP 5 ;
@@ -1490,10 +1481,10 @@
                       ADD ;
                       DUP ;
                       DUP 6 ;
-                      GET 16 ;
+                      GET 14 ;
                       MUL ;
                       DIG 5 ;
-                      GET 11 ;
+                      GET 9 ;
                       DIG 4 ;
                       MUL ;
                       COMPARE ;
