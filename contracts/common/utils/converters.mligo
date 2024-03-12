@@ -33,8 +33,10 @@ let address_to_key_hash
     (*
         NOTE:
         This is a workaround solution. 
-        Use the IMPLICIT instruction of type address -> option key_hash when it will be available
-        (See: https://gitlab.com/nomadic-labs/tezos/-/merge_requests/93)
+        Use the IS_IMPLICIT_ACCOUNT instruction of type address -> option key_hash when it will be available
+        (See: https://gitlab.com/tezos/tezos/-/merge_requests/12436)
+        Or pass address instead of key_hash to Tezos.voting_power instruction when it will be available
+        (See: https://gitlab.com/tezos/tezos/-/merge_requests/12425)
         
         Explanation of workaround
         Bytes.pack for an address can return the following variants depending on address type 
