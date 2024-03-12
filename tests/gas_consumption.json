@@ -1,50 +1,50 @@
 {
     "new_proposal_different_baker_nth_1": {
-        "consumed_gas": 5521,
-        "paid_storage_size_diff": 449
+        "consumed_gas": 5440,
+        "paid_storage_size_diff": 409
     },
     "new_proposal_different_baker_nth_2": {
-        "consumed_gas": 2035,
-        "paid_storage_size_diff": 237
+        "consumed_gas": 2023,
+        "paid_storage_size_diff": 197
     },
     "new_proposal_different_baker_nth_3": {
-        "consumed_gas": 2035,
-        "paid_storage_size_diff": 275
+        "consumed_gas": 2023,
+        "paid_storage_size_diff": 235
     },
     "new_proposal_different_baker_nth_4": {
-        "consumed_gas": 2035,
-        "paid_storage_size_diff": 275
+        "consumed_gas": 2023,
+        "paid_storage_size_diff": 235
     },
     "new_proposal_same_baker_nth_1": {
-        "consumed_gas": 5521,
-        "paid_storage_size_diff": 449
+        "consumed_gas": 5440,
+        "paid_storage_size_diff": 409
     },
     "new_proposal_same_baker_nth_2": {
-        "consumed_gas": 2496,
-        "paid_storage_size_diff": 170
+        "consumed_gas": 2484,
+        "paid_storage_size_diff": 130
     },
     "new_proposal_same_baker_nth_3": {
-        "consumed_gas": 2496,
-        "paid_storage_size_diff": 208
+        "consumed_gas": 2484,
+        "paid_storage_size_diff": 168
     },
     "new_proposal_same_baker_nth_4": {
-        "consumed_gas": 2496,
-        "paid_storage_size_diff": 208
+        "consumed_gas": 2484,
+        "paid_storage_size_diff": 168
     },
     "new_proposal_with_10_proposals_on_previous_voting_period": {
-        "consumed_gas": 1664,
+        "consumed_gas": 1651,
         "paid_storage_size_diff": 0
     },
     "new_proposal_with_50_proposals_on_previous_voting_period": {
-        "consumed_gas": 1664,
+        "consumed_gas": 1651,
         "paid_storage_size_diff": 0
     },
     "new_proposal_with_100_proposals_on_previous_voting_period": {
-        "consumed_gas": 1664,
+        "consumed_gas": 1651,
         "paid_storage_size_diff": 0
     },
     "test_new_proposal_with_event": {
-        "consumed_gas": 1664,
+        "consumed_gas": 1652,
         "paid_storage_size_diff": 75
     },
     "trigger_upgrade_nth_1": {
@@ -61,22 +61,22 @@
     },
     "trigger_upgrade_nth_4": {
         "consumed_gas": 2767,
-        "paid_storage_size_diff": 67
+        "paid_storage_size_diff": 107
     },
     "trigger_upgrade_nth_5": {
         "consumed_gas": 2767,
         "paid_storage_size_diff": 111
     },
     "upvote_nth_1": {
-        "consumed_gas": 2500,
+        "consumed_gas": 2487,
         "paid_storage_size_diff": 134
     },
     "upvote_nth_2": {
-        "consumed_gas": 2500,
+        "consumed_gas": 2487,
         "paid_storage_size_diff": 134
     },
     "upvote_nth_3": {
-        "consumed_gas": 2500,
+        "consumed_gas": 2487,
         "paid_storage_size_diff": 134
     },
     "vote_nth_1": {

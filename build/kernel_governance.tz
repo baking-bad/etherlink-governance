@@ -17,9 +17,7 @@
                       (pair %proposal
                          (big_map %upvoters_upvotes_count key_hash nat)
                          (big_map %upvoters_proposals (pair key_hash bytes) unit)
-                         (big_map %proposals
-                            bytes
-                            (pair (bytes %payload) (key_hash %proposer) (nat %upvotes_voting_power)))
+                         (big_map %proposals bytes (pair (key_hash %proposer) (nat %upvotes_voting_power)))
                          (option %max_upvotes_voting_power nat)
                          (option %winner_candidate bytes)
                          (nat %total_voting_power))
@@ -171,7 +169,7 @@
                  TOTAL_VOTING_POWER ;
                  NONE bytes ;
                  NONE nat ;
-                 EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                 EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                  EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                  EMPTY_BIG_MAP key_hash nat ;
                  PAIR 6 ;
@@ -221,7 +219,7 @@
                               TOTAL_VOTING_POWER ;
                               NONE bytes ;
                               NONE nat ;
-                              EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                              EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                               EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                               EMPTY_BIG_MAP key_hash nat ;
                               PAIR 6 ;
@@ -248,7 +246,7 @@
                                    RIGHT
                                      (pair (big_map key_hash nat)
                                            (big_map (pair key_hash bytes) unit)
-                                           (big_map bytes (pair bytes key_hash nat))
+                                           (big_map bytes (pair key_hash nat))
                                            (option nat)
                                            (option bytes)
                                            nat) }
@@ -265,7 +263,7 @@
                                    TOTAL_VOTING_POWER ;
                                    NONE bytes ;
                                    NONE nat ;
-                                   EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                   EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                    EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                    EMPTY_BIG_MAP key_hash nat ;
                                    PAIR 6 ;
@@ -319,7 +317,7 @@
                           TOTAL_VOTING_POWER ;
                           NONE bytes ;
                           NONE nat ;
-                          EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                          EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                           EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                           EMPTY_BIG_MAP key_hash nat ;
                           PAIR 6 ;
@@ -502,7 +500,7 @@
                      TOTAL_VOTING_POWER ;
                      NONE bytes ;
                      NONE nat ;
-                     EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                     EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                      EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                      EMPTY_BIG_MAP key_hash nat ;
                      PAIR 6 ;
@@ -552,7 +550,7 @@
                                   TOTAL_VOTING_POWER ;
                                   NONE bytes ;
                                   NONE nat ;
-                                  EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                  EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                   EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                   EMPTY_BIG_MAP key_hash nat ;
                                   PAIR 6 ;
@@ -579,7 +577,7 @@
                                        RIGHT
                                          (pair (big_map key_hash nat)
                                                (big_map (pair key_hash bytes) unit)
-                                               (big_map bytes (pair bytes key_hash nat))
+                                               (big_map bytes (pair key_hash nat))
                                                (option nat)
                                                (option bytes)
                                                nat) }
@@ -596,7 +594,7 @@
                                        TOTAL_VOTING_POWER ;
                                        NONE bytes ;
                                        NONE nat ;
-                                       EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                       EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                        EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                        EMPTY_BIG_MAP key_hash nat ;
                                        PAIR 6 ;
@@ -650,7 +648,7 @@
                               TOTAL_VOTING_POWER ;
                               NONE bytes ;
                               NONE nat ;
-                              EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                              EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                               EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                               EMPTY_BIG_MAP key_hash nat ;
                               PAIR 6 ;
@@ -710,7 +708,7 @@
                  RIGHT
                    (pair (big_map key_hash nat)
                          (big_map (pair key_hash bytes) unit)
-                         (big_map bytes (pair bytes key_hash nat))
+                         (big_map bytes (pair key_hash nat))
                          (option nat)
                          (option bytes)
                          nat) ;
@@ -731,7 +729,7 @@
                          TOTAL_VOTING_POWER ;
                          NONE bytes ;
                          NONE nat ;
-                         EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                         EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                          EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                          EMPTY_BIG_MAP key_hash nat ;
                          PAIR 6 ;
@@ -781,7 +779,7 @@
                                       TOTAL_VOTING_POWER ;
                                       NONE bytes ;
                                       NONE nat ;
-                                      EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                      EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                       EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                       EMPTY_BIG_MAP key_hash nat ;
                                       PAIR 6 ;
@@ -808,7 +806,7 @@
                                            RIGHT
                                              (pair (big_map key_hash nat)
                                                    (big_map (pair key_hash bytes) unit)
-                                                   (big_map bytes (pair bytes key_hash nat))
+                                                   (big_map bytes (pair key_hash nat))
                                                    (option nat)
                                                    (option bytes)
                                                    nat) }
@@ -825,7 +823,7 @@
                                            TOTAL_VOTING_POWER ;
                                            NONE bytes ;
                                            NONE nat ;
-                                           EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                           EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                            EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                            EMPTY_BIG_MAP key_hash nat ;
                                            PAIR 6 ;
@@ -879,7 +877,7 @@
                                   TOTAL_VOTING_POWER ;
                                   NONE bytes ;
                                   NONE nat ;
-                                  EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                  EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                   EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                   EMPTY_BIG_MAP key_hash nat ;
                                   PAIR 6 ;
@@ -926,49 +924,47 @@
                      COMPARE ;
                      LT ;
                      IF {} { PUSH string "UPVOTING_LIMIT_EXCEEDED" ; FAILWITH } ;
-                     DUP 8 ;
-                     PACK ;
-                     DUP 3 ;
-                     GET 5 ;
                      DUP 2 ;
+                     GET 5 ;
+                     DUP 9 ;
                      GET ;
                      IF_NONE { PUSH string "PROPOSAL_NOT_FOUND" ; FAILWITH } {} ;
-                     DUP 4 ;
+                     DUP 3 ;
                      GET 3 ;
                      DUP ;
-                     DUP 4 ;
-                     DUP 9 ;
+                     DUP 11 ;
+                     DUP 8 ;
                      PAIR ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_UPVOTED" ; FAILWITH } ;
-                     DIG 5 ;
+                     DIG 4 ;
                      DUP 3 ;
-                     GET 4 ;
+                     CDR ;
                      ADD ;
-                     DUP 6 ;
-                     DUP 6 ;
-                     DUP 9 ;
+                     DUP 5 ;
+                     DUP 5 ;
+                     DUP 8 ;
                      GET ;
                      IF_NONE
-                       { DIG 5 ; PUSH nat 1 ; SOME ; DUP 9 ; UPDATE }
-                       { DIG 6 ; PUSH nat 1 ; DIG 2 ; ADD ; SOME ; DUP 9 ; UPDATE } ;
+                       { DIG 4 ; PUSH nat 1 ; SOME ; DUP 8 ; UPDATE }
+                       { DIG 5 ; PUSH nat 1 ; DIG 2 ; ADD ; SOME ; DUP 8 ; UPDATE } ;
                      UPDATE 1 ;
                      DIG 2 ;
                      UNIT ;
                      SOME ;
-                     DUP 6 ;
-                     DIG 8 ;
+                     DUP 11 ;
+                     DIG 7 ;
                      PAIR ;
                      UPDATE ;
                      UPDATE 3 ;
-                     DIG 4 ;
+                     DIG 3 ;
                      GET 5 ;
                      DIG 3 ;
                      DUP 4 ;
-                     UPDATE 4 ;
+                     UPDATE 2 ;
                      SOME ;
-                     DIG 4 ;
+                     DUP 8 ;
                      UPDATE ;
                      UPDATE 5 ;
                      DUP ;
@@ -1023,7 +1019,7 @@
                          TOTAL_VOTING_POWER ;
                          NONE bytes ;
                          NONE nat ;
-                         EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                         EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                          EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                          EMPTY_BIG_MAP key_hash nat ;
                          PAIR 6 ;
@@ -1073,7 +1069,7 @@
                                       TOTAL_VOTING_POWER ;
                                       NONE bytes ;
                                       NONE nat ;
-                                      EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                      EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                       EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                       EMPTY_BIG_MAP key_hash nat ;
                                       PAIR 6 ;
@@ -1100,7 +1096,7 @@
                                            RIGHT
                                              (pair (big_map key_hash nat)
                                                    (big_map (pair key_hash bytes) unit)
-                                                   (big_map bytes (pair bytes key_hash nat))
+                                                   (big_map bytes (pair key_hash nat))
                                                    (option nat)
                                                    (option bytes)
                                                    nat) }
@@ -1117,7 +1113,7 @@
                                            TOTAL_VOTING_POWER ;
                                            NONE bytes ;
                                            NONE nat ;
-                                           EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                           EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                            EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                            EMPTY_BIG_MAP key_hash nat ;
                                            PAIR 6 ;
@@ -1171,7 +1167,7 @@
                                   TOTAL_VOTING_POWER ;
                                   NONE bytes ;
                                   NONE nat ;
-                                  EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                                  EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                   EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                   EMPTY_BIG_MAP key_hash nat ;
                                   PAIR 6 ;
@@ -1218,39 +1214,36 @@
                      COMPARE ;
                      LT ;
                      IF {} { PUSH string "UPVOTING_LIMIT_EXCEEDED" ; FAILWITH } ;
-                     DUP 8 ;
-                     PACK ;
-                     DUP 3 ;
-                     GET 5 ;
                      DUP 2 ;
+                     GET 5 ;
+                     DUP 9 ;
                      MEM ;
                      NOT ;
                      IF {} { PUSH string "PROPOSAL_ALREADY_CREATED" ; FAILWITH } ;
-                     DUP 3 ;
-                     DUP 3 ;
-                     DUP 7 ;
+                     DUP 2 ;
+                     DUP 2 ;
+                     DUP 6 ;
                      GET ;
                      IF_NONE
-                       { DIG 2 ; PUSH nat 1 ; SOME ; DUP 7 ; UPDATE }
-                       { DIG 3 ; PUSH nat 1 ; DIG 2 ; ADD ; SOME ; DUP 7 ; UPDATE } ;
+                       { SWAP ; PUSH nat 1 ; SOME ; DUP 6 ; UPDATE }
+                       { DIG 2 ; PUSH nat 1 ; DIG 2 ; ADD ; SOME ; DUP 6 ; UPDATE } ;
                      UPDATE 1 ;
-                     DUP 3 ;
+                     DUP 2 ;
                      GET 3 ;
                      UNIT ;
                      SOME ;
-                     DUP 4 ;
-                     DUP 8 ;
+                     DUP 10 ;
+                     DUP 7 ;
                      PAIR ;
                      UPDATE ;
                      UPDATE 3 ;
-                     DIG 2 ;
+                     SWAP ;
                      GET 5 ;
-                     DUP 4 ;
-                     DIG 5 ;
-                     DUP 10 ;
-                     PAIR 3 ;
+                     DUP 3 ;
+                     DIG 4 ;
+                     PAIR ;
                      SOME ;
-                     DIG 3 ;
+                     DUP 8 ;
                      UPDATE ;
                      UPDATE 5 ;
                      DUP ;
@@ -1323,7 +1316,7 @@
              TOTAL_VOTING_POWER ;
              NONE bytes ;
              NONE nat ;
-             EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+             EMPTY_BIG_MAP bytes (pair key_hash nat) ;
              EMPTY_BIG_MAP (pair key_hash bytes) unit ;
              EMPTY_BIG_MAP key_hash nat ;
              PAIR 6 ;
@@ -1373,7 +1366,7 @@
                           TOTAL_VOTING_POWER ;
                           NONE bytes ;
                           NONE nat ;
-                          EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                          EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                           EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                           EMPTY_BIG_MAP key_hash nat ;
                           PAIR 6 ;
@@ -1400,7 +1393,7 @@
                                RIGHT
                                  (pair (big_map key_hash nat)
                                        (big_map (pair key_hash bytes) unit)
-                                       (big_map bytes (pair bytes key_hash nat))
+                                       (big_map bytes (pair key_hash nat))
                                        (option nat)
                                        (option bytes)
                                        nat) }
@@ -1417,7 +1410,7 @@
                                TOTAL_VOTING_POWER ;
                                NONE bytes ;
                                NONE nat ;
-                               EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                               EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                                EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                                EMPTY_BIG_MAP key_hash nat ;
                                PAIR 6 ;
@@ -1471,7 +1464,7 @@
                       TOTAL_VOTING_POWER ;
                       NONE bytes ;
                       NONE nat ;
-                      EMPTY_BIG_MAP bytes (pair bytes key_hash nat) ;
+                      EMPTY_BIG_MAP bytes (pair key_hash nat) ;
                       EMPTY_BIG_MAP (pair key_hash bytes) unit ;
                       EMPTY_BIG_MAP key_hash nat ;
                       PAIR 6 ;

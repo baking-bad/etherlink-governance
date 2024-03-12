@@ -58,21 +58,18 @@ type config_t = {
     'pt - payload type. The value that bakers vote for
 *)
 type 'pt proposal_t = {
-    payload : 'pt;
     proposer : key_hash;
     upvotes_voting_power : nat;
 }
 
-type 'pt proposals_t = (bytes, ('pt proposal_t)) big_map
-
-type payload_key_t = bytes
+type 'pt proposals_t = ('pt, ('pt proposal_t)) big_map
 
 type upvoters_upvotes_count_t = (key_hash, nat) big_map
-type upvoters_proposals_t = (key_hash * payload_key_t, unit) big_map
+type 'pt upvoters_proposals_t = (key_hash * 'pt, unit) big_map
 
 type 'pt proposal_period_t = {
     upvoters_upvotes_count : upvoters_upvotes_count_t;
-    upvoters_proposals : upvoters_proposals_t;
+    upvoters_proposals : 'pt upvoters_proposals_t;
     proposals : 'pt proposals_t;
     max_upvotes_voting_power : nat option;
     winner_candidate : 'pt option;
