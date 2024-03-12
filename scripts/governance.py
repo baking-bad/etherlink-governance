@@ -8,7 +8,7 @@ from enum import Enum
 
 ContractType = Enum('ContractType', ['kernel_governance', 'sequencer_governance'])
 
-def originate_contract(contract_type, manager, config, last_winner):
+def originate_contract(contract_type, manager, config):
     if contract_type == ContractType.kernel_governance.name:
         return KernelGovernance.originate(manager, config).send()
     elif contract_type == ContractType.sequencer_governance.name:
