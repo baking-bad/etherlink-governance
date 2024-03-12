@@ -290,9 +290,6 @@ type config_t = {
     (* Number of proposals that an account may upvote and submit *)
     upvoting_limit : nat;               
 
-    (* Another governance contract which keeps accounts that can submit new proposals (if None then any proposer is allowed) *)
-    proposers_governance_contract : address option;
-
     (* 
         The scale for proposal_quorum, promotion_quorum and promotion_supermajority params. 
         For example if config.scale = 100 and config.proposal_quorum = 80 
