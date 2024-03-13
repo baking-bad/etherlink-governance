@@ -23,11 +23,6 @@ def originate_contract(contract_type, manager, config):
     help='"kernel_governance" or "sequencer_governance"',
 )
 @click.option(
-    '--started_at_level',
-    required=True,
-    help='Block at which the first period of voting will start',
-)
-@click.option(
     '--period_length',
     default=75,
     help='The period life-time (in blocks), default: 75',
@@ -66,7 +61,6 @@ def originate_contract(contract_type, manager, config):
 @click.option('--rpc-url', default=None, help='Tezos RPC URL.')
 def deploy_contract(
     contract: str,
-    started_at_level: int,
     period_length: int,
     adoption_period_sec: int,
     upvoting_limit: int,
@@ -77,10 +71,28 @@ def deploy_contract(
     private_key: Optional[str],
     rpc_url: Optional[str],
 ) -> KernelGovernance:
-    """Deploys Kernel Governance contract using provided key as a manager"""
+    """Deploys a governance contract using provided key as a manager"""
 
     private_key = private_key or load_or_ask('PRIVATE_KEY', is_secret=True)
     rpc_url = rpc_url or load_or_ask('RPC_URL')
+
+    manager = pytezos.using(shell=rpc_url, key=private_key)
+    metadata = manager.shell.head.metadata()
+    current_level = metadata['level_info']['level']
+    voting_position = metadata['voting_period_info']['position']
+    started_at_level = current_level - voting_position
+    protocol_period_length = voting_position + metadata['voting_period_info']['remaining'] + 1
+
+    print('*****')
+    print('metadata: ')
+    print('current_level', current_level)
+    print('protocol_period_length', protocol_period_length)
+    print('voting_position', voting_position)
+    print('started_at_level', started_at_level)
+    print('*****')
+
+    if (protocol_period_length % period_length) != 0: 
+        raise Exception(f'Period length is incorrect. protocol_period_length={protocol_period_length}, period_length={period_length}') 
 
     config = {
         'started_at_level': int(started_at_level),
@@ -92,8 +104,7 @@ def deploy_contract(
         'promotion_quorum': int(promotion_quorum),
         'promotion_supermajority': int(promotion_supermajority),
     }
-    
-    manager = pytezos.using(shell=rpc_url, key=private_key)
+
     opg = originate_contract(contract, manager, config)
     manager.wait(opg)
     kernelGovernance = KernelGovernance.from_opg(manager, opg)
