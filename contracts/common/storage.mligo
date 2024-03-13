@@ -54,17 +54,16 @@ type config_t = {
     promotion_supermajority : nat;      
 }
 
-(*
-    'pt - payload type. The value that bakers vote for
-*)
 type proposal_t = {
     proposer : key_hash;
     upvotes_voting_power : nat;
 }
 
-type 'pt proposals_t = ('pt, (proposal_t)) big_map
+(* 'pt - payload type. The value that bakers vote for *)
+type 'pt proposals_t = ('pt, proposal_t) big_map
 
 type upvoters_upvotes_count_t = (key_hash, nat) big_map
+
 type 'pt upvoters_proposals_t = (key_hash * 'pt, unit) big_map
 
 type 'pt proposal_period_t = {
