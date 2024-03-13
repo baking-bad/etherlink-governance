@@ -24,11 +24,6 @@ poetry run deploy_contract --contract kernel_governance --rpc-url https://rpc.tz
 poetry run deploy_contract --contract sequencer_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --adoption_period_sec 60
 ```
 
-### Deploy Proposers Governance contract
-```
-poetry run deploy_contract --contract proposers_governance --rpc-url https://rpc.tzkt.io/ghostnet --period_length 128 --scale 10000 --proposal_quorum 1 --promotion_quorum 2 --promotion_supermajority 9000 --started_at_level 5488641 --adoption_period_sec 60
-```
-
 ## Deployed contracts
 
 ### Kernel Governance
@@ -188,62 +183,6 @@ octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "
 
 ```bash
 octez-client transfer 0 from tz1RfbwbXjE8UaRLLjZjUyxbj4KCxibTp9xN to KT1Bda2EHR3pwjPgQc6mBHwtfCP8Cuf5ud5j --entrypoint "trigger_committee_upgrade" --arg "\"sr1EStimadnRRA3vnjpWV1RwNAsDbM3JaDt6\""
-```
-
-## Proposers governance contract
-
-This contract serves as a supplementary contract for other governance contracts. The contract includes, as a payload, the addresses of allowed proposers for the main governance contract, which in turn utilizes the check_address_in_committee view of this contract to verify allowed proposers.
-
-### Entrypoints
-
-#### new_proposal
-
-Creates and upvotes a new proposal.
-
-##### Client command
-
-```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "new_proposal" --arg "%ADDRESSES%"
-```
-
-##### Example
-
-```bash
-octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "new_proposal" --arg "{ \"tz1KmScKtmTaeVQQBPXqi29Q846VkEbh39DQ\" ; \"tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq\" }"
-```
-
-#### upvote_proposal
-
-Upvotes an existing proposal.
-
-##### Client command
-
-```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS% --entrypoint "upvote_proposal" --arg "%ADDRESSES%"
-```
-
-##### Example
-
-```bash
-octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "upvote_proposal" --arg "{ \"tz1KmScKtmTaeVQQBPXqi29Q846VkEbh39DQ\" ; \"tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq\" }"
-```
-
-#### vote
-
-Votes with **yea**, **nay** or **pass** on the proposal that has advanced to the promotion period.
-
-##### Client command
-
-```bash
-octez-client transfer 0 from %YOUR_ADDRESS% to %CONTRACT_ADDRESS%  --entrypoint "vote" --arg "\"%YOUR_VOTE%\""
-```
-
-where `%YOUR_VOTE%` is one of the values: `yea`, `nay` or `pass`
-
-##### Example
-
-```bash
-octez-client transfer 0 from tz1RLPEeMxbJYQBFbXYw8WHdXjeUjnG5ZXNq to KT1FRzozuzFMWLimpFeSdADHTMxzU8KtgCr9 --entrypoint "vote" --arg "\"yea\""
 ```
 
 ## The get_voting_state on-chain view and voting_finished events
