@@ -124,3 +124,14 @@ def originate_from_file(
     raw_contract = ContractInterface.from_file(filename)
     contract = raw_contract.using(key=client.key, shell=client.shell)
     return contract.originate(initial_storage=storage)
+
+def get_digits(value: float) -> int:
+    result = 0
+    while(value % 1 != 0):
+        result += 1
+        value *= 10
+    return result
+
+def normalize_params(values : list[float]) -> list[int]:
+    max_digits = max(map(get_digits, values))
+    return list(map(lambda v: int(v * 10**max_digits), values))
