@@ -1,22 +1,14 @@
 import json
 from pytezos import pytezos, PyTezosClient
+from scripts.contract_type import ContractType
 from tests.helpers.contracts.sequencer_governance import SequencerGovernance
 from tests.helpers.contracts.kernel_governance import KernelGovernance
 from typing import Optional
 import click
 from scripts.environment import load_or_ask
-from enum import Enum
+from tests.helpers.metadata import Metadata
 from tests.helpers.utility import normalize_params
-
-ContractType = Enum('ContractType', ['kernel_governance', 'sequencer_governance'])
-
-def originate_contract(contract_type, manager, config):
-    if contract_type == ContractType.kernel_governance.name:
-        return KernelGovernance.originate(manager, config).send()
-    elif contract_type == ContractType.sequencer_governance.name:
-        return SequencerGovernance.originate(manager, config).send()
-    else:
-        raise ValueError("Incorrect contract_type")
+from scripts.metadata import metadata_by_contract_type
 
 @click.command()
 @click.option(
@@ -69,6 +61,7 @@ def deploy_contract(
 ) -> KernelGovernance:
     """Deploys a governance contract using provided key as a manager"""
 
+    contract_type = ContractType[contract]
     period_length = int(period_length)
     adoption_period_sec = int(adoption_period_sec)
     upvoting_limit = int(upvoting_limit)
@@ -92,6 +85,7 @@ def deploy_contract(
 
     normalized_params = normalize_params([100, proposal_quorum, promotion_quorum, promotion_supermajority])
     [scale, proposal_quorum, promotion_quorum, promotion_supermajority] = normalized_params
+    metadata = metadata_by_contract_type[contract_type]
     
     config = {
         'started_at_level': protocol_voting_started_at_level,
@@ -108,20 +102,23 @@ def deploy_contract(
     print('smart_contact_config:', json.dumps(config, indent=4))
 
     print('')
+    print('smart_contact_metadata:', json.dumps(metadata, indent=4))
+
+    print('')
     if not click.confirm('Do you want to originate the smart contract?', default=True):
         return 
 
-    opg = originate_contract(contract, manager, config)
+    opg = originate_contract(contract_type, manager, config, metadata)
     manager.wait(opg)
     kernelGovernance = KernelGovernance.from_opg(manager, opg)
     return kernelGovernance
 
 def get_blockchain_info(manager: PyTezosClient) -> dict:
-    metadata = manager.shell.head.metadata()
-    current_level = int(metadata['level_info']['level'])
-    protocol_voting_position = int(metadata['voting_period_info']['position'])
+    info = manager.shell.head.metadata()
+    current_level = int(info['level_info']['level'])
+    protocol_voting_position = int(info['voting_period_info']['position'])
     protocol_voting_started_at_level = current_level - protocol_voting_position
-    protocol_voting_period_length = protocol_voting_position + int(metadata['voting_period_info']['remaining']) + 1
+    protocol_voting_period_length = protocol_voting_position + int(info['voting_period_info']['remaining']) + 1
 
     return {
         'rpc_url': manager.shell.node.uri[0],
@@ -130,3 +127,11 @@ def get_blockchain_info(manager: PyTezosClient) -> dict:
         'protocol_voting_position': protocol_voting_position,
         'protocol_voting_started_at_level': protocol_voting_started_at_level
     }
+
+def originate_contract(contract_type: ContractType, manager: PyTezosClient, config: dict, metadata: dict):
+    if contract_type in [ContractType.kernel_regular_governance, ContractType.kernel_security_governance]:
+        return KernelGovernance.originate(manager, config, metadata).send()
+    elif contract_type == ContractType.sequencer_governance:
+        return SequencerGovernance.originate(manager, config, metadata).send()
+    else:
+        raise ValueError("Incorrect contract_type")

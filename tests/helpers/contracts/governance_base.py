@@ -31,8 +31,7 @@ class GovernanceBase(ContractHelper):
             'config': config,
             'voting_context': None,
             'last_winner': last_winner,
-            'metadata': {}
-            # 'metadata': metadata
+            'metadata': metadata
         }
     
     def get_voting_state(self):

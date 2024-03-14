@@ -12,11 +12,10 @@ class Metadata:
 
     template = {
         'version': '0.1.0',
-        'name': 'Etherlink Governance',
-        'description': 'The Etherlink Governance consists of contracts designed for upgrading Etherlink kernel and Sequencer committee by voting.',
+        'name': 'Test contract name',
+        'description': 'Test contract description',
         'interfaces': ['TZIP-016'],
         'license': {'name': 'MIT'},
-        'homepage': 'TODO',
     }
 
     @staticmethod

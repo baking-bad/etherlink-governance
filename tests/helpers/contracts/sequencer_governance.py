@@ -12,14 +12,11 @@ from tests.helpers.metadata import Metadata
 
 class SequencerGovernance(GovernanceBase):
     @classmethod
-    def originate(self, client: PyTezosClient, custom_config=None) -> OperationGroup:
+    def originate(self, client: PyTezosClient, custom_config=None, metadata=None) -> OperationGroup:
         """Deploys Sequencer Governance"""
 
-        metadata = Metadata.make_default(
-            name='Sequencer Committee Governance',
-            description='The Sequencer Committee Governance contract allows bakers to make proposals and vote on sequencer committee',
-        )
-
+        metadata = metadata if metadata != None else dict()
+        metadata = Metadata.make_default(**metadata)
         storage = self.make_storage(metadata, custom_config=custom_config)
         filename = join(get_build_dir(), 'sequencer_governance.tz')
 
