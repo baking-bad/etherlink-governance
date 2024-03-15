@@ -4,21 +4,16 @@
   view "get_kernel_upgrade_payload"
        (pair (bytes %kernel_root_hash) (timestamp %activation_timestamp))
        bytes
-       { LAMBDA nat bytes { BYTES } ;
-         LAMBDA
-           (pair (lambda nat bytes) (pair nat nat))
+       { LAMBDA
+           (pair nat nat)
            bytes
            { UNPAIR ;
-             SWAP ;
-             UNPAIR ;
              PUSH nat 56 ;
              DUP 2 ;
              COMPARE ;
              LT ;
-             IF { ADD ; EXEC }
-                { DUP 3 ;
-                  SWAP ;
-                  EXEC ;
+             IF { ADD ; BYTES }
+                { BYTES ;
                   DUP ;
                   SIZE ;
                   PUSH nat 9 ;
@@ -31,13 +26,9 @@
                   DIG 2 ;
                   ADD ;
                   ADD ;
-                  DIG 2 ;
-                  SWAP ;
-                  EXEC ;
+                  BYTES ;
                   CONCAT } } ;
-         DUP 2 ;
-         APPLY ;
-         DIG 2 ;
+         SWAP ;
          CAR ;
          UNPAIR ;
          PUSH nat 33 ;
@@ -53,9 +44,7 @@
          PUSH string "NEGATIVE_TIMESTAMP" ;
          SWAP ;
          IF_NONE { FAILWITH } { SWAP ; DROP } ;
-         DIG 3 ;
-         SWAP ;
-         EXEC ;
+         BYTES ;
          PUSH bytes 0x ;
          PUSH int 1 ;
          PUSH int 1 ;
@@ -150,21 +139,16 @@
              (bytes %pool_address)
              (timestamp %activation_timestamp))
        bytes
-       { LAMBDA nat bytes { BYTES } ;
-         LAMBDA
-           (pair (lambda nat bytes) (pair nat nat))
+       { LAMBDA
+           (pair nat nat)
            bytes
            { UNPAIR ;
-             SWAP ;
-             UNPAIR ;
              PUSH nat 56 ;
              DUP 2 ;
              COMPARE ;
              LT ;
-             IF { ADD ; EXEC }
-                { DUP 3 ;
-                  SWAP ;
-                  EXEC ;
+             IF { ADD ; BYTES }
+                { BYTES ;
                   DUP ;
                   SIZE ;
                   PUSH nat 9 ;
@@ -177,13 +161,9 @@
                   DIG 2 ;
                   ADD ;
                   ADD ;
-                  DIG 2 ;
-                  SWAP ;
-                  EXEC ;
+                  BYTES ;
                   CONCAT } } ;
-         DUP 2 ;
-         APPLY ;
-         DIG 2 ;
+         SWAP ;
          CAR ;
          UNPAIR 3 ;
          DUP ;
@@ -218,9 +198,7 @@
          PUSH string "NEGATIVE_TIMESTAMP" ;
          SWAP ;
          IF_NONE { FAILWITH } { SWAP ; DROP } ;
-         DIG 5 ;
-         SWAP ;
-         EXEC ;
+         BYTES ;
          PUSH bytes 0x ;
          PUSH int 1 ;
          PUSH int 1 ;

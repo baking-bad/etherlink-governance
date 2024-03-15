@@ -32,7 +32,6 @@
              (pair (bytes %payload) (big_map %trigger_history address unit)))
           (big_map %metadata string bytes)) ;
   code { PUSH string "NOT_PROPOSAL_PERIOD" ;
-         LAMBDA nat bytes { BYTES } ;
          LAMBDA
            address
            key_hash
@@ -80,19 +79,15 @@
              EQ ;
              IF { DROP } { FAILWITH } } ;
          LAMBDA
-           (pair (lambda nat bytes) (pair nat nat))
+           (pair nat nat)
            bytes
            { UNPAIR ;
-             SWAP ;
-             UNPAIR ;
              PUSH nat 56 ;
              DUP 2 ;
              COMPARE ;
              LT ;
-             IF { ADD ; EXEC }
-                { DUP 3 ;
-                  SWAP ;
-                  EXEC ;
+             IF { ADD ; BYTES }
+                { BYTES ;
                   DUP ;
                   SIZE ;
                   PUSH nat 9 ;
@@ -105,12 +100,8 @@
                   DIG 2 ;
                   ADD ;
                   ADD ;
-                  DIG 2 ;
-                  SWAP ;
-                  EXEC ;
+                  BYTES ;
                   CONCAT } } ;
-         DUP 3 ;
-         APPLY ;
          LAMBDA
            unit
            unit
@@ -145,12 +136,12 @@
                  EDIV ;
                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
                  CAR } } ;
-         DIG 7 ;
+         DIG 6 ;
          UNPAIR ;
          IF_LEFT
            { DIG 3 ;
              DIG 6 ;
-             DIG 8 ;
+             DIG 7 ;
              DROP 3 ;
              UNIT ;
              DIG 4 ;
@@ -357,9 +348,7 @@
              PUSH string "NEGATIVE_TIMESTAMP" ;
              SWAP ;
              IF_NONE { FAILWITH } { SWAP ; DROP } ;
-             DIG 8 ;
-             SWAP ;
-             EXEC ;
+             BYTES ;
              PUSH bytes 0x ;
              PUSH int 1 ;
              PUSH int 1 ;
@@ -483,8 +472,7 @@
              DIG 2 ;
              CONS }
            { DIG 5 ;
-             DIG 7 ;
-             DROP 2 ;
+             DROP ;
              IF_LEFT
                { DIG 6 ;
                  DROP ;

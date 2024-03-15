@@ -1,5 +1,6 @@
 #import "../errors.mligo" "Errors"
 
+[@inline]
 let nat_to_bytes 
         (value : nat) 
         : bytes =
