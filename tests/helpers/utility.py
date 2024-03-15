@@ -135,3 +135,7 @@ def get_digits(value: float) -> int:
 def normalize_params(values : list[float]) -> list[int]:
     max_digits = max(map(get_digits, values))
     return list(map(lambda v: int(v * 10**max_digits), values))
+
+def validate_percent_value(value : float):
+    if(not (0 <= value <= 100)):
+        raise Exception(f'Incorrect percentage value \'{value}\'. Should be in range [0, 100]') 

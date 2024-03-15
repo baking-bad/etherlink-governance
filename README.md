@@ -16,17 +16,17 @@ poetry run pytest
 
 ### Deploy Kernel Governance contract
 ```
-poetry run deploy_contract --rpc-url https://rpc.tzkt.io/ghostnet --contract kernel_regular_governance --upvoting_limit 20 --period_length 128 --adoption_period_sec 57600 --proposal_quorum 0.01 --promotion_quorum 0.02 --promotion_supermajority 95
+poetry run deploy_contract --rpc-url https://rpc.tzkt.io/ghostnet --contract kernel_regular_governance --upvoting_limit 20 --period_length 128 --adoption_period_sec 57600 --proposal_quorum_percent 10.5 --promotion_quorum_percent 15.5 --promotion_supermajority_percent 95.7
 ```
 
 ### Deploy Kernel Security Governance contract
 ```
-poetry run deploy_contract --rpc-url https://rpc.tzkt.io/ghostnet --contract kernel_security_governance --upvoting_limit 20 --period_length 128 --adoption_period_sec 57600 --proposal_quorum 0.01 --promotion_quorum 0.02 --promotion_supermajority 95
+poetry run deploy_contract --rpc-url https://rpc.tzkt.io/ghostnet --contract kernel_security_governance --upvoting_limit 20 --period_length 128 --adoption_period_sec 57600 --proposal_quorum_percent 10.5 --promotion_quorum_percent 15.5 --promotion_supermajority_percent 95.7
 ```
 
 ### Deploy Sequencer Committee Governance contract
 ```
-poetry run deploy_contract --rpc-url https://rpc.tzkt.io/ghostnet --contract sequencer_governance --upvoting_limit 20 --period_length 128 --adoption_period_sec 57600 --proposal_quorum 0.01 --promotion_quorum 0.02 --promotion_supermajority 95
+poetry run deploy_contract --rpc-url https://rpc.tzkt.io/ghostnet --contract sequencer_governance --upvoting_limit 20 --period_length 128 --adoption_period_sec 57600 --proposal_quorum_percent 10.5 --promotion_quorum_percent 15.5 --promotion_supermajority_percent 95.7
 ```
 
 ## Kernel governance contract
